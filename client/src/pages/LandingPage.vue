@@ -3,16 +3,17 @@
     <header class="flex items-center justify-between border-b px-8 py-4">
       <div class="font-[JetBrains_Mono] text-xl font-semibold">Geoguess Lite</div>
       <nav class="flex gap-4">
-        <Button
-          variant="ghost"
-          class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
-        >
+        <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg">
           [Github]
         </Button>
-        <Button
+        <Button v-if="isCurrentUserLoaded && !currentUser"
           class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-        >
+          @click="signUpWithGoogle">
           Sign Up
+        </Button>
+        <Button v-else variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
+          @click="signOut">
+          Sign Out
         </Button>
       </nav>
     </header>
@@ -27,20 +28,14 @@
               <p class="text-muted-foreground mb-8 font-[JetBrains_Mono] text-2xl">
                 Explore the world, no paywalls, no limits.
               </p>
-              <Button
-                size="lg"
-                class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-              >
+              <Button size="lg"
+                class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
                 Get Started
               </Button>
             </div>
             <div class="flex justify-center">
-              <img
-                src="/images/hero.png"
-                alt="Hero Image"
-                class="floating-animation h-auto max-w-full rounded-full"
-                style="box-shadow: rgb(0 0 0 / 56%) 0 22px 70px 4px"
-              />
+              <img src="/images/hero.png" alt="Hero Image" class="floating-animation h-auto max-w-full rounded-full"
+                style="box-shadow: rgb(0 0 0 / 56%) 0 22px 70px 4px" />
             </div>
           </div>
         </div>
@@ -55,16 +50,11 @@
             </p>
           </div>
           <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card
-              v-for="(content, index) in cardContents"
-              :key="index"
-              :class="`${content.class} border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`"
-            >
+            <Card v-for="(content, index) in cardContents" :key="index"
+              :class="`${content.class} border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`">
               <CardContent class="text-left">
-                <div
-                  class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border p-2 text-3xl"
-                  :class="content.emojiClass"
-                >
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border p-2 text-3xl"
+                  :class="content.emojiClass">
                   {{ content.emoji }}
                 </div>
                 <CardTitle class="mb-2 font-[Roboto] text-xl">
@@ -89,11 +79,7 @@
             </p>
           </div>
           <Accordion type="single" collapsible class="w-full">
-            <AccordionItem
-              v-for="(content, index) in faqContents"
-              :key="index"
-              :value="`item-${index}`"
-            >
+            <AccordionItem v-for="(content, index) in faqContents" :key="index" :value="`item-${index}`">
               <AccordionTrigger class="text-left font-[Roboto] text-xl">
                 {{ content.question }}
               </AccordionTrigger>
@@ -110,16 +96,11 @@
         <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
           <div class="font-[JetBrains_Mono] text-xl font-semibold">Geoguess Lite</div>
           <nav class="flex gap-4">
-            <Button
-              variant="ghost"
-              class="text-muted-foreground cursor-pointer font-[Roboto] text-base"
-            >
+            <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[Roboto] text-base">
               Github
             </Button>
-            <Button
-              variant="ghost"
-              class="text-muted-foreground cursor-pointer font-[Roboto] text-base"
-            >
+            <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[Roboto] text-base"
+              @click="signUpWithGoogle">
               Sign Up
             </Button>
           </nav>
@@ -138,6 +119,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { useCurrentUser, useFirebaseAuth, useIsCurrentUserLoaded } from 'vuefire'
+import { signInWithPopup } from 'firebase/auth'
+import type { FirebaseError } from 'firebase/app'
+import { googleAuthProvider } from '@/lib/firebase'
 
 const cardContents = [
   {
@@ -207,6 +192,30 @@ const faqContents = [
       'GeoGuess Lite is fully open-source and built to be easily self-hosted. You can deploy it on any static hosting service and connect it with your own serverless backend if you prefer full control.',
   },
 ]
+
+const isCurrentUserLoaded = useIsCurrentUserLoaded()
+const currentUser = useCurrentUser()
+const auth = useFirebaseAuth()!
+
+const signUpWithGoogle = async () => {
+  try {
+    await signInWithPopup(auth, googleAuthProvider)
+
+  } catch (error) {
+    console.error(
+      (error as FirebaseError).code,
+      (error as FirebaseError).message,
+    );
+  }
+}
+
+const signOut = async () => {
+  try {
+    await auth.signOut()
+  } catch (error) {
+    console.error('signOut error:', error)
+  }
+}
 </script>
 
 <style scoped>
