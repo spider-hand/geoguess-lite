@@ -1,1 +1,7 @@
 npx lint-staged
+
+cd server
+
+source .venv/bin/activate
+
+pre-commit run --all-files

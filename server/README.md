@@ -10,13 +10,13 @@
 1. Start LocalStack to manage Secrets Manager locally:
 
 ```bash
-docker compose up
+docker compose up -d
 ```
 
 2. Save secrets:
 
 ```bash
-awslocal --region ap-northeast-1 secretsmanager create-secret --name geoguess-lite-localstack-secret --secret-string file://secrets.localstack.json
+awslocal --region ap-northeast-1 secretsmanager create-secret --name geoguess-lite-localstack-secret --secret-string file://secret.localstack.json
 ```
 
 Check if the secrets have been saved:

@@ -12,5 +12,5 @@ services:
       - DEBUG=${DEBUG:-0}
       - SERVICES=secretsmanager
     volumes:
-      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "${LOCALSTACK_VOLUME_DIR:-./server/volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"

@@ -7,11 +7,8 @@ def lambda_handler(event, context):
         secret_data = get_secret()
     except Exception as e:
         secret_data = {"error": str(e)}
-    
+
     return {
         "statusCode": 200,
-        "body": json.dumps({
-            "message": "pong",
-            "secret": secret_data
-        }),
+        "body": json.dumps({"message": "pong", "secret": secret_data}),
     }

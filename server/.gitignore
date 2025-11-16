@@ -252,3 +252,6 @@ secret.**.json
 # SAM config
 samconfig.**.toml
 !samconfig.example.toml
+
+# LocalStack
+volume/
