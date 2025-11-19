@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   geoguess-lite-api
@@ -7,8 +7,13 @@ Description: >
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'Accept, Accept-Encoding, Accept-Language, Authorization, Connection, Host, Origin, Referer, Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site, User-Agent'"
+      AllowOrigin: "'*'"
   Function:
-    Timeout: 3
+    Timeout: 30
 
 Parameters:
   Environment:
@@ -18,8 +23,42 @@ Parameters:
       - dev
       - prod
     Default: localstack
+  SecretArn:
+    Type: String
+  FirebaseServiceAccountArn:
+    Type: String
 
 Resources:
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Auth:
+        DefaultAuthorizer: FirebaseAuthorizer
+        Authorizers:
+          FirebaseAuthorizer:
+            FunctionArn: !GetAtt FirebaseAuthFunction.Arn
+            Identity:
+              Headers:
+                - Authorization
+
+  FirebaseAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: functions.auth.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref FirebaseServiceAccountArn
+
   HealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -31,20 +70,15 @@ Resources:
       Environment:
         Variables:
           Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref FirebaseServiceAccountArn
       Events:
         HealthCheck:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /ping
             Method: get
-
-Outputs:
-  HealthCheckApi:
-    Description: "API Gateway endpoint URL for Prod stage for Health Check function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/ping/"
-  HealthCheckFunction:
-    Description: "Health Check Lambda Function ARN"
-    Value: !GetAtt HealthCheckFunction.Arn
-  HealthCheckFunctionIamRole:
-    Description: "Implicit IAM Role created for Health Check function"
-    Value: !GetAtt HealthCheckFunctionRole.Arn
