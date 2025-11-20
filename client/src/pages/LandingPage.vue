@@ -13,7 +13,7 @@
         </Button>
         <Button v-else variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
           @click="signOut">
-          Sign Out
+          [Sign Out]
         </Button>
       </nav>
     </header>
@@ -29,7 +29,8 @@
                 Explore the world, no paywalls, no limits.
               </p>
               <Button size="lg"
-                class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                @click="currentUser ? router.push('/game') : signUpWithGoogle()" :disabled="!isCurrentUserLoaded">
                 Get Started
               </Button>
             </div>
@@ -99,9 +100,13 @@
             <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[Roboto] text-base">
               Github
             </Button>
-            <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[Roboto] text-base"
-              @click="signUpWithGoogle">
+            <Button v-if="isCurrentUserLoaded && !currentUser" variant="ghost"
+              class="text-muted-foreground cursor-pointer font-[Roboto] text-base" @click="signUpWithGoogle">
               Sign Up
+            </Button>
+            <Button v-else variant="ghost" class="text-muted-foreground cursor-pointer font-[Roboto] text-base"
+              @click="signOut">
+              Sign Out
             </Button>
           </nav>
         </div>
@@ -123,6 +128,7 @@ import { useCurrentUser, useFirebaseAuth, useIsCurrentUserLoaded } from 'vuefire
 import { signInWithPopup } from 'firebase/auth'
 import type { FirebaseError } from 'firebase/app'
 import { googleAuthProvider } from '@/lib/firebase'
+import { useRouter } from 'vue-router'
 
 const cardContents = [
   {
@@ -196,6 +202,8 @@ const faqContents = [
 const isCurrentUserLoaded = useIsCurrentUserLoaded()
 const currentUser = useCurrentUser()
 const auth = useFirebaseAuth()!
+
+const router = useRouter()
 
 const signUpWithGoogle = async () => {
   try {
