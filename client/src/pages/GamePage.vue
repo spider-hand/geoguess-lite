@@ -3,10 +3,7 @@
     <header class="flex items-center justify-between border-b px-8 py-4">
       <div class="font-[JetBrains_Mono] text-xl font-semibold">Geoguess Lite</div>
       <nav class="flex gap-4">
-        <Button
-          variant="ghost"
-          class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
-        >
+        <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg">
           [Github]
         </Button>
       </nav>
@@ -19,22 +16,13 @@
         </p>
       </div>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        <CustomCardComponent
-          v-for="(mode, index) in gameModes"
-          :key="index"
-          :title="mode.title"
-          :description="mode.description"
-          :emoji="mode.emoji"
-          :bg-class="mode.class"
-          :emoji-class="mode.emojiClass"
-        />
+        <CustomCardComponent v-for="(mode, index) in gameModes" :key="index" :title="mode.title"
+          :description="mode.description" :emoji="mode.emoji" :bg-class="mode.class" :emoji-class="mode.emojiClass" />
       </div>
       <Card class="border">
         <CardContent class="flex flex-col gap-8">
           <div>
-            <div
-              class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl"
-            >
+            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl">
               ⚙️
             </div>
             <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Game Configuration</h2>
@@ -66,25 +54,10 @@
                 <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Rounds & Time</h3>
               </div>
               <div class="flex flex-col gap-8">
-                <CustomSliderComponent
-                  label="Number of Rounds"
-                  v-model="rounds"
-                  :min="5"
-                  :max="10"
-                  :step="1"
-                  unit=" rounds"
-                />
-                <CustomSliderComponent
-                  label="Time Limit Per Round"
-                  v-model="timeLimit"
-                  :min="0"
-                  :max="300"
-                  :step="60"
-                  unit="s"
-                  :unlimited-value="0"
-                  unlimited-text="Unlimited"
-                  help-text="Set to 0 for unlimited time"
-                />
+                <CustomSliderComponent label="Number of Rounds" v-model="rounds" :min="5" :max="10" :step="1"
+                  unit=" rounds" />
+                <CustomSliderComponent label="Time Limit Per Round" v-model="timeLimit" :min="0" :max="300" :step="60"
+                  unit="s" :unlimited-value="0" unlimited-text="Unlimited" help-text="Set to 0 for unlimited time" />
               </div>
             </div>
             <div class="flex flex-col gap-4">
@@ -92,29 +65,18 @@
                 <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Gameplay</h3>
               </div>
               <div class="flex flex-col gap-4">
-                <CustomCheckboxComponent
-                  id="allow-moving"
-                  label="Allow Moving"
-                  v-model="allowMoving"
-                />
-                <CustomCheckboxComponent
-                  id="allow-panning"
-                  label="Allow Panning"
-                  v-model="allowPanning"
-                />
-                <CustomCheckboxComponent
-                  id="allow-zooming"
-                  label="Allow Zooming"
-                  v-model="allowZooming"
-                />
+                <CustomCheckboxComponent id="allow-moving" label="Allow Moving" v-model="allowMoving" />
+                <CustomCheckboxComponent id="allow-panning" label="Allow Panning" v-model="allowPanning" />
+                <CustomCheckboxComponent id="allow-zooming" label="Allow Zooming" v-model="allowZooming" />
               </div>
             </div>
           </div>
           <div class="flex justify-end">
-            <Button
-              size="lg"
+            <Button size="lg"
               class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-            >
+              @click="router.push({
+                name: 'game-single-player',
+              })">
               Start Game
             </Button>
           </div>
@@ -138,6 +100,7 @@ import {
 import CustomCardComponent from '@/components/CustomCardComponent.vue'
 import CustomSliderComponent from '@/components/CustomSliderComponent.vue'
 import CustomCheckboxComponent from '@/components/CustomCheckboxComponent.vue'
+import { useRouter } from 'vue-router'
 
 const gameModes = [
   {
@@ -165,6 +128,8 @@ const gameModes = [
     emojiClass: 'bg-purple-100 border-purple-200',
   },
 ]
+
+const router = useRouter()
 
 const mapType = ref<string>('world')
 const rounds = ref<number>(5)

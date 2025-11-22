@@ -13,6 +13,11 @@ const router = createRouter({
       name: 'game',
       component: () => import('@/pages/GamePage.vue'),
     },
+    {
+      path: '/game/single-player',
+      name: 'game-single-player',
+      component: () => import('@/pages/SinglePlayerGamePage.vue'),
+    },
   ],
 })
 

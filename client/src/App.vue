@@ -13,11 +13,9 @@ const currentUser = useCurrentUser()
 watch(currentUser, async (newVal, oldVal) => {
   try {
     if (!newVal && oldVal) {
-      // User has logged out
       console.log('User logged out')
     } else if (newVal) {
       if (!oldVal) {
-        // User has logged in
         console.log('User logged in:', newVal)
       }
     }
@@ -26,6 +24,4 @@ watch(currentUser, async (newVal, oldVal) => {
     auth?.signOut()
   }
 })
-
-// TODO: Force the user to sign out when failing to fetch the user from database
 </script>
