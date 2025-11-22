@@ -51,21 +51,9 @@
             </p>
           </div>
           <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card v-for="(content, index) in cardContents" :key="index"
-              :class="`${content.class} border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`">
-              <CardContent class="text-left">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border p-2 text-3xl"
-                  :class="content.emojiClass">
-                  {{ content.emoji }}
-                </div>
-                <CardTitle class="mb-2 font-[Roboto] text-xl">
-                  {{ content.title }}
-                </CardTitle>
-                <CardDescription class="text-muted-foreground font-[JetBrains_Mono] text-lg">
-                  {{ content.description }}
-                </CardDescription>
-              </CardContent>
-            </Card>
+            <CustomCardComponent v-for="(content, index) in cardContents" :key="index" :title="content.title"
+              :description="content.description" :emoji="content.emoji" :bg-class="content.class"
+              :emoji-class="content.emojiClass" content-align="text-left" icon-align="justify-start" />
           </div>
         </div>
       </section>
@@ -117,13 +105,13 @@
 
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import CustomCardComponent from '@/components/CustomCardComponent.vue'
 import { useCurrentUser, useFirebaseAuth, useIsCurrentUserLoaded } from 'vuefire'
 import { signInWithPopup } from 'firebase/auth'
 import type { FirebaseError } from 'firebase/app'

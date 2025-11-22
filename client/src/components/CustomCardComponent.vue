@@ -1,0 +1,52 @@
+<template>
+  <Card :class="`${bgClass} border cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`">
+    <CardContent :class="contentAlign">
+      <div class="flex" :class="iconAlign">
+        <div :class="`mb-4 flex h-12 w-12 items-center justify-center rounded-xl border text-3xl p-2 ${emojiClass}`">
+          {{ emoji }}
+        </div>
+      </div>
+      <CardTitle :class="`font-[Roboto] text-xl mb-2`">
+        {{ title }}
+      </CardTitle>
+      <CardDescription :class="`text-muted-foreground font-[JetBrains_Mono] text-lg`">
+        {{ description }}
+      </CardDescription>
+    </CardContent>
+  </Card>
+</template>
+
+<script setup lang="ts">
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
+
+defineProps({
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  emoji: {
+    type: String,
+    required: true
+  },
+  bgClass: {
+    type: String,
+    required: true
+  },
+  emojiClass: {
+    type: String,
+    required: true
+  },
+  contentAlign: {
+    type: String,
+    default: 'text-center'
+  },
+  iconAlign: {
+    type: String,
+    default: 'justify-center'
+  }
+})
+</script>
