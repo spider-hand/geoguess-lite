@@ -4,24 +4,25 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
-import { RouterView } from 'vue-router'
-import { useCurrentUser, useFirebaseAuth } from 'vuefire'
+import { RouterView, useRoute, useRouter } from 'vue-router'
+import { useCurrentUser } from 'vuefire'
 
-const auth = useFirebaseAuth()
 const currentUser = useCurrentUser()
+const router = useRouter()
+const route = useRoute()
 
-watch(currentUser, async (newVal, oldVal) => {
-  try {
-    if (!newVal && oldVal) {
-      console.log('User logged out')
-    } else if (newVal) {
-      if (!oldVal) {
-        console.log('User logged in:', newVal)
-      }
-    }
-  } catch (error) {
-    console.error('currentUser watch error:', error)
-    auth?.signOut()
+watch(currentUser, (newVal, oldVal) => {
+  // Redirect to landing page if user logs out on a protected route
+  if (
+    !newVal &&
+    oldVal &&
+    route.meta.requiresAuth
+  ) {
+    return router.push({ name: 'landing' })
+  }
+
+  if (newVal && typeof route.query.redirect === 'string') {
+    return router.push(route.query.redirect)
   }
 })
 </script>
