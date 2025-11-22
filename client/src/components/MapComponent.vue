@@ -1,5 +1,5 @@
 <template>
-  <div ref="mapRef" class="absolute! top-0 right-0 w-[50%] h-full"></div>
+  <div ref="mapRef" class="h-full w-full rounded-4xl"></div>
 </template>
 
 <script setup lang="ts">

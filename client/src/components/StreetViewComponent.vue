@@ -1,5 +1,5 @@
 <template>
-  <div ref="viewerRef" class="absolute! top-0 left-0 w-[50%] h-full"></div>
+  <div ref="viewerRef" class="flex-1 lg:w-2/3 min-h-[40vh] lg:min-h-0 rounded-4xl"></div>
 </template>
 
 <script setup lang="ts">
@@ -34,7 +34,8 @@ const getRandomImageId = async () => {
       const randomIndex = Math.floor(Math.random() * data.data.length);
       return data.data[randomIndex].id;
     }
-    return await getRandomImageId();
+    return "524779645570864"
+    // return await getRandomImageId();
   } catch (err) {
     console.error('Error in getRandomImageId:', err);
     throw err;
