@@ -1,22 +1,28 @@
 <template>
   <div class="flex flex-col gap-2">
     <div>
-      <label class="font-[JetBrains_Mono] text-base font-medium text-foreground">
+      <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
         {{ label }}
       </label>
     </div>
     <div class="flex flex-col gap-1">
       <div>
-        <Slider v-model="internalValue" :min="min" :max="max" :step="step" class="w-full"
-          @update:model-value="handleUpdate" />
+        <Slider
+          v-model="internalValue"
+          :min="min"
+          :max="max"
+          :step="step"
+          class="w-full"
+          @update:model-value="handleUpdate"
+        />
       </div>
-      <div class="flex justify-between text-sm text-muted-foreground font-[JetBrains_Mono]">
+      <div class="text-muted-foreground flex justify-between font-[JetBrains_Mono] text-sm">
         <span>{{ formatValue(min) }}</span>
-        <span class="font-medium text-foreground">{{ displayValue }}</span>
+        <span class="text-foreground font-medium">{{ displayValue }}</span>
         <span>{{ formatValue(max) }}</span>
       </div>
     </div>
-    <p v-if="helpText" class="font-[JetBrains_Mono] text-sm text-muted-foreground mt-1">
+    <p v-if="helpText" class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm">
       {{ helpText }}
     </p>
   </div>
@@ -25,7 +31,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { Slider } from '@/components/ui/slider'
-
 
 const props = defineProps({
   label: {
@@ -89,7 +94,10 @@ const handleUpdate = (value: number[] | undefined) => {
   emit('update:modelValue', newValue)
 }
 
-watch(() => props.modelValue, (newValue) => {
-  internalValue.value = [newValue]
-})
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    internalValue.value = [newValue]
+  },
+)
 </script>

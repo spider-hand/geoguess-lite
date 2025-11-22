@@ -1,12 +1,16 @@
 <template>
-  <Card :class="`${bgClass} border cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`">
+  <Card
+    :class="`${bgClass} cursor-pointer border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`"
+  >
     <CardContent :class="contentAlign">
       <div class="flex" :class="iconAlign">
-        <div :class="`mb-4 flex h-12 w-12 items-center justify-center rounded-xl border text-3xl p-2 ${emojiClass}`">
+        <div
+          :class="`mb-4 flex h-12 w-12 items-center justify-center rounded-xl border p-2 text-3xl ${emojiClass}`"
+        >
           {{ emoji }}
         </div>
       </div>
-      <CardTitle :class="`font-[Roboto] text-xl mb-2`">
+      <CardTitle :class="`mb-2 font-[Roboto] text-xl`">
         {{ title }}
       </CardTitle>
       <CardDescription :class="`text-muted-foreground font-[JetBrains_Mono] text-lg`">
@@ -22,31 +26,31 @@ import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/c
 defineProps({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   description: {
     type: String,
-    required: true
+    required: true,
   },
   emoji: {
     type: String,
-    required: true
+    required: true,
   },
   bgClass: {
     type: String,
-    required: true
+    required: true,
   },
   emojiClass: {
     type: String,
-    required: true
+    required: true,
   },
   contentAlign: {
     type: String,
-    default: 'text-center'
+    default: 'text-center',
   },
   iconAlign: {
     type: String,
-    default: 'justify-center'
-  }
+    default: 'justify-center',
+  },
 })
 </script>

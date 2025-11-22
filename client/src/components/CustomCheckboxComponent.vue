@@ -1,7 +1,10 @@
 <template>
   <div class="flex items-center gap-2">
     <Checkbox :id="id" :checked="modelValue" @update:checked="handleUpdate" />
-    <label :for="id" class="font-[JetBrains_Mono] text-base font-medium text-foreground cursor-pointer">
+    <label
+      :for="id"
+      class="text-foreground cursor-pointer font-[JetBrains_Mono] text-base font-medium"
+    >
       {{ label }}
     </label>
   </div>
@@ -13,16 +16,16 @@ import { Checkbox } from '@/components/ui/checkbox'
 defineProps({
   id: {
     type: String,
-    required: true
+    required: true,
   },
   label: {
     type: String,
-    required: true
+    required: true,
   },
   modelValue: {
     type: Boolean,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const emit = defineEmits<{

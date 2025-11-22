@@ -1,4 +1,8 @@
+cd client
+
 npx lint-staged
+
+cd ..
 
 cd server
 
