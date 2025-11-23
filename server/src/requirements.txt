@@ -1,3 +1,4 @@
 requests
 boto3
 firebase-admin
+psycopg[binary]

@@ -82,3 +82,27 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /ping
             Method: get
+  
+  UsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: functions.users.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref FirebaseServiceAccountArn
+      Events:
+        UsersApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /users
+            Method: get

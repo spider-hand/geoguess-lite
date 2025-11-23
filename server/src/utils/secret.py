@@ -7,6 +7,7 @@ from typing import TypedDict
 
 class SecretsDict(TypedDict):
     lambda_resource_arn: str
+    neon_db_uri: str
     firebase_service_account: dict
 
 

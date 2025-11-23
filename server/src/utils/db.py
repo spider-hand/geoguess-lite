@@ -1,0 +1,15 @@
+import psycopg
+from .secret import get_secret
+
+conn = None
+
+
+def get_db_connection():
+    global conn
+
+    if conn is None:
+        secrets = get_secret()
+        neon_db_uri = secrets.get("neon_db_uri")
+
+        conn = psycopg.connect(neon_db_uri)
+    return conn
