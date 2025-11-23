@@ -1,22 +1,6 @@
 <template>
   <div class="flex min-h-screen flex-col">
-    <header class="flex items-center justify-between border-b px-8 py-4">
-      <div class="font-[JetBrains_Mono] text-xl font-semibold">Geoguess Lite</div>
-      <nav class="flex gap-4">
-        <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg">
-          [Github]
-        </Button>
-        <Button v-if="isCurrentUserLoaded && !currentUser"
-          class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-          @click="signUpWithGoogle">
-          Sign Up
-        </Button>
-        <Button v-else variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
-          @click="signOut">
-          [Sign Out]
-        </Button>
-      </nav>
-    </header>
+    <HeaderComponent />
     <main class="flex-1">
       <section class="px-8 py-16">
         <div class="mx-auto max-w-7xl">
@@ -82,26 +66,7 @@
         </div>
       </section>
     </main>
-    <footer class="bg-gray-50 px-8 py-8">
-      <div class="mx-auto max-w-7xl">
-        <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div class="font-[JetBrains_Mono] text-xl font-semibold">Geoguess Lite</div>
-          <nav class="flex gap-4">
-            <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[Roboto] text-base">
-              Github
-            </Button>
-            <Button v-if="isCurrentUserLoaded && !currentUser" variant="ghost"
-              class="text-muted-foreground cursor-pointer font-[Roboto] text-base" @click="signUpWithGoogle">
-              Sign Up
-            </Button>
-            <Button v-else variant="ghost" class="text-muted-foreground cursor-pointer font-[Roboto] text-base"
-              @click="signOut">
-              Sign Out
-            </Button>
-          </nav>
-        </div>
-      </div>
-    </footer>
+    <FooterComponent />
   </div>
 </template>
 
@@ -114,17 +79,16 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import CustomCardComponent from '@/components/CustomCardComponent.vue'
-import { useCurrentUser, useFirebaseAuth, useIsCurrentUserLoaded } from 'vuefire'
-import { signInWithPopup } from 'firebase/auth'
-import type { FirebaseError } from 'firebase/app'
-import { googleAuthProvider } from '@/lib/firebase'
 import { useRouter } from 'vue-router'
+import HeaderComponent from '@/components/HeaderComponent.vue'
+import FooterComponent from '@/components/FooterComponent.vue'
+import useAuth from '@/composables/useAuth';
 
 const cardContents = [
   {
     title: 'Zero Subscription',
     description:
-      'Play freely — no accounts, no paywalls. GeoGuess Lite is built to be fully open and free to explore.',
+      'Play freely — no paywalls. GeoGuess Lite is built to be fully open and free to explore.',
     emoji: '🪶',
     class: 'bg-blue-50 border-blue-100',
     emojiClass: 'bg-blue-100 border-blue-200',
@@ -175,12 +139,12 @@ const faqContents = [
   {
     question: 'Is GeoGuess Lite really free?',
     answer:
-      'Yes — completely free. GeoGuess Lite doesn’t require any subscription, sign-up, or payment.',
+      'Yes — completely free. GeoGuess Lite doesn’t require any subscription or payment.',
   },
   {
     question: 'Are there any limitations?',
     answer:
-      "You can play unlimited rounds at no cost. However, since Street View is powered by Google Maps' free tier, heavy usage might occasionally hit the daily quota — but for most players, it's virtually unlimited.",
+      "You can play as much as you want. Both the map and imagery are powered by open data and open-source technology, so there are no quotas, usage limits, or fees.",
   },
   {
     question: 'Can I self-host GeoGuess Lite?',
@@ -189,27 +153,9 @@ const faqContents = [
   },
 ]
 
-const isCurrentUserLoaded = useIsCurrentUserLoaded()
-const currentUser = useCurrentUser()
-const auth = useFirebaseAuth()!
-
 const router = useRouter()
 
-const signUpWithGoogle = async () => {
-  try {
-    await signInWithPopup(auth, googleAuthProvider)
-  } catch (error) {
-    console.error((error as FirebaseError).code, (error as FirebaseError).message)
-  }
-}
-
-const signOut = async () => {
-  try {
-    await auth.signOut()
-  } catch (error) {
-    console.error('signOut error:', error)
-  }
-}
+const { currentUser, isCurrentUserLoaded, signUpWithGoogle } = useAuth();
 </script>
 
 <style scoped>
