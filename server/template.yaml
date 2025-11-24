@@ -14,6 +14,13 @@ Globals:
       AllowOrigin: "'*'"
   Function:
     Timeout: 30
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: geoguess-lite-api
+        POWERTOOLS_LOG_LEVEL: INFO
+    # @see: https://docs.aws.amazon.com/powertools/python/latest/#lambda-layer
+    Layers:
+      - !Sub arn:aws:lambda:ap-northeast-1:017000801446:layer:AWSLambdaPowertoolsPythonV3-python314-x86_64:27
 
 Parameters:
   Environment:
@@ -24,8 +31,6 @@ Parameters:
       - prod
     Default: localstack
   SecretArn:
-    Type: String
-  FirebaseServiceAccountArn:
     Type: String
 
 Resources:
@@ -46,7 +51,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: functions.auth.lambda_handler
+      Handler: core.auth.lambda_handler
       Runtime: python3.14
       Architectures:
         - x86_64
@@ -56,14 +61,12 @@ Resources:
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Ref SecretArn
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref FirebaseServiceAccountArn
 
   HealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: functions.ping.lambda_handler
+      Handler: health.handler.lambda_handler
       Runtime: python3.14
       Architectures:
         - x86_64
@@ -73,21 +76,19 @@ Resources:
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Ref SecretArn
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref FirebaseServiceAccountArn
       Events:
         HealthCheck:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGateway
-            Path: /ping
+            Path: /health
             Method: get
-  
+
   UsersFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: functions.users.lambda_handler
+      Handler: users.handler.lambda_handler
       Runtime: python3.14
       Architectures:
         - x86_64
@@ -97,12 +98,10 @@ Resources:
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Ref SecretArn
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref FirebaseServiceAccountArn
       Events:
         UsersApi:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGateway
             Path: /users
-            Method: get
+            Method: post

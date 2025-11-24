@@ -1,16 +1,27 @@
-from utils.firebase import verify_firebase_token
-from utils.secret import get_secret
+from core.firebase import verify_firebase_token
+from core.secret import get_secret
+from aws_lambda_powertools.utilities.typing import LambdaContext
+from core.logger import dynamic_inject_lambda_context, logger
 
 
-def lambda_handler(event, context):
+@dynamic_inject_lambda_context
+def lambda_handler(event: dict, context: LambdaContext) -> dict:
     try:
         token = event["authorizationToken"]
 
         if not token:
+            logger.warning("Missing authorization token")
             raise Exception("Unauthorized: No token provided")
 
         decoded_token = verify_firebase_token(token)
         uid = decoded_token["uid"]
+
+        logger.info(
+            {
+                "event": "authentication_successful",
+                "uid": uid,
+            }
+        )
 
         secrets = get_secret()
         lambda_resource_arn = secrets.get("lambda_resource_arn")
@@ -20,13 +31,18 @@ def lambda_handler(event, context):
         return policy
 
     except Exception as e:
-        print(f"Authentication error: {str(e)}")
-        print(f"Event: {str(event)}")
+        logger.exception("Authentication error")
+        logger.info(
+            {
+                "event": "authentication_failed",
+                "error": str(e),
+            }
+        )
         policy = generate_policy("user", "Deny", "*")
         return policy
 
 
-def generate_policy(principal_id, effect, resource):
+def generate_policy(principal_id: str, effect: str, resource: str) -> dict:
     policy_document = {
         "principalId": principal_id,
         "policyDocument": {

@@ -1,10 +1,10 @@
 import psycopg
-from .secret import get_secret
+from core.secret import get_secret
 
 conn = None
 
 
-def get_db_connection():
+def get_db_connection() -> psycopg.Connection:
     global conn
 
     if conn is None:

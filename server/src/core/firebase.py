@@ -1,6 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, auth
-from utils.secret import get_secret
+from core.secret import get_secret
 
 
 def initialize_firebase_app():
@@ -13,11 +13,9 @@ def initialize_firebase_app():
             firebase_admin.initialize_app(cred)
         except Exception as e:
             raise Exception(f"Failed to initialize Firebase Admin SDK: {str(e)}")
-    else:
-        pass
 
 
-def get_firebase_auth():
+def get_firebase_auth() -> auth.Client:
     if not firebase_admin._apps:
         initialize_firebase_app()
 
