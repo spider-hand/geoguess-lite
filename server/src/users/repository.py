@@ -3,6 +3,34 @@ from core.logger import logger
 from users.model import User
 
 
+def get_user_by_id(user_id: str) -> User | None:
+    try:
+        conn = get_db_connection()
+
+        logger.debug({"event": "fetching_user_by_id", "user_id": user_id})
+
+        row = conn.execute(
+            """
+            SELECT id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score
+            FROM users
+            WHERE id = %s
+            """,
+            (user_id,),
+        ).fetchone()
+
+        if row is None:
+            logger.info({"event": "user_not_found", "user_id": user_id})
+            return None
+
+        logger.debug({"event": "user_fetched", "user_id": user_id})
+
+        return User(**row)
+
+    except Exception as e:
+        logger.exception("Failed to fetch user from database")
+        raise e
+
+
 def insert_user(user: User) -> User:
     try:
         conn = get_db_connection()

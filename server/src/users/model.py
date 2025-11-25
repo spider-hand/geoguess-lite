@@ -11,5 +11,5 @@ class User(BaseModel):
     average_score: float
 
 
-class CreateUserRequest(User):
-    pass
+class CreateUserRequest(BaseModel):
+    name: str

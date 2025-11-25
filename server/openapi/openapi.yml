@@ -1,0 +1,18 @@
+openapi: 3.1.1
+info:
+  title: Geoguess Lite
+  version: "1.0.0"
+paths:
+  /health:
+    $ref: ./paths/health.yml
+  /users/me:
+    $ref: ./paths/users-me.yml
+components:
+  schemas:
+    User:
+      $ref: ./components/schemas/user.yml
+    ErrorResponse:
+      $ref: ./components/schemas/error-response.yml
+  requestBodies:
+    CreateUserRequest:
+      $ref: ./components/requestBodies/user-me.yml

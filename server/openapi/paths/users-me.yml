@@ -1,0 +1,20 @@
+post:
+  description: Get the current user or create a new user if not exists
+  tags:
+    - users
+  operationId: getMe
+  requestBody:
+    $ref: ../components/requestBodies/user-me.yml
+  responses:
+    "200":
+      description: User retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/user.yml
+    default:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/error-response.yml

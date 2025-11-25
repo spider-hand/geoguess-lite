@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+    "@tanstack/vue-query": "^5.91.2",
     "@vueuse/core": "^14.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

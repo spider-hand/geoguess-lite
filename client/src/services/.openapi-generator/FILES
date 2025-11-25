@@ -1,0 +1,13 @@
+.openapi-generator-ignore
+apis/HealthApi.ts
+apis/UsersApi.ts
+apis/index.ts
+index.ts
+models/ErrorResponse.ts
+models/GetMe200Response.ts
+models/GetMeDefaultResponse.ts
+models/GetMeRequest.ts
+models/HealthCheck200Response.ts
+models/User.ts
+models/index.ts
+runtime.ts

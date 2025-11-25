@@ -84,28 +84,28 @@
               <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Profile</h2>
             </div>
             <div class="flex flex-col items-center gap-4">
-              <div class="flex h-20 w-20 items-center justify-center rounded-full text-4xl"
-                :class="userProfile.avatarClass">
-                {{ userProfile.emoji }}
+              <div class="flex h-20 w-20 items-center justify-center rounded-full text-4xl border"
+                :class="getAvatarClass(user?.avatarBg)">
+                {{ user?.avatarEmoji }}
               </div>
               <div class="text-center">
-                <h3 class="text-foreground font-[Roboto] text-lg font-semibold">{{ userProfile.name }}</h3>
+                <h3 class="text-foreground font-[Roboto] text-lg font-semibold">{{ user?.name }}</h3>
               </div>
             </div>
             <div class="flex flex-col gap-3">
               <div class="flex justify-between">
                 <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Games Played</span>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ userProfile.gamesPlayed
+                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.gamesPlayed
                   }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Avg. Score</span>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ userProfile.avgScore
+                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.averageScore
                   }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">High Score</span>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ userProfile.highScore
+                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.bestScore
                   }}</span>
               </div>
             </div>
@@ -157,6 +157,8 @@ import CustomSliderComponent from '@/components/CustomSliderComponent.vue'
 import CustomCheckboxComponent from '@/components/CustomCheckboxComponent.vue'
 import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
+import useUserQuery from '@/composables/useUserQuery'
+import { AVATAR_CLASS_MAP } from '@/consts'
 
 const gameModes = [
   {
@@ -185,14 +187,6 @@ const gameModes = [
   },
 ]
 
-const userProfile = {
-  name: 'Explorer_123',
-  emoji: '🚀',
-  avatarClass: 'bg-blue-100 border border-blue-200',
-  gamesPlayed: 42,
-  avgScore: 3250,
-  highScore: 4850
-}
 
 const leaderboard = [
   { name: 'GeoMaster', emoji: '🏆', avatarClass: 'bg-yellow-100 border border-yellow-200', score: 4950 },
@@ -204,10 +198,16 @@ const leaderboard = [
 
 const router = useRouter()
 
+const { user } = useUserQuery()
+
 const mapType = ref<string>('world')
 const rounds = ref<number>(5)
 const timeLimit = ref<number>(0)
 const allowMoving = ref<boolean>(true)
 const allowPanning = ref<boolean>(true)
 const allowZooming = ref<boolean>(true)
+
+const getAvatarClass = (avatarBg?: string) => {
+  return avatarBg ? AVATAR_CLASS_MAP[avatarBg] ?? "" : ""
+}
 </script>
