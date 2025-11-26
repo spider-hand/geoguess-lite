@@ -18,6 +18,7 @@ import type {
   GetMe200Response,
   GetMeDefaultResponse,
   GetMeRequest,
+  UpdateMeRequest,
 } from '../models/index';
 import {
     GetMe200ResponseFromJSON,
@@ -26,16 +27,50 @@ import {
     GetMeDefaultResponseToJSON,
     GetMeRequestFromJSON,
     GetMeRequestToJSON,
+    UpdateMeRequestFromJSON,
+    UpdateMeRequestToJSON,
 } from '../models/index';
 
 export interface GetMeOperationRequest {
     getMeRequest: GetMeRequest;
 }
 
+export interface UpdateMeOperationRequest {
+    updateMeRequest: UpdateMeRequest;
+}
+
 /**
  * 
  */
 export class UsersApi extends runtime.BaseAPI {
+
+    /**
+     * Delete the current user
+     */
+    async deleteMeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/users/me`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete the current user
+     */
+    async deleteMe(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteMeRaw(initOverrides);
+    }
 
     /**
      * Get the current user or create a new user if not exists
@@ -73,6 +108,45 @@ export class UsersApi extends runtime.BaseAPI {
      */
     async getMe(requestParameters: GetMeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetMe200Response> {
         const response = await this.getMeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Update the current user\'s profile
+     */
+    async updateMeRaw(requestParameters: UpdateMeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetMe200Response>> {
+        if (requestParameters['updateMeRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateMeRequest',
+                'Required parameter "updateMeRequest" was null or undefined when calling updateMe().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/users/me`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateMeRequestToJSON(requestParameters['updateMeRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetMe200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Update the current user\'s profile
+     */
+    async updateMe(requestParameters: UpdateMeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetMe200Response> {
+        const response = await this.updateMeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -83,34 +83,117 @@
             <div>
               <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Profile</h2>
             </div>
-            <div class="flex flex-col items-center gap-4">
-              <div class="flex h-20 w-20 items-center justify-center rounded-full text-4xl border"
-                :class="getAvatarClass(user?.avatarBg)">
-                {{ user?.avatarEmoji }}
+            <template v-if="!isEditingProfile">
+              <div class="flex flex-col items-center gap-4">
+                <div class="flex h-20 w-20 items-center justify-center rounded-full text-4xl border"
+                  :class="getAvatarClass(user?.avatarBg)">
+                  {{ user?.avatarEmoji }}
+                </div>
+                <div class="text-center">
+                  <h3 class="text-foreground font-[Roboto] text-lg font-semibold">{{ user?.name }}</h3>
+                </div>
               </div>
-              <div class="text-center">
-                <h3 class="text-foreground font-[Roboto] text-lg font-semibold">{{ user?.name }}</h3>
+              <div class="flex flex-col gap-3">
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Games Played</span>
+                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.gamesPlayed }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Avg. Score</span>
+                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.averageScore
+                    }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">High Score</span>
+                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.bestScore }}</span>
+                </div>
               </div>
+              <div class="flex flex-col gap-3">
+                <Button variant="secondary" @click="startEditProfile"
+                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                  Edit Profile
+                </Button>
+                <Button variant="secondary" @click="startDeleteAccount"
+                  class="text-red-500 cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                  Delete Account
+                </Button>
+              </div>
+            </template>
+            <template v-else>
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col items-center gap-4">
+                  <div class="flex h-20 w-20 items-center justify-center rounded-full text-4xl border"
+                    :class="getAvatarClass(editForm.avatarBg)">
+                    {{ editForm.avatarEmoji }}
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">Name</label>
+                  <Input v-model="editForm.name" placeholder="Enter your name" class="font-[JetBrains_Mono]" />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">Avatar Emoji</label>
+                  <emoji-picker @emoji-click="onEmojiSelect" class="w-full font-[JetBrains_Mono]"></emoji-picker>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">Background Color</label>
+                  <Select v-model="editForm.avatarBg">
+                    <SelectTrigger class="w-full">
+                      <SelectValue class="font-[JetBrains_Mono]" placeholder="Select background color" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem v-for="color in Object.keys(AVATAR_CLASS_MAP)" :key="color" :value="color">
+                        <div class="flex items-center gap-3">
+                          <div class="w-4 h-4 rounded-full border" :class="getAvatarClass(color)">
+                          </div>
+                          <span class="font-[JetBrains_Mono] capitalize">{{ color }}</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <Button @click="saveProfile" :disabled="isPendingOnUpdateUser"
+                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                    {{ isPendingOnUpdateUser ? 'Saving...' : 'Save Changes' }}
+                  </Button>
+                  <Button variant="secondary" @click="cancelEditProfile"
+                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </template>
+          </CardContent>
+        </Card>
+        <Card v-if="isDeletingAccount" class="borde">
+          <CardContent class="flex flex-col gap-6">
+            <div>
+              <h2 class="text-red-500 font-[Roboto] text-2xl font-semibold">Delete Account</h2>
             </div>
-            <div class="flex flex-col gap-3">
-              <div class="flex justify-between">
-                <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Games Played</span>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.gamesPlayed
-                  }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Avg. Score</span>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.averageScore
-                  }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">High Score</span>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.bestScore
-                  }}</span>
+            <div class="flex flex-col gap-4">
+              <p class="text-foreground font-[JetBrains_Mono] text-sm">
+                This action cannot be undone. This will permanently delete your account and remove all your data.
+              </p>
+              <p class="text-foreground font-[JetBrains_Mono] text-sm">
+                Please type <strong>"Delete account"</strong> to confirm deletion.
+              </p>
+              <Input v-model="deleteConfirmationText" placeholder="Delete account" class="font-[JetBrains_Mono]" />
+              <div class="flex flex-col gap-2">
+                <Button @click="confirmDeleteAccount"
+                  :disabled="deleteConfirmationText !== 'Delete account' || isPendingOnDeleteUser"
+                  class="bg-red-600 hover:bg-red-600 text-white cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                  {{ isPendingOnDeleteUser ? 'Deleting...' : 'Delete Account' }}
+                </Button>
+                <Button variant="secondary" @click="cancelDeleteAccount" :disabled="isPendingOnDeleteUser"
+                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                  Cancel
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
+
         <Card class="border">
           <CardContent class="flex flex-col gap-6">
             <div>
@@ -143,6 +226,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import 'emoji-picker-element'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -152,6 +236,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import CustomCardComponent from '@/components/CustomCardComponent.vue'
 import CustomSliderComponent from '@/components/CustomSliderComponent.vue'
 import CustomCheckboxComponent from '@/components/CustomCheckboxComponent.vue'
@@ -159,6 +244,7 @@ import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import useUserQuery from '@/composables/useUserQuery'
 import { AVATAR_CLASS_MAP } from '@/consts'
+
 
 const gameModes = [
   {
@@ -198,7 +284,17 @@ const leaderboard = [
 
 const router = useRouter()
 
-const { user } = useUserQuery()
+const { user, mutateUserUpdateAsync, isPendingOnUpdateUser, mutateUserDeleteAsync, isPendingOnDeleteUser } = useUserQuery()
+
+const isEditingProfile = ref(false)
+const editForm = ref({
+  name: '',
+  avatarEmoji: '',
+  avatarBg: ''
+})
+
+const isDeletingAccount = ref(false)
+const deleteConfirmationText = ref('')
 
 const mapType = ref<string>('world')
 const rounds = ref<number>(5)
@@ -210,4 +306,71 @@ const allowZooming = ref<boolean>(true)
 const getAvatarClass = (avatarBg?: string) => {
   return avatarBg ? AVATAR_CLASS_MAP[avatarBg] ?? "" : ""
 }
+
+const startEditProfile = () => {
+  if (user.value) {
+    editForm.value = {
+      name: user.value.name,
+      avatarEmoji: user.value.avatarEmoji,
+      avatarBg: user.value.avatarBg
+    }
+  }
+  isEditingProfile.value = true
+}
+
+const cancelEditProfile = () => {
+  isEditingProfile.value = false
+  editForm.value = { name: '', avatarEmoji: '', avatarBg: '' }
+}
+
+const saveProfile = async () => {
+  try {
+    if (editForm.value.name && editForm.value.avatarEmoji && editForm.value.avatarBg) {
+      await mutateUserUpdateAsync({
+        name: editForm.value.name,
+        avatarEmoji: editForm.value.avatarEmoji,
+        avatarBg: editForm.value.avatarBg
+      })
+    }
+  } catch (error) {
+    console.error('Error saving profile:', error)
+  } finally {
+    isEditingProfile.value = false
+  }
+}
+
+const onEmojiSelect = (event: CustomEvent) => {
+  editForm.value.avatarEmoji = event.detail.unicode
+}
+
+const startDeleteAccount = () => {
+  isDeletingAccount.value = true
+}
+
+const cancelDeleteAccount = () => {
+  isDeletingAccount.value = false
+  deleteConfirmationText.value = ''
+}
+
+const confirmDeleteAccount = async () => {
+  if (deleteConfirmationText.value === 'Delete account') {
+    try {
+      await mutateUserDeleteAsync()
+    } catch (error) {
+      console.error('Error deleting account:', error)
+    }
+  }
+}
 </script>
+
+<style scoped>
+emoji-picker {
+  --button-hover-background: var(--color-gray-200);
+  --border-radius: 8px;
+  --input-border-radius: 8px;
+  --input-border-color: var(--color-gray-300);
+  --input-padding: 4px 12px;
+  --input-placeholder-color: var(--color-gray-500);
+  --indicator-color: var(--color-blue-500);
+}
+</style>

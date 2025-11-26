@@ -102,4 +102,15 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /users/me
             Method: post
-
+        UpdateMe:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /users/me
+            Method: patch
+        DeleteMe:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /users/me
+            Method: delete

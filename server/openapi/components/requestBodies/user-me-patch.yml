@@ -1,0 +1,19 @@
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+        avatar_emoji:
+          type: string
+        avatar_bg:
+          type: string
+        games_played:
+          type: integer
+        best_score:
+          type: integer
+        average_score:
+          type: number
+          format: float

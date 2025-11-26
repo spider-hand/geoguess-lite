@@ -13,3 +13,12 @@ class User(BaseModel):
 
 class CreateUserRequest(BaseModel):
     name: str
+
+
+class UpdateUserRequest(BaseModel):
+    name: str | None = None
+    avatar_emoji: str | None = None
+    avatar_bg: str | None = None
+    games_played: int | None = None
+    best_score: int | None = None
+    average_score: float | None = None

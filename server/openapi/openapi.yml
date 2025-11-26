@@ -15,4 +15,6 @@ components:
       $ref: ./components/schemas/error-response.yml
   requestBodies:
     CreateUserRequest:
-      $ref: ./components/requestBodies/user-me.yml
+      $ref: ./components/requestBodies/user-me-post.yml
+    UpdateUserRequest:
+      $ref: ./components/requestBodies/user-me-patch.yml

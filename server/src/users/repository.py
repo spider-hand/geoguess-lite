@@ -61,3 +61,79 @@ def insert_user(user: User) -> User:
     except Exception as e:
         logger.exception("Failed to insert user into database")
         raise e
+
+
+def update_user(user_id: str, update_fields: dict) -> User:
+    try:
+        conn = get_db_connection()
+
+        logger.debug(
+            {
+                "event": "updating_user",
+                "user_id": user_id,
+                "fields": list(update_fields.keys()),
+            }
+        )
+
+        set_clauses = []
+        values = []
+
+        allowed_fields = [
+            "name",
+            "avatar_emoji",
+            "avatar_bg",
+            "games_played",
+            "best_score",
+            "average_score",
+        ]
+
+        for field, value in update_fields.items():
+            if field in allowed_fields:
+                set_clauses.append(f"{field} = %s")
+                values.append(value)
+
+        if not set_clauses:
+            raise ValueError("No valid fields to update")
+
+        values.append(user_id)  # Add user_id for WHERE clause
+
+        sql = f"""
+            UPDATE users
+            SET {", ".join(set_clauses)}
+            WHERE id = %s
+            RETURNING id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score
+        """
+
+        row = conn.execute(sql, tuple(values)).fetchone()
+
+        if row is None:
+            raise Exception(f"User with id {user_id} not found")
+
+        logger.debug({"event": "user_updated", "user_id": user_id})
+
+        return User(**row)
+
+    except Exception as e:
+        logger.exception("Failed to update user in database")
+        raise e
+
+
+def delete_user(user_id: str) -> None:
+    try:
+        conn = get_db_connection()
+
+        logger.debug({"event": "deleting_user", "user_id": user_id})
+
+        conn.execute(
+            """
+            DELETE FROM users
+            WHERE id = %s
+            """,
+            (user_id,),
+        )
+
+        logger.debug({"event": "user_deleted", "user_id": user_id})
+
+    except Exception as e:
+        logger.exception("Failed to delete user from database")
+        raise e
