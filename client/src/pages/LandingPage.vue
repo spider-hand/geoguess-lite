@@ -12,17 +12,28 @@
               <p class="text-muted-foreground mb-8 font-[JetBrains_Mono] text-2xl">
                 Explore the world, no paywalls, no limits.
               </p>
-              <Button size="lg"
+              <Button
+                size="lg"
                 class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-                @click="currentUser ? router.push({
-                  name: 'game'
-                }) : signUpWithGoogle()" :disabled="!isCurrentUserLoaded">
+                @click="
+                  currentUser
+                    ? router.push({
+                        name: 'game',
+                      })
+                    : signUpWithGoogle()
+                "
+                :disabled="!isCurrentUserLoaded"
+              >
                 Get Started
               </Button>
             </div>
             <div class="flex justify-center">
-              <img src="/images/hero.png" alt="Hero Image" class="floating-animation h-auto max-w-full rounded-full"
-                style="box-shadow: rgb(0 0 0 / 56%) 0 22px 70px 4px" />
+              <img
+                src="/images/hero.png"
+                alt="Hero Image"
+                class="floating-animation h-auto max-w-full rounded-full"
+                style="box-shadow: rgb(0 0 0 / 56%) 0 22px 70px 4px"
+              />
             </div>
           </div>
         </div>
@@ -37,9 +48,17 @@
             </p>
           </div>
           <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <CustomCardComponent v-for="(content, index) in cardContents" :key="index" :title="content.title"
-              :description="content.description" :emoji="content.emoji" :bg-class="content.class"
-              :emoji-class="content.emojiClass" content-align="text-left" icon-align="justify-start" />
+            <CustomCardComponent
+              v-for="(content, index) in cardContents"
+              :key="index"
+              :title="content.title"
+              :description="content.description"
+              :emoji="content.emoji"
+              :bg-class="content.class"
+              :emoji-class="content.emojiClass"
+              content-align="text-left"
+              icon-align="justify-start"
+            />
           </div>
         </div>
       </section>
@@ -54,7 +73,11 @@
             </p>
           </div>
           <Accordion type="single" collapsible class="w-full">
-            <AccordionItem v-for="(content, index) in faqContents" :key="index" :value="`item-${index}`">
+            <AccordionItem
+              v-for="(content, index) in faqContents"
+              :key="index"
+              :value="`item-${index}`"
+            >
               <AccordionTrigger class="text-left font-[Roboto] text-xl">
                 {{ content.question }}
               </AccordionTrigger>
@@ -82,7 +105,7 @@ import CustomCardComponent from '@/components/CustomCardComponent.vue'
 import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import FooterComponent from '@/components/FooterComponent.vue'
-import useAuth from '@/composables/useAuth';
+import useAuth from '@/composables/useAuth'
 
 const cardContents = [
   {
@@ -138,13 +161,12 @@ const cardContents = [
 const faqContents = [
   {
     question: 'Is GeoGuess Lite really free?',
-    answer:
-      'Yes — completely free. GeoGuess Lite doesn’t require any subscription or payment.',
+    answer: 'Yes — completely free. GeoGuess Lite doesn’t require any subscription or payment.',
   },
   {
     question: 'Are there any limitations?',
     answer:
-      "You can play as much as you want. Both the map and imagery are powered by open data and open-source technology, so there are no quotas, usage limits, or fees.",
+      'You can play as much as you want. Both the map and imagery are powered by open data and open-source technology, so there are no quotas, usage limits, or fees.',
   },
   {
     question: 'Can I self-host GeoGuess Lite?',
@@ -155,7 +177,7 @@ const faqContents = [
 
 const router = useRouter()
 
-const { currentUser, isCurrentUserLoaded, signUpWithGoogle } = useAuth();
+const { currentUser, isCurrentUserLoaded, signUpWithGoogle } = useAuth()
 </script>
 
 <style scoped>

@@ -1,7 +1,14 @@
 <template>
   <div class="flex items-center gap-2">
-    <Checkbox :id="id" :model-value="modelValue" @update:model-value="(val) => handleUpdate(val as boolean)" />
-    <label :for="id" class="text-foreground cursor-pointer font-[JetBrains_Mono] text-base font-medium">
+    <Checkbox
+      :id="id"
+      :model-value="modelValue"
+      @update:model-value="(val) => handleUpdate(val as boolean)"
+    />
+    <label
+      :for="id"
+      class="text-foreground cursor-pointer font-[JetBrains_Mono] text-base font-medium"
+    >
       {{ label }}
     </label>
   </div>

@@ -1,8 +1,8 @@
 <template>
   <div class="flex min-h-screen flex-col">
     <HeaderComponent />
-    <main class="flex flex-col lg:flex-row gap-8 bg-gray-50 p-8">
-      <div class="flex flex-col gap-8 lg:flex-1 order-1 lg:order-2">
+    <main class="flex flex-col gap-8 bg-gray-50 p-8 lg:flex-row">
+      <div class="order-1 flex flex-col gap-8 lg:order-2 lg:flex-1">
         <div class="flex flex-col items-center gap-2 text-center">
           <h1 class="font-[JetBrains_Mono] text-4xl font-bold lg:text-5xl">Start New Game</h1>
           <p class="text-muted-foreground font-[JetBrains_Mono] text-xl">
@@ -10,38 +10,62 @@
           </p>
         </div>
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <div v-for="(mode, index) in gameModes" :key="index" @click="gameConfig.selectedGameMode = mode.id"
-            class="h-full">
-            <CustomCardComponent :title="mode.title" :description="mode.description" :emoji="mode.emoji"
-              :bg-class="getGameModeCardClass(mode.id)" :emoji-class="mode.emojiClass" />
+          <div
+            v-for="(mode, index) in gameModes"
+            :key="index"
+            @click="gameConfig.selectedGameMode = mode.id"
+            class="h-full"
+          >
+            <CustomCardComponent
+              :title="mode.title"
+              :description="mode.description"
+              :emoji="mode.emoji"
+              :bg-class="getGameModeCardClass(mode.id)"
+              :emoji-class="mode.emojiClass"
+            />
           </div>
         </div>
         <Card class="border">
           <CardContent class="flex flex-col gap-8">
             <div>
-              <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl">
+              <div
+                class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl"
+              >
                 ⚙️
               </div>
-              <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Game Configuration</h2>
+              <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">
+                Game Configuration
+              </h2>
               <p class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-base">
                 Customize your game experience
               </p>
             </div>
             <div v-if="gameConfig.selectedGameMode === 'multiplayer'" class="flex flex-col gap-4">
               <div class="flex flex-col gap-4">
-                <CustomCheckboxComponent id="is-host" label="I am the host" v-model="gameConfig.isHost" />
+                <CustomCheckboxComponent
+                  id="is-host"
+                  label="I am the host"
+                  v-model="gameConfig.isHost"
+                />
                 <div v-if="!gameConfig.isHost" class="flex flex-col gap-1">
                   <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
                     Room Number
                   </label>
-                  <Input v-model="gameConfig.roomNumber" placeholder="Enter room number"
-                    class="font-[JetBrains_Mono] max-w-xs" />
+                  <Input
+                    v-model="gameConfig.roomNumber"
+                    placeholder="Enter room number"
+                    class="max-w-xs font-[JetBrains_Mono]"
+                  />
                 </div>
               </div>
             </div>
             <div
-              v-if="(gameConfig.selectedGameMode === 'single-player') || (gameConfig.selectedGameMode === 'multiplayer' && gameConfig.isHost)"
-              class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
+              v-if="
+                gameConfig.selectedGameMode === 'single-player' ||
+                (gameConfig.selectedGameMode === 'multiplayer' && gameConfig.isHost)
+              "
+              class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3"
+            >
               <div class="flex flex-col gap-4">
                 <div>
                   <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Maps</h3>
@@ -65,11 +89,25 @@
                   <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Rounds & Time</h3>
                 </div>
                 <div class="flex flex-col gap-8">
-                  <CustomSliderComponent label="Number of Rounds" v-model="gameConfig.rounds" :min="5" :max="10"
-                    :step="1" unit=" rounds" />
-                  <CustomSliderComponent label="Time Limit Per Round" v-model="gameConfig.timeLimit" :min="0" :max="300"
-                    :step="60" unit="s" :unlimited-value="0" unlimited-text="Unlimited"
-                    help-text="Set to 0 for unlimited time" />
+                  <CustomSliderComponent
+                    label="Number of Rounds"
+                    v-model="gameConfig.rounds"
+                    :min="5"
+                    :max="10"
+                    :step="1"
+                    unit=" rounds"
+                  />
+                  <CustomSliderComponent
+                    label="Time Limit Per Round"
+                    v-model="gameConfig.timeLimit"
+                    :min="0"
+                    :max="300"
+                    :step="60"
+                    unit="s"
+                    :unlimited-value="0"
+                    unlimited-text="Unlimited"
+                    help-text="Set to 0 for unlimited time"
+                  />
                 </div>
               </div>
               <div class="flex flex-col gap-4">
@@ -77,24 +115,36 @@
                   <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Gameplay</h3>
                 </div>
                 <div class="flex flex-col gap-4">
-                  <CustomCheckboxComponent id="allow-moving" label="Allow Moving" v-model="gameConfig.allowMoving" />
-                  <CustomCheckboxComponent id="allow-zooming" label="Allow Zooming" v-model="gameConfig.allowZooming" />
+                  <CustomCheckboxComponent
+                    id="allow-moving"
+                    label="Allow Moving"
+                    v-model="gameConfig.allowMoving"
+                  />
+                  <CustomCheckboxComponent
+                    id="allow-zooming"
+                    label="Allow Zooming"
+                    v-model="gameConfig.allowZooming"
+                  />
                 </div>
               </div>
             </div>
             <div class="flex justify-end">
-              <Button size="lg"
+              <Button
+                size="lg"
                 class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-                @click="router.push({
-                  name: 'game-single-player',
-                })">
+                @click="
+                  router.push({
+                    name: 'game-single-player',
+                  })
+                "
+              >
                 Start Game
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
-      <div class="flex flex-col gap-8 lg:w-80 order-2 lg:order-1">
+      <div class="order-2 flex flex-col gap-8 lg:order-1 lg:w-80">
         <Card class="border">
           <CardContent class="flex flex-col gap-6">
             <div>
@@ -102,36 +152,57 @@
             </div>
             <template v-if="!isEditingProfile">
               <div class="flex flex-col items-center gap-4">
-                <div class="flex h-20 w-20 items-center justify-center rounded-full text-4xl border"
-                  :class="getAvatarClass(user?.avatarBg)">
+                <div
+                  class="flex h-20 w-20 items-center justify-center rounded-full border text-4xl"
+                  :class="getAvatarClass(user?.avatarBg)"
+                >
                   {{ user?.avatarEmoji }}
                 </div>
                 <div class="text-center">
-                  <h3 class="text-foreground font-[Roboto] text-lg font-semibold">{{ user?.name }}</h3>
+                  <h3 class="text-foreground font-[Roboto] text-lg font-semibold">
+                    {{ user?.name }}
+                  </h3>
                 </div>
               </div>
               <div class="flex flex-col gap-3">
                 <div class="flex justify-between">
-                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Games Played</span>
-                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.gamesPlayed }}</span>
+                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                    >Games Played</span
+                  >
+                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
+                    user?.gamesPlayed
+                  }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Avg. Score</span>
-                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.averageScore
-                    }}</span>
+                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                    >Avg. Score</span
+                  >
+                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
+                    user?.averageScore
+                  }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">High Score</span>
-                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.bestScore }}</span>
+                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                    >High Score</span
+                  >
+                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
+                    user?.bestScore
+                  }}</span>
                 </div>
               </div>
               <div class="flex flex-col gap-3">
-                <Button variant="secondary" @click="startEditProfile"
-                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                <Button
+                  variant="secondary"
+                  @click="startEditProfile"
+                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                >
                   Edit Profile
                 </Button>
-                <Button variant="secondary" @click="startDeleteAccount"
-                  class="text-red-500 cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                <Button
+                  variant="secondary"
+                  @click="startDeleteAccount"
+                  class="cursor-pointer rounded-none font-[JetBrains_Mono] text-red-500 transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                >
                   Delete Account
                 </Button>
               </div>
@@ -139,30 +210,54 @@
             <template v-else>
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col items-center gap-4">
-                  <div class="flex h-20 w-20 items-center justify-center rounded-full text-4xl border"
-                    :class="getAvatarClass(editForm.avatarBg)">
+                  <div
+                    class="flex h-20 w-20 items-center justify-center rounded-full border text-4xl"
+                    :class="getAvatarClass(editForm.avatarBg)"
+                  >
                     {{ editForm.avatarEmoji }}
                   </div>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">Name</label>
-                  <Input v-model="editForm.name" placeholder="Enter your name" class="font-[JetBrains_Mono]" />
+                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium"
+                    >Name</label
+                  >
+                  <Input
+                    v-model="editForm.name"
+                    placeholder="Enter your name"
+                    class="font-[JetBrains_Mono]"
+                  />
                 </div>
                 <div class="flex flex-col gap-2">
-                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">Avatar Emoji</label>
-                  <emoji-picker @emoji-click="onEmojiSelect" class="w-full font-[JetBrains_Mono]"></emoji-picker>
+                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium"
+                    >Avatar Emoji</label
+                  >
+                  <emoji-picker
+                    @emoji-click="onEmojiSelect"
+                    class="w-full font-[JetBrains_Mono]"
+                  ></emoji-picker>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">Background Color</label>
+                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium"
+                    >Background Color</label
+                  >
                   <Select v-model="editForm.avatarBg">
                     <SelectTrigger class="w-full">
-                      <SelectValue class="font-[JetBrains_Mono]" placeholder="Select background color" />
+                      <SelectValue
+                        class="font-[JetBrains_Mono]"
+                        placeholder="Select background color"
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem v-for="color in Object.keys(AVATAR_CLASS_MAP)" :key="color" :value="color">
+                      <SelectItem
+                        v-for="color in Object.keys(AVATAR_CLASS_MAP)"
+                        :key="color"
+                        :value="color"
+                      >
                         <div class="flex items-center gap-3">
-                          <div class="w-4 h-4 rounded-full border" :class="getAvatarClass(color)">
-                          </div>
+                          <div
+                            class="h-4 w-4 rounded-full border"
+                            :class="getAvatarClass(color)"
+                          ></div>
                           <span class="font-[JetBrains_Mono] capitalize">{{ color }}</span>
                         </div>
                       </SelectItem>
@@ -170,12 +265,18 @@
                   </Select>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <Button @click="saveProfile" :disabled="isPendingOnUpdateUser"
-                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                  <Button
+                    @click="saveProfile"
+                    :disabled="isPendingOnUpdateUser"
+                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                  >
                     {{ isPendingOnUpdateUser ? 'Saving...' : 'Save Changes' }}
                   </Button>
-                  <Button variant="secondary" @click="cancelEditProfile"
-                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                  <Button
+                    variant="secondary"
+                    @click="cancelEditProfile"
+                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -186,24 +287,35 @@
         <Card v-if="isDeletingAccount" class="borde">
           <CardContent class="flex flex-col gap-6">
             <div>
-              <h2 class="text-red-500 font-[Roboto] text-2xl font-semibold">Delete Account</h2>
+              <h2 class="font-[Roboto] text-2xl font-semibold text-red-500">Delete Account</h2>
             </div>
             <div class="flex flex-col gap-4">
               <p class="text-foreground font-[JetBrains_Mono] text-sm">
-                This action cannot be undone. This will permanently delete your account and remove all your data.
+                This action cannot be undone. This will permanently delete your account and remove
+                all your data.
               </p>
               <p class="text-foreground font-[JetBrains_Mono] text-sm">
                 Please type <strong>"Delete account"</strong> to confirm deletion.
               </p>
-              <Input v-model="deleteConfirmationText" placeholder="Delete account" class="font-[JetBrains_Mono]" />
+              <Input
+                v-model="deleteConfirmationText"
+                placeholder="Delete account"
+                class="font-[JetBrains_Mono]"
+              />
               <div class="flex flex-col gap-2">
-                <Button @click="confirmDeleteAccount"
+                <Button
+                  @click="confirmDeleteAccount"
                   :disabled="deleteConfirmationText !== 'Delete account' || isPendingOnDeleteUser"
-                  class="bg-red-600 hover:bg-red-600 text-white cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                  class="cursor-pointer rounded-none bg-red-600 font-[JetBrains_Mono] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-red-600 hover:opacity-95"
+                >
                   {{ isPendingOnDeleteUser ? 'Deleting...' : 'Delete Account' }}
                 </Button>
-                <Button variant="secondary" @click="cancelDeleteAccount" :disabled="isPendingOnDeleteUser"
-                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95">
+                <Button
+                  variant="secondary"
+                  @click="cancelDeleteAccount"
+                  :disabled="isPendingOnDeleteUser"
+                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                >
                   Cancel
                 </Button>
               </div>
@@ -220,18 +332,30 @@
               </p>
             </div>
             <div class="flex flex-col gap-4">
-              <div v-for="(player, index) in leaderboard" :key="index" class="flex items-center justify-between">
+              <div
+                v-for="(player, index) in leaderboard"
+                :key="index"
+                class="flex items-center justify-between"
+              >
                 <div class="flex items-center gap-3">
-                  <div class="flex h-10 w-10 items-center justify-center rounded-full text-lg"
-                    :class="player.avatarClass">
+                  <div
+                    class="flex h-10 w-10 items-center justify-center rounded-full text-lg"
+                    :class="player.avatarClass"
+                  >
                     {{ player.emoji }}
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-foreground font-[Roboto] text-sm font-medium">{{ player.name }}</span>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-xs">#{{ index + 1 }}</span>
+                    <span class="text-foreground font-[Roboto] text-sm font-medium">{{
+                      player.name
+                    }}</span>
+                    <span class="text-muted-foreground font-[JetBrains_Mono] text-xs"
+                      >#{{ index + 1 }}</span
+                    >
                   </div>
                 </div>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ player.score }}</span>
+                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
+                  player.score
+                }}</span>
               </div>
             </div>
           </CardContent>
@@ -264,14 +388,13 @@ import { AVATAR_CLASS_MAP } from '@/consts'
 import type { GameModeType } from '@/types'
 import useGameConfigStore from '@/stores/gameConfig'
 
-
 interface GameModeItem {
-  id: GameModeType;
-  title: string;
-  description: string;
-  emoji: string;
-  class: string;
-  emojiClass: string;
+  id: GameModeType
+  title: string
+  description: string
+  emoji: string
+  class: string
+  emojiClass: string
 }
 
 const gameModes: GameModeItem[] = [
@@ -301,24 +424,54 @@ const gameModes: GameModeItem[] = [
   },
 ]
 
-
 const leaderboard = [
-  { name: 'GeoMaster', emoji: '🏆', avatarClass: 'bg-yellow-100 border border-yellow-200', score: 4950 },
-  { name: 'WorldExplorer', emoji: '🌍', avatarClass: 'bg-green-100 border border-green-200', score: 4720 },
-  { name: 'MapWizard', emoji: '🧙‍♂️', avatarClass: 'bg-purple-100 border border-purple-200', score: 4680 },
-  { name: 'Navigator_Pro', emoji: '🧭', avatarClass: 'bg-blue-100 border border-blue-200', score: 4520 },
-  { name: 'GlobeTrotter', emoji: '✈️', avatarClass: 'bg-red-100 border border-red-200', score: 4350 }
+  {
+    name: 'GeoMaster',
+    emoji: '🏆',
+    avatarClass: 'bg-yellow-100 border border-yellow-200',
+    score: 4950,
+  },
+  {
+    name: 'WorldExplorer',
+    emoji: '🌍',
+    avatarClass: 'bg-green-100 border border-green-200',
+    score: 4720,
+  },
+  {
+    name: 'MapWizard',
+    emoji: '🧙‍♂️',
+    avatarClass: 'bg-purple-100 border border-purple-200',
+    score: 4680,
+  },
+  {
+    name: 'Navigator_Pro',
+    emoji: '🧭',
+    avatarClass: 'bg-blue-100 border border-blue-200',
+    score: 4520,
+  },
+  {
+    name: 'GlobeTrotter',
+    emoji: '✈️',
+    avatarClass: 'bg-red-100 border border-red-200',
+    score: 4350,
+  },
 ]
 
 const router = useRouter()
 
-const { user, mutateUserUpdateAsync, isPendingOnUpdateUser, mutateUserDeleteAsync, isPendingOnDeleteUser } = useUserQuery()
+const {
+  user,
+  mutateUserUpdateAsync,
+  isPendingOnUpdateUser,
+  mutateUserDeleteAsync,
+  isPendingOnDeleteUser,
+} = useUserQuery()
 
 const isEditingProfile = ref(false)
 const editForm = ref({
   name: '',
   avatarEmoji: '',
-  avatarBg: ''
+  avatarBg: '',
 })
 
 const isDeletingAccount = ref(false)
@@ -327,7 +480,7 @@ const deleteConfirmationText = ref('')
 const gameConfig = useGameConfigStore()
 
 const getGameModeCardClass = (modeId: GameModeType) => {
-  const mode = gameModes.find(m => m.id === modeId)
+  const mode = gameModes.find((m) => m.id === modeId)
   const baseClass = mode?.class || ''
 
   if (gameConfig.selectedGameMode === modeId) {
@@ -344,7 +497,7 @@ const getGameModeCardClass = (modeId: GameModeType) => {
 }
 
 const getAvatarClass = (avatarBg?: string) => {
-  return avatarBg ? AVATAR_CLASS_MAP[avatarBg] ?? "" : ""
+  return avatarBg ? (AVATAR_CLASS_MAP[avatarBg] ?? '') : ''
 }
 
 const startEditProfile = () => {
@@ -352,7 +505,7 @@ const startEditProfile = () => {
     editForm.value = {
       name: user.value.name,
       avatarEmoji: user.value.avatarEmoji,
-      avatarBg: user.value.avatarBg
+      avatarBg: user.value.avatarBg,
     }
   }
   isEditingProfile.value = true
@@ -369,7 +522,7 @@ const saveProfile = async () => {
       await mutateUserUpdateAsync({
         name: editForm.value.name,
         avatarEmoji: editForm.value.avatarEmoji,
-        avatarBg: editForm.value.avatarBg
+        avatarBg: editForm.value.avatarBg,
       })
     }
   } catch (error) {

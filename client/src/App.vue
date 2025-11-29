@@ -16,23 +16,20 @@ const router = useRouter()
 const route = useRoute()
 const { signOut } = useAuth()
 
-const {
-  isErrorOnFetchUser,
-} = useUserQuery()
+const { isErrorOnFetchUser } = useUserQuery()
 
-watch(currentUser, async (newVal, oldVal) => {
-  // Redirect to landing page if user logs out on a protected route
-  if (
-    !newVal &&
-    oldVal &&
-    route.meta.requiresAuth
-  ) {
-    queryClient.clear()
-    return router.push({ name: 'landing' })
-  } else if (newVal) {
-    return router.push({ name: 'game' })
-  }
-}, { immediate: true }
+watch(
+  currentUser,
+  async (newVal, oldVal) => {
+    // Redirect to landing page if user logs out on a protected route
+    if (!newVal && oldVal && route.meta.requiresAuth) {
+      queryClient.clear()
+      return router.push({ name: 'landing' })
+    } else if (newVal) {
+      return router.push({ name: 'game' })
+    }
+  },
+  { immediate: true },
 )
 
 watch(isErrorOnFetchUser, (newVal) => {

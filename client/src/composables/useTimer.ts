@@ -17,31 +17,31 @@ export function useTimer(timeLimitInSeconds: number) {
 
   const formattedTime = computed(() => {
     if (timeLimitInSeconds <= 0) return 'Unlimited'
-    
+
     const time = Math.ceil(remainingTime.value)
     const minutes = Math.floor(time / 60)
     const seconds = time % 60
-    
+
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   })
 
   const updateTimer = () => {
     if (!isActive.value) return
-    
+
     const currentTime = performance.now()
     elapsedTime.value = (currentTime - startTime.value) / 1000 // Convert to seconds
-    
+
     if (timeLimitInSeconds > 0 && elapsedTime.value >= timeLimitInSeconds) {
       stop()
       return
     }
-    
+
     animationFrame = requestAnimationFrame(updateTimer)
   }
 
   const start = () => {
     if (isActive.value) return
-    
+
     startTime.value = performance.now()
     isActive.value = true
     elapsedTime.value = 0
@@ -73,6 +73,6 @@ export function useTimer(timeLimitInSeconds: number) {
     elapsedTime,
     start,
     stop,
-    reset
+    reset,
   }
 }
