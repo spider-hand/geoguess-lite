@@ -29,6 +29,11 @@
           </Button>
         </nav>
       </div>
+      <div class="mt-6 pt-6 text-center">
+        <p class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+          © {{ new Date().getFullYear() }} Akinori Hoshina
+        </p>
+      </div>
     </div>
   </footer>
 </template>

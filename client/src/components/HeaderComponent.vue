@@ -17,7 +17,8 @@
       Geoguess
       Lite</button>
     <nav class="flex gap-4">
-      <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg">
+      <Button variant="ghost" class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
+        @click="openGithub">
         [Github]
       </Button>
       <Button v-if="isCurrentUserLoaded && !currentUser"
@@ -41,4 +42,8 @@ import useAuth from '@/composables/useAuth';
 const router = useRouter()
 
 const { currentUser, isCurrentUserLoaded, signUpWithGoogle, signOut } = useAuth();
+
+const openGithub = () => {
+  window.open('https://github.com/spider-hand/geoguess-lite', '_blank')
+}
 </script>
