@@ -17,3 +17,8 @@ export const AVATAR_CLASS_MAP: Record<string, string> = {
   pink: 'bg-pink-100 border-pink-200',
   rose: 'bg-rose-100 border-rose-200',
 } as const
+
+export const EARTH_RADIUS_KM = 6371 as const
+export const MAX_SCORE = 5000 as const
+export const PERFECT_SCORE_THRESHOLD_KM = 0.025 as const
+export const DEFAULT_WORLD_SCALE = 14917 as const

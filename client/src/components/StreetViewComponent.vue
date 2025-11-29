@@ -1,10 +1,25 @@
 <template>
-  <div ref="viewerRef" class="flex-1 lg:w-2/3 min-h-[40vh] lg:min-h-0 rounded-4xl"></div>
+  <div class="flex-1 lg:w-2/3 min-h-[40vh] lg:min-h-0 rounded-4xl relative">
+    <div ref="viewerRef" class="h-full w-full rounded-4xl"></div>
+    <div v-if="showResult" class="absolute inset-0 flex items-center justify-center">
+      <div class="bg-black opacity-80 rounded-lg px-8 py-6 shadow-lg text-center">
+        <div class="font-[JetBrains_Mono] text-2xl font-bolds text-white">{{ resultScore }} points</div>
+        <div class="font-[JetBrains_Mono] text-lg mt-2 text-gray-300">
+          {{ resultDistance === -1 ? 'Time\'s up! No guess made.' : `You were ${resultDistance}km away!` }}
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { Viewer } from "mapillary-js";
+
+const emit = defineEmits<{
+  imageLoaded: [position: { lat: number, lng: number }]
+  imageLoadingStart: []
+}>();
 
 const props = defineProps({
   allowMoving: {
@@ -14,6 +29,18 @@ const props = defineProps({
   allowZooming: {
     type: Boolean,
     default: true,
+  },
+  showResult: {
+    type: Boolean,
+    default: false,
+  },
+  resultScore: {
+    type: Number,
+    default: 0,
+  },
+  resultDistance: {
+    type: Number,
+    default: 0,
   },
 });
 
@@ -57,16 +84,23 @@ const loadRandomView = async () => {
   try {
     if (!viewer.value) return;
 
+    emit('imageLoadingStart');
     const imageId = await getRandomImageId();
     await viewer.value.moveTo(imageId);
 
     const pos = await viewer.value.getPosition();
     console.log(`Loaded image at lat: ${pos.lat}, lng: ${pos.lng}`);
+
+    emit('imageLoaded', { lat: pos.lat, lng: pos.lng });
   } catch (err) {
     console.error('Error in loadRandomView:', err);
     throw err;
   }
 }
+
+defineExpose({
+  loadRandomView
+});
 
 onMounted(async () => {
   try {
