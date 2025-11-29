@@ -41,7 +41,7 @@ const props = defineProps({
   resultDistance: {
     type: Number,
     default: 0,
-  },
+  }
 });
 
 const viewer = ref<Viewer | null>(null);
@@ -102,9 +102,9 @@ defineExpose({
   loadRandomView
 });
 
-onMounted(async () => {
+const initViewer = async () => {
   try {
-    if (!viewerRef.value) return;
+    if (!viewerRef.value || viewer.value) return;
 
     viewer.value = new Viewer({
       container: viewerRef.value,
@@ -121,5 +121,9 @@ onMounted(async () => {
   } catch (err) {
     console.error('Error loading Mapillary view:', err);
   }
+};
+
+onMounted(async () => {
+  await initViewer();
 });
 </script>

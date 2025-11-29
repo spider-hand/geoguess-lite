@@ -1,7 +1,10 @@
 <template>
   <div class="flex min-h-screen flex-col">
-    <header class="flex items-center justify-between border-b px-8 py-4">
-      <div class="font-[JetBrains_Mono] text-xl font-semibold">Round {{ currentRound }} / {{ gameConfig.rounds }}</div>
+    <HeaderComponent v-if="showSummaryView" />
+    <header v-else class="flex items-center justify-between border-b px-8 py-4">
+      <div class="font-[JetBrains_Mono] text-xl font-semibold">
+        <span>Round {{ currentRound }} / {{ gameConfig.rounds }}</span>
+      </div>
       <nav class="flex gap-4">
         <div class="text-muted-foreground font-[JetBrains_Mono] text-lg px-4 py-2 h-9">
           [Time: {{ formattedTime }}]
@@ -11,7 +14,7 @@
         </div>
       </nav>
     </header>
-    <main class="grow flex flex-col lg:flex-row gap-6 p-6 sm:p-8">
+    <main v-if="!showSummaryView" class="grow flex flex-col lg:flex-row gap-6 p-6 sm:p-8">
       <StreetViewComponent ref="streetViewComponent" :allow-moving="gameConfig.allowMoving"
         :allow-zooming="gameConfig.allowZooming" :show-result="showResult" :result-score="score"
         :result-distance="distance" @image-loaded="onImageLoaded" @image-loading-start="onImageLoadingStart" />
@@ -31,6 +34,8 @@
         </Button>
       </div>
     </main>
+    <GameSummarySinglePlayerComponent v-else :total-score="totalScore" @play-again="playAgain"
+      @return-to-menu="returnToMenu" />
   </div>
 </template>
 
@@ -42,13 +47,18 @@ import Button from '@/components/ui/button/Button.vue';
 import useGameConfigStore from '@/stores/gameConfig';
 import { calculateDistance, calculateScore } from '@/utils';
 import { useTimer } from '@/composables/useTimer';
+import { useRouter } from 'vue-router'
+import HeaderComponent from '@/components/HeaderComponent.vue';
+import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue';
 
 const gameConfig = useGameConfigStore();
 const { isExpired: isTimerExpired, formattedTime, start: startTimer, stop: stopTimer, reset: resetTimer } = useTimer(gameConfig.timeLimit);
+const router = useRouter();
 
 const hasMarker = ref(false);
 const showResult = ref(false);
 const isLoadingImage = ref(false);
+const showSummaryView = ref(false);
 const distance = ref(0);
 const score = ref(0);
 const totalScore = ref(0);
@@ -158,6 +168,17 @@ const nextRound = async () => {
 };
 
 const showSummary = () => {
-  console.log('Game completed! Total score:', totalScore.value);
+  showSummaryView.value = true;
+};
+
+const playAgain = () => {
+  showSummaryView.value = false;
+  currentRound.value = 1;
+  totalScore.value = 0;
+  resetRound();
+};
+
+const returnToMenu = () => {
+  router.push('/game');
 };
 </script>
