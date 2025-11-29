@@ -10,8 +10,10 @@
           </p>
         </div>
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <CustomCardComponent v-for="(mode, index) in gameModes" :key="index" :title="mode.title"
-            :description="mode.description" :emoji="mode.emoji" :bg-class="mode.class" :emoji-class="mode.emojiClass" />
+          <div v-for="(mode, index) in gameModes" :key="index" @click="selectGameMode(mode.id)" class="h-full">
+            <CustomCardComponent :title="mode.title" :description="mode.description" :emoji="mode.emoji"
+              :bg-class="getGameModeCardClass(mode.id)" :emoji-class="mode.emojiClass" />
+          </div>
         </div>
         <Card class="border">
           <CardContent class="flex flex-col gap-8">
@@ -24,7 +26,19 @@
                 Customize your game experience
               </p>
             </div>
-            <div class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
+            <div v-if="selectedGameMode === 'multiplayer'" class="flex flex-col gap-4">
+              <div class="flex flex-col gap-4">
+                <CustomCheckboxComponent id="is-host" label="I am the host" v-model="isHost" />
+                <div v-if="!isHost" class="flex flex-col gap-1">
+                  <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
+                    Room Number
+                  </label>
+                  <Input v-model="roomNumber" placeholder="Enter room number" class="font-[JetBrains_Mono] max-w-xs" />
+                </div>
+              </div>
+            </div>
+            <div v-if="(selectedGameMode === 'single-player') || (selectedGameMode === 'multiplayer' && isHost)"
+              class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
               <div class="flex flex-col gap-4">
                 <div>
                   <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Maps</h3>
@@ -101,7 +115,7 @@
                 <div class="flex justify-between">
                   <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Avg. Score</span>
                   <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.averageScore
-                    }}</span>
+                  }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">High Score</span>
@@ -246,9 +260,18 @@ import useUserQuery from '@/composables/useUserQuery'
 import { AVATAR_CLASS_MAP } from '@/consts'
 
 
-const gameModes = [
+interface GameModeItem {
+  id: GameModeType;
+  title: string;
+  description: string;
+  emoji: string;
+  class: string;
+  emojiClass: string;
+}
+
+const gameModes: GameModeItem[] = [
   {
-    id: 'single',
+    id: 'single-player',
     title: 'Single Player',
     description: 'Explore the world at your own pace',
     emoji: '🌍',
@@ -264,7 +287,7 @@ const gameModes = [
     emojiClass: 'bg-green-100 border-green-200',
   },
   {
-    id: 'daily',
+    id: 'daily-challenge',
     title: 'Daily Challenge',
     description: "Compete in today's unique challenge",
     emoji: '🏆',
@@ -296,12 +319,39 @@ const editForm = ref({
 const isDeletingAccount = ref(false)
 const deleteConfirmationText = ref('')
 
+type GameModeType = 'single-player' | 'multiplayer' | 'daily-challenge'
+
+const selectedGameMode = ref<GameModeType>('single-player')
+const isHost = ref<boolean>(false)
+const roomNumber = ref<string>('')
+
 const mapType = ref<string>('world')
 const rounds = ref<number>(5)
 const timeLimit = ref<number>(0)
 const allowMoving = ref<boolean>(true)
 const allowPanning = ref<boolean>(true)
 const allowZooming = ref<boolean>(true)
+
+const selectGameMode = (modeId: GameModeType) => {
+  selectedGameMode.value = modeId
+}
+
+const getGameModeCardClass = (modeId: GameModeType) => {
+  const mode = gameModes.find(m => m.id === modeId)
+  const baseClass = mode?.class || ''
+
+  if (selectedGameMode.value === modeId) {
+    if (modeId === 'single-player') {
+      return `${baseClass} border-2! border-blue-500`
+    } else if (modeId === 'multiplayer') {
+      return `${baseClass} border-2! border-green-500`
+    } else if (modeId === 'daily-challenge') {
+      return `${baseClass} border-2! border-purple-500`
+    }
+  }
+
+  return baseClass
+}
 
 const getAvatarClass = (avatarBg?: string) => {
   return avatarBg ? AVATAR_CLASS_MAP[avatarBg] ?? "" : ""

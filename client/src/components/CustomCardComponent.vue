@@ -1,8 +1,8 @@
 <template>
   <Card
-    :class="`${bgClass} cursor-pointer border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`"
+    :class="`${bgClass} cursor-pointer border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg h-full`"
   >
-    <CardContent :class="contentAlign">
+    <CardContent :class="`${contentAlign} flex flex-col justify-between h-full`">
       <div class="flex" :class="iconAlign">
         <div
           :class="`mb-4 flex h-12 w-12 items-center justify-center rounded-xl border p-2 text-3xl ${emojiClass}`"
