@@ -6,6 +6,17 @@
 import { onMounted, ref } from "vue";
 import { Viewer } from "mapillary-js";
 
+const props = defineProps({
+  allowMoving: {
+    type: Boolean,
+    default: true,
+  },
+  allowZooming: {
+    type: Boolean,
+    default: true,
+  },
+});
+
 const viewer = ref<Viewer | null>(null);
 const viewerRef = ref<HTMLElement | null>(null);
 
@@ -64,6 +75,12 @@ onMounted(async () => {
     viewer.value = new Viewer({
       container: viewerRef.value,
       accessToken: import.meta.env.VITE_MAPILLARY_TOKEN,
+      component: {
+        pointer: props.allowZooming,
+        sequence: props.allowMoving,
+        direction: props.allowMoving,
+        zoom: props.allowZooming,
+      }
     });
 
     await loadRandomView();

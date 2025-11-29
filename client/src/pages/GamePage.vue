@@ -10,7 +10,8 @@
           </p>
         </div>
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <div v-for="(mode, index) in gameModes" :key="index" @click="selectGameMode(mode.id)" class="h-full">
+          <div v-for="(mode, index) in gameModes" :key="index" @click="gameConfig.selectedGameMode = mode.id"
+            class="h-full">
             <CustomCardComponent :title="mode.title" :description="mode.description" :emoji="mode.emoji"
               :bg-class="getGameModeCardClass(mode.id)" :emoji-class="mode.emojiClass" />
           </div>
@@ -26,18 +27,20 @@
                 Customize your game experience
               </p>
             </div>
-            <div v-if="selectedGameMode === 'multiplayer'" class="flex flex-col gap-4">
+            <div v-if="gameConfig.selectedGameMode === 'multiplayer'" class="flex flex-col gap-4">
               <div class="flex flex-col gap-4">
-                <CustomCheckboxComponent id="is-host" label="I am the host" v-model="isHost" />
-                <div v-if="!isHost" class="flex flex-col gap-1">
+                <CustomCheckboxComponent id="is-host" label="I am the host" v-model="gameConfig.isHost" />
+                <div v-if="!gameConfig.isHost" class="flex flex-col gap-1">
                   <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
                     Room Number
                   </label>
-                  <Input v-model="roomNumber" placeholder="Enter room number" class="font-[JetBrains_Mono] max-w-xs" />
+                  <Input v-model="gameConfig.roomNumber" placeholder="Enter room number"
+                    class="font-[JetBrains_Mono] max-w-xs" />
                 </div>
               </div>
             </div>
-            <div v-if="(selectedGameMode === 'single-player') || (selectedGameMode === 'multiplayer' && isHost)"
+            <div
+              v-if="(gameConfig.selectedGameMode === 'single-player') || (gameConfig.selectedGameMode === 'multiplayer' && gameConfig.isHost)"
               class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
               <div class="flex flex-col gap-4">
                 <div>
@@ -47,7 +50,7 @@
                   <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
                     Map Type
                   </label>
-                  <Select v-model="mapType">
+                  <Select v-model="gameConfig.mapType">
                     <SelectTrigger class="w-full">
                       <SelectValue placeholder="Select map type" class="font-[JetBrains_Mono]" />
                     </SelectTrigger>
@@ -62,10 +65,11 @@
                   <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Rounds & Time</h3>
                 </div>
                 <div class="flex flex-col gap-8">
-                  <CustomSliderComponent label="Number of Rounds" v-model="rounds" :min="5" :max="10" :step="1"
-                    unit=" rounds" />
-                  <CustomSliderComponent label="Time Limit Per Round" v-model="timeLimit" :min="0" :max="300" :step="60"
-                    unit="s" :unlimited-value="0" unlimited-text="Unlimited" help-text="Set to 0 for unlimited time" />
+                  <CustomSliderComponent label="Number of Rounds" v-model="gameConfig.rounds" :min="5" :max="10"
+                    :step="1" unit=" rounds" />
+                  <CustomSliderComponent label="Time Limit Per Round" v-model="gameConfig.timeLimit" :min="0" :max="300"
+                    :step="60" unit="s" :unlimited-value="0" unlimited-text="Unlimited"
+                    help-text="Set to 0 for unlimited time" />
                 </div>
               </div>
               <div class="flex flex-col gap-4">
@@ -73,9 +77,8 @@
                   <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Gameplay</h3>
                 </div>
                 <div class="flex flex-col gap-4">
-                  <CustomCheckboxComponent id="allow-moving" label="Allow Moving" v-model="allowMoving" />
-                  <CustomCheckboxComponent id="allow-panning" label="Allow Panning" v-model="allowPanning" />
-                  <CustomCheckboxComponent id="allow-zooming" label="Allow Zooming" v-model="allowZooming" />
+                  <CustomCheckboxComponent id="allow-moving" label="Allow Moving" v-model="gameConfig.allowMoving" />
+                  <CustomCheckboxComponent id="allow-zooming" label="Allow Zooming" v-model="gameConfig.allowZooming" />
                 </div>
               </div>
             </div>
@@ -115,7 +118,7 @@
                 <div class="flex justify-between">
                   <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">Avg. Score</span>
                   <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{ user?.averageScore
-                  }}</span>
+                    }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">High Score</span>
@@ -258,6 +261,8 @@ import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import useUserQuery from '@/composables/useUserQuery'
 import { AVATAR_CLASS_MAP } from '@/consts'
+import type { GameModeType } from '@/types'
+import useGameConfigStore from '@/stores/gameConfig'
 
 
 interface GameModeItem {
@@ -319,28 +324,13 @@ const editForm = ref({
 const isDeletingAccount = ref(false)
 const deleteConfirmationText = ref('')
 
-type GameModeType = 'single-player' | 'multiplayer' | 'daily-challenge'
-
-const selectedGameMode = ref<GameModeType>('single-player')
-const isHost = ref<boolean>(false)
-const roomNumber = ref<string>('')
-
-const mapType = ref<string>('world')
-const rounds = ref<number>(5)
-const timeLimit = ref<number>(0)
-const allowMoving = ref<boolean>(true)
-const allowPanning = ref<boolean>(true)
-const allowZooming = ref<boolean>(true)
-
-const selectGameMode = (modeId: GameModeType) => {
-  selectedGameMode.value = modeId
-}
+const gameConfig = useGameConfigStore()
 
 const getGameModeCardClass = (modeId: GameModeType) => {
   const mode = gameModes.find(m => m.id === modeId)
   const baseClass = mode?.class || ''
 
-  if (selectedGameMode.value === modeId) {
+  if (gameConfig.selectedGameMode === modeId) {
     if (modeId === 'single-player') {
       return `${baseClass} border-2! border-blue-500`
     } else if (modeId === 'multiplayer') {

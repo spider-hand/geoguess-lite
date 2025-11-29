@@ -30,6 +30,7 @@
     "lucide-vue-next": "^0.553.0",
     "mapillary-js": "^4.1.2",
     "maplibre-gl": "^5.13.0",
+    "pinia": "^3.0.4",
     "reka-ui": "^2.6.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",

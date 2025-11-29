@@ -12,7 +12,7 @@
       </nav>
     </header>
     <main class="grow flex flex-col lg:flex-row gap-6 p-6 sm:p-8">
-      <StreetViewComponent />
+      <StreetViewComponent :allow-moving="gameConfig.allowMoving" :allow-zooming="gameConfig.allowZooming" />
       <div class="flex flex-col lg:w-1/3 lg:max-w-md gap-6">
         <MapComponent />
         <Button
@@ -28,5 +28,9 @@
 import MapComponent from '@/components/MapComponent.vue';
 import StreetViewComponent from '@/components/StreetViewComponent.vue';
 import Button from '@/components/ui/button/Button.vue';
+import useGameConfigStore from '@/stores/gameConfig';
+
+const gameConfig = useGameConfigStore();
+
 
 </script>
