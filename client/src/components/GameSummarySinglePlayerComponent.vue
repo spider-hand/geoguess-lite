@@ -87,15 +87,18 @@
     </div>
 
     <div class="flex justify-center gap-4">
-      <Button @click="$emit('play-again')" class="rounded-none font-[JetBrains_Mono] text-lg">
+      <Button
+        @click="$emit('play-again')"
+        class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
+      >
         Play Again
       </Button>
       <Button
         @click="$emit('return-to-menu')"
         variant="ghost"
-        class="font-[JetBrains_Mono] text-lg"
+        class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
       >
-        Return to Main Menu
+        [Return to Main Menu]
       </Button>
     </div>
   </div>

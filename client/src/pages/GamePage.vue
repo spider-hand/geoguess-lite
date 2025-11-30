@@ -192,18 +192,18 @@
               </div>
               <div class="flex flex-col gap-3">
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   @click="startEditProfile"
-                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                  class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono]"
                 >
-                  Edit Profile
+                  [Edit Profile]
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   @click="startDeleteAccount"
-                  class="cursor-pointer rounded-none font-[JetBrains_Mono] text-red-500 transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                  class="cursor-pointer rounded-none font-[JetBrains_Mono] text-red-500 hover:bg-red-50 hover:text-red-600"
                 >
-                  Delete Account
+                  [Delete Account]
                 </Button>
               </div>
             </template>
@@ -273,11 +273,11 @@
                     {{ isPendingOnUpdateUser ? 'Saving...' : 'Save Changes' }}
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     @click="cancelEditProfile"
-                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                    class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono]"
                   >
-                    Cancel
+                    [Cancel]
                   </Button>
                 </div>
               </div>
@@ -311,12 +311,12 @@
                   {{ isPendingOnDeleteUser ? 'Deleting...' : 'Delete Account' }}
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   @click="cancelDeleteAccount"
                   :disabled="isPendingOnDeleteUser"
-                  class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                  class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono]"
                 >
-                  Cancel
+                  [Cancel]
                 </Button>
               </div>
             </div>

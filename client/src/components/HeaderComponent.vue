@@ -34,7 +34,7 @@
     <nav class="flex gap-4">
       <Button
         variant="ghost"
-        class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
+        class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
         @click="openGithub"
       >
         [Github]
@@ -49,7 +49,7 @@
       <Button
         v-else
         variant="ghost"
-        class="text-muted-foreground cursor-pointer font-[JetBrains_Mono] text-lg"
+        class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
         @click="signOut"
       >
         [Sign Out]
