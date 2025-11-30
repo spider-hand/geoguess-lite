@@ -7,9 +7,16 @@
       </p>
     </div>
 
-    <Card class="mb-6">
+    <Card class="mb-6 border-indigo-100 bg-indigo-50">
       <CardHeader>
-        <CardTitle class="text-muted-foreground font-[Roboto]">Score</CardTitle>
+        <div class="flex items-center gap-3">
+          <div
+            class="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-100 p-2 text-2xl"
+          >
+            🎯
+          </div>
+          <CardTitle class="text-muted-foreground font-[Roboto]">Score</CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
         <div class="space-y-2">
@@ -21,46 +28,46 @@
           <Progress
             :model-value="(totalScore / (gameConfig.rounds * MAX_SCORE)) * 100"
             :max="gameConfig.rounds * MAX_SCORE"
-            class="h-2"
+            class="h-2 [&>div]:bg-indigo-700"
           />
         </div>
       </CardContent>
     </Card>
 
     <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-      <Card>
-        <CardHeader>
-          <CardTitle class="text-muted-foreground font-[Roboto]">Total Distance Off</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="font-[JetBrains_Mono] text-2xl font-bold">1,234km</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle class="text-muted-foreground font-[Roboto]">Average Score</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="font-[JetBrains_Mono] text-2xl font-bold">850</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle class="text-muted-foreground font-[Roboto]">Average Time</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="font-[JetBrains_Mono] text-2xl font-bold">1m 32s</div>
-        </CardContent>
-      </Card>
+      <SummaryCardComponent
+        title="Total Distance Off"
+        value="1,234km"
+        emoji="📍"
+        bg-class="bg-red-50 border-red-100"
+        emoji-class="bg-red-100 border-red-200"
+      />
+      <SummaryCardComponent
+        title="Average Score"
+        value="850 points"
+        emoji="📊"
+        bg-class="bg-emerald-50 border-emerald-100"
+        emoji-class="bg-emerald-100 border-emerald-200"
+      />
+      <SummaryCardComponent
+        title="Average Time"
+        value="1m 32s"
+        emoji="⏱️"
+        bg-class="bg-amber-50 border-amber-100"
+        emoji-class="bg-amber-100 border-amber-200"
+      />
     </div>
 
     <div class="mb-6">
       <h2 class="mb-4 font-[Roboto] text-2xl font-bold">Round Breakdown</h2>
       <Accordion type="single" collapsible>
         <AccordionItem v-for="round in gameConfig.rounds" :key="round" :value="`round-${round}`">
-          <AccordionTrigger class="flex items-center font-[Roboto] text-xl"
-            >Round {{ round }}</AccordionTrigger
-          >
+          <AccordionTrigger class="flex items-center">
+            <div class="flex items-center gap-2">
+              <span class="font-[Roboto] text-xl">Round {{ round }}</span>
+              <span class="text-muted-foreground">850 points</span>
+            </div>
+          </AccordionTrigger>
           <AccordionContent>
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <div class="h-64">
@@ -98,6 +105,7 @@
 import useGameConfigStore from '@/stores/gameConfig'
 import MapComponent from './MapComponent.vue'
 import StreetViewComponent from './StreetViewComponent.vue'
+import SummaryCardComponent from './SummaryCardComponent.vue'
 import Accordion from './ui/accordion/Accordion.vue'
 import AccordionContent from './ui/accordion/AccordionContent.vue'
 import AccordionItem from './ui/accordion/AccordionItem.vue'
@@ -108,6 +116,7 @@ import CardHeader from './ui/card/CardHeader.vue'
 import CardTitle from './ui/card/CardTitle.vue'
 import { MAX_SCORE } from '@/consts'
 import Button from './ui/button/Button.vue'
+import Progress from './ui/progress/Progress.vue'
 
 const gameConfig = useGameConfigStore()
 
