@@ -1,20 +1,27 @@
 <template>
   <div class="flex min-h-screen flex-col">
     <HeaderComponent v-if="showSummaryView" />
-    <header v-else class="flex items-center justify-between border-b px-8 py-4">
-      <div class="font-[JetBrains_Mono] text-xl font-semibold">
+    <header v-else class="flex items-center justify-between border-b px-4 py-4 sm:px-8">
+      <div class="font-[JetBrains_Mono] text-lg font-semibold sm:text-xl">
         <span>Round {{ currentRound }} / {{ ROUNDS }}</span>
       </div>
-      <nav class="flex gap-4">
-        <div class="text-muted-foreground h-9 px-4 py-2 font-[JetBrains_Mono] text-lg">
+      <nav class="flex gap-2 sm:gap-4">
+        <div
+          class="text-muted-foreground h-9 px-2 py-2 font-[JetBrains_Mono] text-sm sm:px-4 sm:text-lg"
+        >
           [Time: {{ formattedTime }}]
         </div>
-        <div class="text-muted-foreground h-9 px-4 py-2 font-[JetBrains_Mono] text-lg">
+        <div
+          class="text-muted-foreground h-9 px-2 py-2 font-[JetBrains_Mono] text-sm sm:px-4 sm:text-lg"
+        >
           [Score: {{ totalScore }}]
         </div>
       </nav>
     </header>
-    <main v-if="!showSummaryView" class="flex grow flex-col gap-6 p-6 sm:p-8 lg:flex-row">
+    <main
+      v-if="!showSummaryView"
+      class="flex grow flex-col gap-4 p-4 sm:gap-6 sm:p-6 md:p-8 lg:flex-row"
+    >
       <StreetViewComponent
         ref="streetViewRef"
         :allow-moving="gameConfig.allowMoving"
@@ -25,8 +32,10 @@
         @image-loaded="onImageLoaded"
         @image-loading-start="onImageLoadingStart"
       />
-      <div class="flex flex-col gap-6 lg:w-1/3 lg:max-w-md">
-        <MapComponent ref="mapRef" @marker-placed="onMarkerPlaced" />
+      <div class="flex flex-col gap-4 sm:gap-6 lg:w-1/3 lg:max-w-md">
+        <div class="h-[300px] sm:h-[400px] lg:h-full">
+          <MapComponent ref="mapRef" @marker-placed="onMarkerPlaced" />
+        </div>
         <Button
           v-if="!showResult"
           :disabled="!hasMarker || isLoadingImage"

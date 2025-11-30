@@ -1,5 +1,7 @@
 <template>
-  <div class="relative min-h-[40vh] flex-1 rounded-4xl lg:min-h-0 lg:w-2/3">
+  <div
+    class="relative h-[300px] w-full rounded-4xl sm:h-[400px] lg:min-h-[500px] lg:w-2/3 lg:flex-1"
+  >
     <div ref="viewerRef" class="h-full w-full rounded-4xl"></div>
     <div v-if="showResult" class="absolute inset-0 flex items-center justify-center">
       <div class="rounded-lg bg-black px-8 py-6 text-center opacity-80 shadow-lg">
