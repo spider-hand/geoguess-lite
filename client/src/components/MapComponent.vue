@@ -5,9 +5,28 @@
 <script setup lang="ts">
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, type PropType } from 'vue'
 import useUserQuery from '@/composables/useUserQuery'
-import { getAvatarClass } from '@/utils'
+import { calculateCenter, calculateZoomLevel, getAvatarClass } from '@/utils'
+
+const props = defineProps({
+  playerLocation: {
+    type: Object as PropType<{ lat: number; lng: number } | null>,
+    default: null,
+  },
+  correctLocation: {
+    type: Object as PropType<{ lat: number; lng: number } | null>,
+    default: null,
+  },
+  center: {
+    type: Array as PropType<number[] | null>,
+    default: null,
+  },
+  zoom: {
+    type: Number,
+    default: 2,
+  },
+})
 
 const emit = defineEmits<{
   markerPlaced: [position: { lat: number; lng: number }]
@@ -78,25 +97,8 @@ const centerMapOnMarkers = (
 ) => {
   if (!map.value) return
 
-  const centerLng = (userPos[0] + correctPos[0]) / 2
-  const centerLat = (userPos[1] + correctPos[1]) / 2
-
-  let zoom = 10
-  if (distance < 1) {
-    zoom = 15
-  } else if (distance < 10) {
-    zoom = 12
-  } else if (distance < 50) {
-    zoom = 9
-  } else if (distance < 200) {
-    zoom = 7
-  } else if (distance < 1000) {
-    zoom = 5
-  } else if (distance < 5000) {
-    zoom = 2
-  } else {
-    zoom = 1
-  }
+  const [centerLng, centerLat] = calculateCenter(userPos, correctPos)
+  const zoom = calculateZoomLevel(distance)
 
   map.value.flyTo({
     center: [centerLng, centerLat],
@@ -126,6 +128,17 @@ const enableClicks = () => {
   map.value.on('click', handleMapClick)
 }
 
+const addCorrectLocationMarker = (location: { lat: number; lng: number }) => {
+  if (!map.value) return
+
+  correctLocationMarker.value = new maplibregl.Marker({
+    color: '#ef4444',
+  }).setLngLat([location.lng, location.lat])
+
+  // @ts-expect-error maplibre type issue
+  correctLocationMarker.value.addTo(map.value)
+}
+
 const initializeMap = () => {
   if (!mapRef.value || map.value) return
 
@@ -151,12 +164,25 @@ const initializeMap = () => {
           maxzoom: 19,
         },
       ],
-      center: [6.82, 50.06],
-      zoom: 3,
+      center: props.center || [6.82, 50.06],
+      zoom: props.zoom || 3,
     },
   })
 
-  map.value.on('click', handleMapClick)
+  // Disable click event and show the markers when initializing the map for summary view
+  if (!props.correctLocation) {
+    map.value.on('click', handleMapClick)
+  }
+
+  map.value.on('load', () => {
+    if (props.correctLocation) {
+      addCorrectLocationMarker(props.correctLocation)
+
+      if (props.playerLocation) {
+        addMarkerToMap([props.playerLocation.lng, props.playerLocation.lat])
+      }
+    }
+  })
 }
 
 onMounted(() => {

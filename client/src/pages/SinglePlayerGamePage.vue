@@ -16,7 +16,7 @@
     </header>
     <main v-if="!showSummaryView" class="flex grow flex-col gap-6 p-6 sm:p-8 lg:flex-row">
       <StreetViewComponent
-        ref="streetViewComponent"
+        ref="streetViewRef"
         :allow-moving="gameConfig.allowMoving"
         :allow-zooming="gameConfig.allowZooming"
         :show-result="showResult"
@@ -26,7 +26,7 @@
         @image-loading-start="onImageLoadingStart"
       />
       <div class="flex flex-col gap-6 lg:w-1/3 lg:max-w-md">
-        <MapComponent ref="mapComponent" @marker-placed="onMarkerPlaced" />
+        <MapComponent ref="mapRef" @marker-placed="onMarkerPlaced" />
         <Button
           v-if="!showResult"
           :disabled="!hasMarker || isLoadingImage"
@@ -54,6 +54,8 @@
     <GameSummarySinglePlayerComponent
       v-else
       :total-score="totalScore"
+      :average-score="averageScore"
+      :game-records="gameRecords"
       @play-again="playAgain"
       @return-to-menu="returnToMenu"
     />
@@ -61,16 +63,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
 import useGameConfigStore from '@/stores/gameConfig'
-import { calculateDistance, calculateScore } from '@/utils'
+import { calculateCenter, calculateDistance, calculateScore, calculateZoomLevel } from '@/utils'
 import { useTimer } from '@/composables/useTimer'
 import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue'
+import type { RoundRecord } from '@/types'
 
 const gameConfig = useGameConfigStore()
 const {
@@ -92,8 +95,36 @@ const totalScore = ref(0)
 const currentRound = ref(1)
 const imagePosition = ref<{ lat: number; lng: number } | null>(null)
 const markerPosition = ref<{ lat: number; lng: number } | null>(null)
-const mapComponent = ref()
-const streetViewComponent = ref()
+const mapRef = ref<InstanceType<typeof MapComponent> | null>(null)
+const streetViewRef = ref<InstanceType<typeof StreetViewComponent> | null>(null)
+
+const gameRecords = ref<RoundRecord[]>([])
+
+const saveRoundRecord = () => {
+  if (!imagePosition.value) return
+
+  const [centerLng, centerLat] = calculateCenter(
+    [markerPosition.value!.lng, markerPosition.value!.lat],
+    [imagePosition.value!.lng, imagePosition.value!.lat],
+  )
+  const zoom = calculateZoomLevel(distance.value)
+
+  gameRecords.value.push({
+    round: currentRound.value,
+    score: score.value,
+    distance: distance.value,
+    correctLocation: imagePosition.value,
+    playerLocation: markerPosition.value,
+    mapCenter: [centerLng, centerLat],
+    mapZoom: zoom,
+  })
+}
+
+const averageScore = computed(() => {
+  if (gameRecords.value.length === 0) return 0
+  const sum = gameRecords.value.reduce((acc, record) => acc + record.score, 0)
+  return Math.round(sum / gameRecords.value.length)
+})
 
 watch(
   () => isTimerExpired.value,
@@ -115,10 +146,10 @@ const handleTimeExpired = () => {
     totalScore.value += score.value
     showResult.value = true
 
-    if (mapComponent.value && imagePosition.value) {
-      mapComponent.value.disableClicks()
-      mapComponent.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
-      mapComponent.value.centerMapOnMarkers(
+    if (mapRef.value && imagePosition.value) {
+      mapRef.value.disableClicks()
+      mapRef.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
+      mapRef.value.centerMapOnMarkers(
         [markerPosition.value.lng, markerPosition.value.lat],
         [imagePosition.value.lng, imagePosition.value.lat],
         distance.value,
@@ -130,11 +161,13 @@ const handleTimeExpired = () => {
     distance.value = -1 // Use -1 to indicate no guess was made
     showResult.value = true
 
-    if (mapComponent.value && imagePosition.value) {
-      mapComponent.value.disableClicks()
-      mapComponent.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
+    if (mapRef.value && imagePosition.value) {
+      mapRef.value.disableClicks()
+      mapRef.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
     }
   }
+
+  saveRoundRecord()
 }
 
 const onImageLoaded = (position: { lat: number; lng: number }) => {
@@ -162,15 +195,17 @@ const makeGuess = () => {
   totalScore.value += score.value
   showResult.value = true
 
-  if (mapComponent.value && imagePosition.value) {
-    mapComponent.value.disableClicks()
-    mapComponent.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
-    mapComponent.value.centerMapOnMarkers(
+  if (mapRef.value && imagePosition.value) {
+    mapRef.value.disableClicks()
+    mapRef.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
+    mapRef.value.centerMapOnMarkers(
       [markerPosition.value.lng, markerPosition.value.lat],
       [imagePosition.value.lng, imagePosition.value.lat],
       distance.value,
     )
   }
+
+  saveRoundRecord()
 }
 
 const resetRound = () => {
@@ -182,9 +217,9 @@ const resetRound = () => {
   score.value = 0
   resetTimer()
 
-  if (mapComponent.value) {
-    mapComponent.value.removeMarkers()
-    mapComponent.value.enableClicks()
+  if (mapRef.value) {
+    mapRef.value.removeMarkers()
+    mapRef.value.enableClicks()
   }
 }
 
@@ -192,8 +227,8 @@ const nextRound = async () => {
   currentRound.value += 1
   resetRound()
 
-  if (streetViewComponent.value) {
-    await streetViewComponent.value.loadRandomView()
+  if (streetViewRef.value) {
+    await streetViewRef.value.loadRandomView()
   }
 }
 
@@ -205,6 +240,7 @@ const playAgain = () => {
   showSummaryView.value = false
   currentRound.value = 1
   totalScore.value = 0
+  gameRecords.value = []
   resetRound()
 }
 

@@ -37,21 +37,21 @@
     <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
       <SummaryCardComponent
         title="Total Distance Off"
-        value="1,234km"
+        :value="totalDistance"
         emoji="📍"
         bg-class="bg-red-50 border-red-100"
         emoji-class="bg-red-100 border-red-200"
       />
       <SummaryCardComponent
         title="Average Score"
-        value="850 points"
+        :value="`${averageScore} points`"
         emoji="📊"
         bg-class="bg-emerald-50 border-emerald-100"
         emoji-class="bg-emerald-100 border-emerald-200"
       />
       <SummaryCardComponent
         title="Average Time"
-        value="1m 32s"
+        :value="averageTime"
         emoji="⏱️"
         bg-class="bg-amber-50 border-amber-100"
         emoji-class="bg-amber-100 border-amber-200"
@@ -61,17 +61,26 @@
     <div class="mb-6">
       <h2 class="mb-4 font-[Roboto] text-2xl font-bold">Round Breakdown</h2>
       <Accordion type="single" collapsible>
-        <AccordionItem v-for="round in gameConfig.rounds" :key="round" :value="`round-${round}`">
+        <AccordionItem
+          v-for="record in gameRecords"
+          :key="record.round"
+          :value="`round-${record.round}`"
+        >
           <AccordionTrigger class="flex items-center">
             <div class="flex items-center gap-2">
-              <span class="font-[Roboto] text-xl">Round {{ round }}</span>
-              <span class="text-muted-foreground">850 points</span>
+              <span class="font-[Roboto] text-xl">Round {{ record.round }}</span>
+              <span class="text-muted-foreground">{{ record.score }} points</span>
             </div>
           </AccordionTrigger>
           <AccordionContent>
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <div class="h-64">
-                <MapComponent />
+                <MapComponent
+                  :player-location="record.playerLocation"
+                  :correct-location="record.correctLocation"
+                  :center="record.mapCenter"
+                  :zoom="record.mapZoom"
+                />
               </div>
               <div class="flex h-64 flex-col">
                 <StreetViewComponent
@@ -105,6 +114,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed, type PropType } from 'vue'
 import useGameConfigStore from '@/stores/gameConfig'
 import MapComponent from './MapComponent.vue'
 import StreetViewComponent from './StreetViewComponent.vue'
@@ -120,14 +130,37 @@ import CardTitle from './ui/card/CardTitle.vue'
 import { MAX_SCORE } from '@/consts'
 import Button from './ui/button/Button.vue'
 import Progress from './ui/progress/Progress.vue'
+import type { RoundRecord } from '@/types'
 
 const gameConfig = useGameConfigStore()
 
-defineProps({
+const props = defineProps({
   totalScore: {
     type: Number,
     required: true,
   },
+  averageScore: {
+    type: Number,
+    required: true,
+  },
+  gameRecords: {
+    type: Array as PropType<RoundRecord[]>,
+    required: true,
+  },
+})
+
+const totalDistance = computed(() => {
+  if (props.gameRecords.length === 0) return '0km'
+
+  const sum = props.gameRecords.reduce((acc, record) => {
+    return record.distance >= 0 ? acc + record.distance : acc
+  }, 0)
+
+  return `${Math.round(sum)}km`
+})
+
+const averageTime = computed(() => {
+  return 'N/A'
 })
 
 defineEmits(['play-again', 'return-to-menu'])
