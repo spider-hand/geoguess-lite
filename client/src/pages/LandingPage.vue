@@ -161,7 +161,7 @@ const cardContents = [
 const faqContents = [
   {
     question: 'Is GeoGuess Lite really free?',
-    answer: 'Yes — completely free. GeoGuess Lite doesn’t require any subscription or payment.',
+    answer: "Yes - completely free. GeoGuess Lite doesn't require any subscription or payment.",
   },
   {
     question: 'Are there any limitations?',
@@ -172,6 +172,11 @@ const faqContents = [
     question: 'Can I self-host GeoGuess Lite?',
     answer:
       'GeoGuess Lite is fully open-source and built to be easily self-hosted. You can deploy it on any static hosting service and connect it with your own serverless backend if you prefer full control.',
+  },
+  {
+    question: 'Any other questions?',
+    answer:
+      'Feel free to reach out at creative.spider.hand@gmail.com or check out the GitHub repository for more information and contributions.',
   },
 ]
 
