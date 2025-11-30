@@ -75,6 +75,7 @@ import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue'
 import type { RoundRecord } from '@/types'
 import { ROUNDS } from '@/consts'
+import useUserQuery from '@/composables/useUserQuery'
 
 const gameConfig = useGameConfigStore()
 const {
@@ -85,6 +86,7 @@ const {
   reset: resetTimer,
 } = useTimer(gameConfig.timeLimit)
 const router = useRouter()
+const { user, mutateUserUpdate } = useUserQuery()
 
 const hasMarker = ref(false)
 const showResult = ref(false)
@@ -235,6 +237,21 @@ const nextRound = async () => {
 
 const showSummary = () => {
   showSummaryView.value = true
+
+  if (user.value) {
+    const newBestScore = Math.max(user.value.bestScore ?? 0, totalScore.value)
+    const newGamesPlayed = (user.value.gamesPlayed ?? 0) + 1
+    const totalRoundsSum =
+      (user.value.averageScore ?? 0) * (user.value.gamesPlayed ?? 0) * ROUNDS + totalScore.value
+    const totalRoundsPlayed = newGamesPlayed * ROUNDS
+    const newAverageScore = Math.round(totalRoundsSum / totalRoundsPlayed)
+
+    mutateUserUpdate({
+      bestScore: newBestScore,
+      averageScore: newAverageScore,
+      gamesPlayed: newGamesPlayed,
+    })
+  }
 }
 
 const playAgain = () => {
