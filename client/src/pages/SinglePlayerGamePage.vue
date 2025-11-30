@@ -3,7 +3,7 @@
     <HeaderComponent v-if="showSummaryView" />
     <header v-else class="flex items-center justify-between border-b px-8 py-4">
       <div class="font-[JetBrains_Mono] text-xl font-semibold">
-        <span>Round {{ currentRound }} / {{ gameConfig.rounds }}</span>
+        <span>Round {{ currentRound }} / {{ ROUNDS }}</span>
       </div>
       <nav class="flex gap-4">
         <div class="text-muted-foreground h-9 px-4 py-2 font-[JetBrains_Mono] text-lg">
@@ -36,7 +36,7 @@
           {{ isLoadingImage ? 'Loading...' : 'Make Guess' }}
         </Button>
         <Button
-          v-else-if="currentRound < gameConfig.rounds"
+          v-else-if="currentRound < ROUNDS"
           @click="nextRound"
           class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
         >
@@ -74,6 +74,7 @@ import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue'
 import type { RoundRecord } from '@/types'
+import { ROUNDS } from '@/consts'
 
 const gameConfig = useGameConfigStore()
 const {

@@ -67,9 +67,6 @@
               class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3"
             >
               <div class="flex flex-col gap-4">
-                <div>
-                  <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Maps</h3>
-                </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
                     Map Type
@@ -85,18 +82,7 @@
                 </div>
               </div>
               <div class="flex flex-col gap-4">
-                <div>
-                  <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Rounds & Time</h3>
-                </div>
                 <div class="flex flex-col gap-8">
-                  <CustomSliderComponent
-                    label="Number of Rounds"
-                    v-model="gameConfig.rounds"
-                    :min="5"
-                    :max="10"
-                    :step="1"
-                    unit=" rounds"
-                  />
                   <CustomSliderComponent
                     label="Time Limit Per Round"
                     v-model="gameConfig.timeLimit"
@@ -111,9 +97,6 @@
                 </div>
               </div>
               <div class="flex flex-col gap-4">
-                <div>
-                  <h3 class="text-foreground font-[Roboto] text-lg font-semibold">Gameplay</h3>
-                </div>
                 <div class="flex flex-col gap-4">
                   <CustomCheckboxComponent
                     id="allow-moving"

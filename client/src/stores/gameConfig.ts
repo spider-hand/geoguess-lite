@@ -8,7 +8,6 @@ const useGameConfigStore = defineStore('gameConfig', () => {
   const roomNumber = ref<string>('')
 
   const mapType = ref<string>('world')
-  const rounds = ref<number>(5)
   const timeLimit = ref<number>(0)
   const allowMoving = ref<boolean>(true)
   const allowZooming = ref<boolean>(true)
@@ -18,7 +17,6 @@ const useGameConfigStore = defineStore('gameConfig', () => {
     isHost,
     roomNumber,
     mapType,
-    rounds,
     timeLimit,
     allowMoving,
     allowZooming,

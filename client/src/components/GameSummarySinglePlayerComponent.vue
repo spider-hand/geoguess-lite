@@ -21,13 +21,11 @@
       <CardContent>
         <div class="space-y-2">
           <div class="flex justify-between text-sm">
-            <span class="font-[JetBrains_Mono]"
-              >{{ totalScore }} / {{ gameConfig.rounds * MAX_SCORE }}</span
-            >
+            <span class="font-[JetBrains_Mono]">{{ totalScore }} / {{ ROUNDS * MAX_SCORE }}</span>
           </div>
           <Progress
-            :model-value="(totalScore / (gameConfig.rounds * MAX_SCORE)) * 100"
-            :max="gameConfig.rounds * MAX_SCORE"
+            :model-value="(totalScore / (ROUNDS * MAX_SCORE)) * 100"
+            :max="ROUNDS * MAX_SCORE"
             class="h-2 [&>div]:bg-indigo-700"
           />
         </div>
@@ -115,7 +113,6 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from 'vue'
-import useGameConfigStore from '@/stores/gameConfig'
 import MapComponent from './MapComponent.vue'
 import StreetViewComponent from './StreetViewComponent.vue'
 import SummaryCardComponent from './SummaryCardComponent.vue'
@@ -127,12 +124,10 @@ import Card from './ui/card/Card.vue'
 import CardContent from './ui/card/CardContent.vue'
 import CardHeader from './ui/card/CardHeader.vue'
 import CardTitle from './ui/card/CardTitle.vue'
-import { MAX_SCORE } from '@/consts'
+import { MAX_SCORE, ROUNDS } from '@/consts'
 import Button from './ui/button/Button.vue'
 import Progress from './ui/progress/Progress.vue'
 import type { RoundRecord } from '@/types'
-
-const gameConfig = useGameConfigStore()
 
 const props = defineProps({
   totalScore: {
