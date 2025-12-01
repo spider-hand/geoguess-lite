@@ -1,11 +1,15 @@
+apis/DailyChallengesApi.ts
 apis/HealthApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
+models/DailyChallenge.ts
 models/ErrorResponse.ts
 models/GetMe200Response.ts
 models/GetMeDefaultResponse.ts
 models/GetMeRequest.ts
+models/GetTodayChallenge200Response.ts
+models/GetTodayChallenge200ResponseRoundsInner.ts
 models/HealthCheck200Response.ts
 models/UpdateMeRequest.ts
 models/User.ts

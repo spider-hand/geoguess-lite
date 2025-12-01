@@ -114,3 +114,67 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /users/me
             Method: delete
+
+  DailyChallengesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: dailyChallenges.handler.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+      Events:
+        GetTodayChallenge:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /daily-challenges/today
+            Method: get
+
+  DailyChallengeCreatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: scheduled.daily_challenge_creator.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+      Events:
+        ScheduledCreation:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 0 * * ? *)
+            ScheduleExpressionTimezone: UTC
+
+  DailyChallengeCleanerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: scheduled.daily_challenge_cleaner.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+      Events:
+        ScheduledCleanup:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 1 * * ? *)
+            ScheduleExpressionTimezone: UTC
