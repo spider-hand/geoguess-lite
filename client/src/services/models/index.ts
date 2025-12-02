@@ -1,12 +1,17 @@
 /* tslint:disable */
 
+export * from './CreateDailyScoreRequest'
 export * from './DailyChallenge'
+export * from './DailyScore'
 export * from './ErrorResponse'
 export * from './GetMe200Response'
 export * from './GetMeDefaultResponse'
 export * from './GetMeRequest'
 export * from './GetTodayChallenge200Response'
 export * from './GetTodayChallenge200ResponseRoundsInner'
+export * from './GetTodayTopScores200Response'
+export * from './GetTodayTopScores200ResponseScoresInner'
 export * from './HealthCheck200Response'
+export * from './TopDailyScores'
 export * from './UpdateMeRequest'
 export * from './User'

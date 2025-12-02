@@ -178,3 +178,52 @@ Resources:
           Properties:
             ScheduleExpression: cron(0 1 * * ? *)
             ScheduleExpressionTimezone: UTC
+
+  DailyScoresFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: dailyScores.handler.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+      Events:
+        CreateDailyScore:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /daily-scores
+            Method: post
+        GetTopDailyScores:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /daily-scores
+            Method: get
+
+  DailyScoreCleanerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: scheduled.daily_score_cleaner.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+      Events:
+        ScheduledCleanup:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 2 * * ? *)
+            ScheduleExpressionTimezone: UTC
