@@ -23,6 +23,7 @@ Parameters:
   Environment:
     Type: String
     AllowedValues:
+      - local
       - localstack
       - dev
       - prod
@@ -145,6 +146,7 @@ Resources:
       Runtime: python3.14
       Architectures:
         - x86_64
+      Timeout: 600
       Environment:
         Variables:
           Environment: !Ref Environment

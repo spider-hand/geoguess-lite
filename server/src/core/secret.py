@@ -15,11 +15,22 @@ class SecretsDict(TypedDict):
 @lru_cache(maxsize=1)
 def get_secret() -> SecretsDict:
     environment = os.getenv("Environment", "localstack")
+
     secret_name = f"geoguess-lite-{environment}-secret"
     service_name = "secretsmanager"
     region_name = "ap-northeast-1"
 
-    if environment == "localstack":
+    if environment == "local":
+        secret_files = "/var/task/secret.local.json"
+
+        if os.path.exists(secret_files):
+            with open(secret_files, "r") as f:
+                return json.load(f)
+
+        raise FileNotFoundError(
+            "No local secret file found. Please ensure secret.local.json is available."
+        )
+    elif environment == "localstack":
         client = boto3.client(
             service_name=service_name,
             region_name=region_name,

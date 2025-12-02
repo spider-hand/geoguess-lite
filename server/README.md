@@ -42,3 +42,9 @@ sam build --use-container
 ```bash
 sam local start-api --region ap-northeast-1 --docker-network <localstack-network-id> --port 3001 --parameter-overrides Environment=localstack
 ```
+
+5. Test scheduled functions locally:
+
+```bash
+sam local invoke <function> --parameter-overrides Environment=local
+```
