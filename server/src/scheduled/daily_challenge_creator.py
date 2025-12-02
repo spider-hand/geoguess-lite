@@ -16,12 +16,11 @@ async def create_challenge():
         tomorrow = date.today() + timedelta(days=1)
         logger.info({"event": "create_challenge", "date": tomorrow.isoformat()})
 
-        rounds = await create_daily_challenge_service(tomorrow)
+        await create_daily_challenge_service(tomorrow)
         logger.info(
             {
                 "event": "challenge_created",
                 "date": tomorrow.isoformat(),
-                "rounds_count": len(rounds),
             }
         )
 
