@@ -23,9 +23,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Viewer } from 'mapillary-js'
+import { CANDIDATE_LOCATIONS } from '@/consts'
 
 const emit = defineEmits<{
-  imageLoaded: [position: { lat: number; lng: number }]
+  imageLoaded: [position: { lat: number; lng: number }, imageId: string]
   imageLoadingStart: []
 }>()
 
@@ -50,15 +51,19 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  imageId: {
+    type: String,
+    default: null,
+  },
 })
 
 const viewer = ref<Viewer | null>(null)
 const viewerRef = ref<HTMLElement | null>(null)
 
 const getRandomLatLng = () => {
-  const lat = Math.random() * 170 - 85
-  const lng = Math.random() * 360 - 180
-  return { lat, lng }
+  const [baseLat, baseLng] =
+    CANDIDATE_LOCATIONS[Math.floor(Math.random() * CANDIDATE_LOCATIONS.length)]!
+  return { lat: baseLat, lng: baseLng }
 }
 
 const buildBBox = (lat: number, lng: number) => {
@@ -82,8 +87,7 @@ const getRandomImageId = async () => {
       const randomIndex = Math.floor(Math.random() * data.data.length)
       return data.data[randomIndex].id
     }
-    return '524779645570864'
-    // return await getRandomImageId();
+    return await getRandomImageId()
   } catch (err) {
     console.error('Error in getRandomImageId:', err)
     throw err
@@ -95,13 +99,13 @@ const loadRandomView = async () => {
     if (!viewer.value) return
 
     emit('imageLoadingStart')
-    const imageId = await getRandomImageId()
+    const imageId = props.imageId ?? (await getRandomImageId())
     await viewer.value.moveTo(imageId)
 
     const pos = await viewer.value.getPosition()
     console.log(`Loaded image at lat: ${pos.lat}, lng: ${pos.lng}`)
 
-    emit('imageLoaded', { lat: pos.lat, lng: pos.lng })
+    emit('imageLoaded', { lat: pos.lat, lng: pos.lng }, imageId)
   } catch (err) {
     console.error('Error in loadRandomView:', err)
     throw err

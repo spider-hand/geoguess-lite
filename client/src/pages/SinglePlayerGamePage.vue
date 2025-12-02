@@ -105,6 +105,7 @@ const distance = ref(0)
 const score = ref(0)
 const totalScore = ref(0)
 const currentRound = ref(1)
+const currentImageId = ref<string | null>(null)
 const imagePosition = ref<{ lat: number; lng: number } | null>(null)
 const markerPosition = ref<{ lat: number; lng: number } | null>(null)
 const mapRef = ref<InstanceType<typeof MapComponent> | null>(null)
@@ -113,7 +114,7 @@ const streetViewRef = ref<InstanceType<typeof StreetViewComponent> | null>(null)
 const gameRecords = ref<RoundRecord[]>([])
 
 const saveRoundRecord = () => {
-  if (!imagePosition.value) return
+  if (!imagePosition.value || !currentImageId.value) return
 
   const [centerLng, centerLat] = calculateCenter(
     [markerPosition.value!.lng, markerPosition.value!.lat],
@@ -129,6 +130,7 @@ const saveRoundRecord = () => {
     playerLocation: markerPosition.value,
     mapCenter: [centerLng, centerLat],
     mapZoom: zoom,
+    imageId: currentImageId.value,
   })
 }
 
@@ -182,7 +184,8 @@ const handleTimeExpired = () => {
   saveRoundRecord()
 }
 
-const onImageLoaded = (position: { lat: number; lng: number }) => {
+const onImageLoaded = (position: { lat: number; lng: number }, imageId: string) => {
+  currentImageId.value = imageId
   imagePosition.value = position
   isLoadingImage.value = false
   startTimer()
@@ -227,6 +230,7 @@ const resetRound = () => {
   markerPosition.value = null
   distance.value = 0
   score.value = 0
+  currentImageId.value = null
   resetTimer()
 
   if (mapRef.value) {

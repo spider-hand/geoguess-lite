@@ -8,4 +8,5 @@ export interface RoundRecord {
   playerLocation: { lat: number; lng: number } | null
   mapCenter: [number, number]
   mapZoom: number
+  imageId: string
 }

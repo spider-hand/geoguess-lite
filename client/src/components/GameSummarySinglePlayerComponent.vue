@@ -85,6 +85,7 @@
                   class="h-full! min-h-full! w-full! flex-1!"
                   :allow-moving="false"
                   :allow-zooming="false"
+                  :image-id="record.imageId"
                 />
               </div>
             </div>
