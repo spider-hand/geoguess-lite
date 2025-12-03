@@ -61,6 +61,12 @@ export interface GetMe200Response {
    * @memberof GetMe200Response
    */
   averageScore: number
+  /**
+   * Whether the user has played today's daily challenge
+   * @type {boolean}
+   * @memberof GetMe200Response
+   */
+  hasPlayedDailyChallenge: boolean
 }
 
 /**
@@ -74,6 +80,8 @@ export function instanceOfGetMe200Response(value: object): value is GetMe200Resp
   if (!('gamesPlayed' in value) || value['gamesPlayed'] === undefined) return false
   if (!('bestScore' in value) || value['bestScore'] === undefined) return false
   if (!('averageScore' in value) || value['averageScore'] === undefined) return false
+  if (!('hasPlayedDailyChallenge' in value) || value['hasPlayedDailyChallenge'] === undefined)
+    return false
   return true
 }
 
@@ -96,6 +104,7 @@ export function GetMe200ResponseFromJSONTyped(
     gamesPlayed: json['games_played'],
     bestScore: json['best_score'],
     averageScore: json['average_score'],
+    hasPlayedDailyChallenge: json['has_played_daily_challenge'],
   }
 }
 
@@ -119,5 +128,6 @@ export function GetMe200ResponseToJSONTyped(
     games_played: value['gamesPlayed'],
     best_score: value['bestScore'],
     average_score: value['averageScore'],
+    has_played_daily_challenge: value['hasPlayedDailyChallenge'],
   }
 }

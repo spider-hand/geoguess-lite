@@ -1,16 +1,35 @@
-from users.model import User, CreateUserRequest, UpdateUserRequest
+from users.model import User, GetUserResponse, CreateUserRequest, UpdateUserRequest
 from users.repository import insert_user, get_user_by_id, update_user, delete_user
+from dailyScores.repository import has_user_played_today
 from core.logger import logger
 import random
+from datetime import date
 from aws_lambda_powertools.utilities.parser.models import APIGatewayProxyEventModel
 from core.firebase import get_firebase_auth
+
+
+def build_get_user_response(user_db: User) -> GetUserResponse:
+    today = date.today()
+    has_played = has_user_played_today(user_db.id, today)
+
+    # Create a new User instance with the additional field
+    return GetUserResponse(
+        id=user_db.id,
+        name=user_db.name,
+        avatar_emoji=user_db.avatar_emoji,
+        avatar_bg=user_db.avatar_bg,
+        games_played=user_db.games_played,
+        best_score=user_db.best_score,
+        average_score=user_db.average_score,
+        has_played_daily_challenge=has_played,
+    )
 
 
 def get_or_create_user_service(user_id: str, event: APIGatewayProxyEventModel) -> User:
     try:
         user = get_user_by_id(user_id)
         if user is not None:
-            return user
+            return build_get_user_response(user)
 
         body = CreateUserRequest.model_validate_json(event.body)
 
@@ -49,7 +68,7 @@ def get_or_create_user_service(user_id: str, event: APIGatewayProxyEventModel) -
             "rose",
         ]
 
-        user = User(
+        user_db = User(
             id=user_id,
             name=body.name,
             avatar_emoji=random.choice(initial_avatar_emoji_list),
@@ -58,11 +77,11 @@ def get_or_create_user_service(user_id: str, event: APIGatewayProxyEventModel) -
             best_score=0,
             average_score=0,
         )
-        created_user = insert_user(user)
+        created_user_db = insert_user(user_db)
 
-        logger.info({"event": "user_created", "user_id": created_user.id})
+        logger.info({"event": "user_created", "user_id": created_user_db.id})
 
-        return created_user
+        return build_get_user_response(created_user_db)
 
     except Exception as e:
         logger.exception("Failed to get or create user")
@@ -88,7 +107,7 @@ def update_user_service(user_id: str, event: APIGatewayProxyEventModel) -> User:
 
         logger.info({"event": "user_updated", "user_id": updated_user.id})
 
-        return updated_user
+        return build_get_user_response(updated_user)
     except Exception as e:
         logger.exception("Failed to update user")
         raise e

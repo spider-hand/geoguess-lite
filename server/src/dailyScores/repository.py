@@ -116,3 +116,42 @@ def delete_daily_scores_by_date(score_date: date) -> int:
     except Exception as e:
         logger.exception("Failed to delete daily scores from database")
         raise e
+
+
+def has_user_played_today(user_id: str, score_date: date) -> bool:
+    try:
+        conn = get_db_connection()
+
+        logger.debug(
+            {
+                "event": "checking_user_daily_play",
+                "user_id": user_id,
+                "date": score_date.isoformat(),
+            }
+        )
+
+        row = conn.execute(
+            """
+            SELECT 1 FROM daily_scores
+            WHERE user_id = %s AND date = %s
+            LIMIT 1
+            """,
+            (user_id, score_date),
+        ).fetchone()
+
+        has_played = row is not None
+
+        logger.debug(
+            {
+                "event": "user_daily_play_checked",
+                "user_id": user_id,
+                "date": score_date.isoformat(),
+                "has_played": has_played,
+            }
+        )
+
+        return has_played
+
+    except Exception as e:
+        logger.exception("Failed to check if user played today")
+        raise e

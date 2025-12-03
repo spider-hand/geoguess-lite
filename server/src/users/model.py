@@ -2,6 +2,8 @@ from pydantic import BaseModel
 
 
 class User(BaseModel):
+    """User model for database operations (without computed fields)"""
+
     id: str
     name: str
     avatar_emoji: str
@@ -9,6 +11,17 @@ class User(BaseModel):
     games_played: int
     best_score: int
     average_score: float
+
+
+class GetUserResponse(BaseModel):
+    id: str
+    name: str
+    avatar_emoji: str
+    avatar_bg: str
+    games_played: int
+    best_score: int
+    average_score: float
+    has_played_daily_challenge: bool
 
 
 class CreateUserRequest(BaseModel):

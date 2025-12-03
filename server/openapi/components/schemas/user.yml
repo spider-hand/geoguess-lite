@@ -15,6 +15,9 @@ properties:
   average_score:
     type: number
     format: float
+  has_played_daily_challenge:
+    type: boolean
+    description: Whether the user has played today's daily challenge
 required:
   - id
   - name
@@ -23,3 +26,4 @@ required:
   - games_played
   - best_score
   - average_score
+  - has_played_daily_challenge

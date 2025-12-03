@@ -120,11 +120,16 @@
                     name: 'game-single-player',
                   })
                 "
+                :disabled="
+                  !user ||
+                  (gameConfig.selectedGameMode === 'daily-challenge' &&
+                    user.hasPlayedDailyChallenge)
+                "
               >
                 Start Game
               </Button>
-            </div>
-          </CardContent>
+            </div> </CardContent
+          >1
         </Card>
       </div>
       <div class="order-2 flex flex-col gap-8 lg:order-1 lg:w-80">
