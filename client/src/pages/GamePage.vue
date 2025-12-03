@@ -115,11 +115,7 @@
               <Button
                 size="lg"
                 class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-                @click="
-                  router.push({
-                    name: 'game-single-player',
-                  })
-                "
+                @click="startGame"
                 :disabled="
                   !user ||
                   (gameConfig.selectedGameMode === 'daily-challenge' &&
@@ -128,8 +124,8 @@
               >
                 Start Game
               </Button>
-            </div> </CardContent
-          >1
+            </div>
+          </CardContent>
         </Card>
       </div>
       <div class="order-2 flex flex-col gap-8 lg:order-1 lg:w-80">
@@ -320,14 +316,20 @@
               </p>
             </div>
             <div class="flex flex-col gap-4">
+              <div v-if="leaderboard.length === 0" class="flex items-center justify-center py-8">
+                <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+                  No scores today yet
+                </span>
+              </div>
               <div
+                v-else
                 v-for="(player, index) in leaderboard"
                 :key="index"
                 class="flex items-center justify-between"
               >
                 <div class="flex items-center gap-3">
                   <div
-                    class="flex h-10 w-10 items-center justify-center rounded-full text-lg"
+                    class="flex h-10 w-10 items-center justify-center rounded-full border text-lg"
                     :class="player.avatarClass"
                   >
                     {{ player.emoji }}
@@ -354,7 +356,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import 'emoji-picker-element'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -372,6 +374,7 @@ import CustomCheckboxComponent from '@/components/CustomCheckboxComponent.vue'
 import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import useUserQuery from '@/composables/useUserQuery'
+import useDailyScoreQuery from '@/composables/useDailyScoreQuery'
 import { AVATAR_CLASS_MAP } from '@/consts'
 import type { GameModeType } from '@/types'
 import useGameConfigStore from '@/stores/gameConfig'
@@ -412,38 +415,20 @@ const gameModes: GameModeItem[] = [
   },
 ]
 
-const leaderboard = [
-  {
-    name: 'GeoMaster',
-    emoji: '🏆',
-    avatarClass: 'bg-yellow-100 border border-yellow-200',
-    score: 4950,
-  },
-  {
-    name: 'WorldExplorer',
-    emoji: '🌍',
-    avatarClass: 'bg-green-100 border border-green-200',
-    score: 4720,
-  },
-  {
-    name: 'MapWizard',
-    emoji: '🧙‍♂️',
-    avatarClass: 'bg-purple-100 border border-purple-200',
-    score: 4680,
-  },
-  {
-    name: 'Navigator_Pro',
-    emoji: '🧭',
-    avatarClass: 'bg-blue-100 border border-blue-200',
-    score: 4520,
-  },
-  {
-    name: 'GlobeTrotter',
-    emoji: '✈️',
-    avatarClass: 'bg-red-100 border border-red-200',
-    score: 4350,
-  },
-]
+const { todayTopScores } = useDailyScoreQuery()
+
+const leaderboard = computed(() => {
+  if (!todayTopScores.value?.scores) {
+    return []
+  }
+
+  return todayTopScores.value.scores.map((player) => ({
+    name: player.name,
+    emoji: player.avatarEmoji,
+    avatarClass: getAvatarClass(player.avatarBg),
+    score: player.score,
+  }))
+})
 
 const router = useRouter()
 
@@ -540,6 +525,19 @@ const confirmDeleteAccount = async () => {
     } catch (error) {
       console.error('Error deleting account:', error)
     }
+  }
+}
+
+const startGame = () => {
+  switch (gameConfig.selectedGameMode) {
+    case 'single-player':
+      router.push({ name: 'game-single-player' })
+      break
+    case 'daily-challenge':
+      router.push({ name: 'game-daily-challenge' })
+      break
+    default:
+      router.push({ name: 'game-single-player' })
   }
 }
 </script>

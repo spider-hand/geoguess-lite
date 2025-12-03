@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { Viewer } from 'mapillary-js'
 import { CANDIDATE_LOCATIONS } from '@/consts'
 
@@ -136,6 +136,15 @@ const initViewer = async () => {
     console.error('Error loading Mapillary view:', err)
   }
 }
+
+watch(
+  () => props.imageId,
+  async (newImageId) => {
+    if (viewer.value && newImageId) {
+      await loadRandomView()
+    }
+  },
+)
 
 onMounted(async () => {
   await initViewer()

@@ -17,6 +17,12 @@ class CreateDailyScoreRequest(BaseModel):
     time_taken: int
 
 
+class UpdateDailyScoreRequest(BaseModel):
+    score: int | None = None
+    distance: float | None = None
+    time_taken: int | None = None
+
+
 class DailyScoreResponse(BaseModel):
     id: str
     user_id: str

@@ -1,4 +1,8 @@
-import { DailyScoresApi, type CreateDailyScoreRequest } from '@/services'
+import {
+  DailyScoresApi,
+  type CreateDailyScoreRequest,
+  type UpdateDailyScoreRequest,
+} from '@/services'
 import useApi from './useApi'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
@@ -41,6 +45,27 @@ const useDailyScoreQuery = () => {
     },
   })
 
+  const {
+    mutate: mutateDailyScoreUpdate,
+    mutateAsync: mutateDailyScoreUpdateAsync,
+    isSuccess: isSuccessOnUpdateDailyScore,
+    isError: isErrorOnUpdateDailyScore,
+    isPending: isPendingOnUpdateDailyScore,
+  } = useMutation({
+    mutationFn: async (params: UpdateDailyScoreRequest) => {
+      const resp = await dailyScoresApi.updateDailyScore({
+        updateDailyScoreRequest: params,
+      })
+      return resp
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dailyScores', 'today'] })
+    },
+    onError: (error) => {
+      console.error('Error updating daily score:', error)
+    },
+  })
+
   return {
     todayTopScores,
     isPendingOnFetchTodayTopScores,
@@ -51,6 +76,11 @@ const useDailyScoreQuery = () => {
     isSuccessOnCreateDailyScore,
     isErrorOnCreateDailyScore,
     isPendingOnCreateDailyScore,
+    mutateDailyScoreUpdate,
+    mutateDailyScoreUpdateAsync,
+    isSuccessOnUpdateDailyScore,
+    isErrorOnUpdateDailyScore,
+    isPendingOnUpdateDailyScore,
   }
 }
 

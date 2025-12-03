@@ -30,3 +30,5 @@ components:
       $ref: ./components/requestBodies/user-me-patch.yml
     CreateDailyScoreRequest:
       $ref: ./components/requestBodies/daily-score-post.yml
+    UpdateDailyScoreRequest:
+      $ref: ./components/requestBodies/daily-score-patch.yml

@@ -96,6 +96,7 @@
 
     <div class="flex justify-center gap-4">
       <Button
+        v-if="isPlayAgainEnabled"
         @click="$emit('play-again')"
         class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
       >
@@ -142,6 +143,10 @@ const props = defineProps({
   gameRecords: {
     type: Array as PropType<RoundRecord[]>,
     required: true,
+  },
+  isPlayAgainEnabled: {
+    type: Boolean,
+    default: true,
   },
 })
 

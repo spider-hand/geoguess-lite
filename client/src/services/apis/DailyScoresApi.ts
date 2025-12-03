@@ -18,6 +18,7 @@ import type {
   GetMeDefaultResponse,
   GetTodayTopScores200Response,
   GetTodayTopScores200ResponseScoresInner,
+  UpdateDailyScoreRequest,
 } from '../models/index'
 import {
   CreateDailyScoreRequestFromJSON,
@@ -28,10 +29,16 @@ import {
   GetTodayTopScores200ResponseToJSON,
   GetTodayTopScores200ResponseScoresInnerFromJSON,
   GetTodayTopScores200ResponseScoresInnerToJSON,
+  UpdateDailyScoreRequestFromJSON,
+  UpdateDailyScoreRequestToJSON,
 } from '../models/index'
 
 export interface CreateDailyScoreOperationRequest {
   createDailyScoreRequest: CreateDailyScoreRequest
+}
+
+export interface UpdateDailyScoreOperationRequest {
+  updateDailyScoreRequest: UpdateDailyScoreRequest
 }
 
 /**
@@ -121,6 +128,55 @@ export class DailyScoresApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<GetTodayTopScores200Response> {
     const response = await this.getTodayTopScoresRaw(initOverrides)
+    return await response.value()
+  }
+
+  /**
+   * Update daily score record
+   */
+  async updateDailyScoreRaw(
+    requestParameters: UpdateDailyScoreOperationRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<GetTodayTopScores200ResponseScoresInner>> {
+    if (requestParameters['updateDailyScoreRequest'] == null) {
+      throw new runtime.RequiredError(
+        'updateDailyScoreRequest',
+        'Required parameter "updateDailyScoreRequest" was null or undefined when calling updateDailyScore().',
+      )
+    }
+
+    const queryParameters: any = {}
+
+    const headerParameters: runtime.HTTPHeaders = {}
+
+    headerParameters['Content-Type'] = 'application/json'
+
+    let urlPath = `/daily-scores`
+
+    const response = await this.request(
+      {
+        path: urlPath,
+        method: 'PATCH',
+        headers: headerParameters,
+        query: queryParameters,
+        body: UpdateDailyScoreRequestToJSON(requestParameters['updateDailyScoreRequest']),
+      },
+      initOverrides,
+    )
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      GetTodayTopScores200ResponseScoresInnerFromJSON(jsonValue),
+    )
+  }
+
+  /**
+   * Update daily score record
+   */
+  async updateDailyScore(
+    requestParameters: UpdateDailyScoreOperationRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<GetTodayTopScores200ResponseScoresInner> {
+    const response = await this.updateDailyScoreRaw(requestParameters, initOverrides)
     return await response.value()
   }
 }

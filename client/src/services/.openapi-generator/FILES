@@ -17,6 +17,7 @@ models/GetTodayTopScores200Response.ts
 models/GetTodayTopScores200ResponseScoresInner.ts
 models/HealthCheck200Response.ts
 models/TopDailyScores.ts
+models/UpdateDailyScoreRequest.ts
 models/UpdateMeRequest.ts
 models/User.ts
 models/index.ts

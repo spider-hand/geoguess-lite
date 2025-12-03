@@ -21,6 +21,12 @@ const router = createRouter({
       component: () => import('@/pages/SinglePlayerGamePage.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/game/daily-challenge',
+      name: 'game-daily-challenge',
+      component: () => import('@/pages/DailyChallengeGamePage.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

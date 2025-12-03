@@ -1,7 +1,13 @@
 from datetime import date
-from .model import DailyScore, CreateDailyScoreRequest, GetTopDailyScoresResponse
+from .model import (
+    DailyScore,
+    CreateDailyScoreRequest,
+    UpdateDailyScoreRequest,
+    GetTopDailyScoresResponse,
+)
 from .repository import (
     insert_daily_score,
+    update_daily_score,
     get_top_daily_scores_by_date,
     delete_daily_scores_by_date,
 )
@@ -36,6 +42,30 @@ def get_today_top_scores_service() -> GetTopDailyScoresResponse:
         return get_top_daily_scores_by_date(today)
     except Exception:
         logger.exception("Failed to get today's top scores")
+        raise
+
+
+def update_daily_score_service(
+    user_id: str, event: APIGatewayProxyEventModel
+) -> DailyScore:
+    try:
+        body = UpdateDailyScoreRequest.model_validate_json(event.body)
+        today = date.today()
+
+        logger.info({"event": "update_daily_score", "user_id": user_id})
+
+        update_fields = body.model_dump(exclude_unset=True)
+
+        if not update_fields:
+            raise ValueError("No fields provided for update")
+
+        return update_daily_score(
+            user_id=user_id,
+            score_date=today,
+            update_fields=update_fields,
+        )
+    except Exception:
+        logger.exception("Failed to update daily score")
         raise
 
 

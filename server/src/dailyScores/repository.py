@@ -62,7 +62,7 @@ def get_top_daily_scores_by_date(
                    u.name, u.avatar_emoji, u.avatar_bg
             FROM daily_scores ds
             JOIN users u ON ds.user_id = u.id
-            WHERE ds.date = %s
+            WHERE ds.date = %s AND ds.score > 0
             ORDER BY ds.score DESC, ds.distance ASC, ds.time_taken ASC
             LIMIT %s
             """,
@@ -115,6 +115,63 @@ def delete_daily_scores_by_date(score_date: date) -> int:
 
     except Exception as e:
         logger.exception("Failed to delete daily scores from database")
+        raise e
+
+
+def update_daily_score(
+    user_id: str, score_date: date, update_fields: dict
+) -> DailyScore:
+    try:
+        conn = get_db_connection()
+
+        logger.debug(
+            {
+                "event": "updating_daily_score",
+                "user_id": user_id,
+                "date": score_date.isoformat(),
+                "fields": list(update_fields.keys()),
+            }
+        )
+
+        set_clauses = []
+        values = []
+
+        allowed_fields = ["score", "distance", "time_taken"]
+
+        for field, value in update_fields.items():
+            if field in allowed_fields:
+                set_clauses.append(f"{field} = %s")
+                values.append(value)
+
+        if not set_clauses:
+            raise ValueError("No valid fields to update")
+
+        values.extend([user_id, score_date])
+
+        sql = f"""
+            UPDATE daily_scores
+            SET {", ".join(set_clauses)}
+            WHERE user_id = %s AND date = %s
+            RETURNING id, user_id, date, score, distance, time_taken
+        """
+
+        row = conn.execute(sql, tuple(values)).fetchone()
+
+        if row is None:
+            raise Exception(f"Daily score for user {user_id} on {score_date} not found")
+
+        logger.debug(
+            {
+                "event": "daily_score_updated",
+                "user_id": user_id,
+                "date": score_date.isoformat(),
+            }
+        )
+
+        return DailyScore(**row)
+
+    except Exception as e:
+        logger.exception("Failed to update daily score in database")
         raise e
 
 

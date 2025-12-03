@@ -1,5 +1,6 @@
 from dailyScores.service import (
     create_daily_score_service,
+    update_daily_score_service,
     get_today_top_scores_service,
 )
 from aws_lambda_powertools.utilities.typing import LambdaContext
@@ -19,6 +20,15 @@ def lambda_handler(event: CustomEvent, context: LambdaContext) -> dict:
         return {
             "statusCode": 201,
             "body": created_score.model_dump_json(),
+        }
+    elif event.httpMethod == "PATCH":
+        user_id = event.requestContext.authorizer.uid
+        logger.info({"event": "update_daily_score", "user_id": user_id})
+
+        updated_score = update_daily_score_service(user_id, event)
+        return {
+            "statusCode": 200,
+            "body": updated_score.model_dump_json(),
         }
     elif event.httpMethod == "GET":
         logger.info({"event": "get_today_top_scores"})
