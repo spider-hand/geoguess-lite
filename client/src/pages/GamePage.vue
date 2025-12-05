@@ -533,6 +533,9 @@ const startGame = () => {
     case 'single-player':
       router.push({ name: 'game-single-player' })
       break
+    case 'multiplayer':
+      router.push({ name: 'game-multiplayer' })
+      break
     case 'daily-challenge':
       router.push({ name: 'game-daily-challenge' })
       break
