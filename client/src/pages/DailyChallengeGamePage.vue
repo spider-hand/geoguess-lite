@@ -26,7 +26,6 @@
         ref="streetViewRef"
         :allow-moving="true"
         :allow-zooming="true"
-        :image-id="currentImageId || undefined"
         :show-result="showResult"
         :result-score="score"
         :result-distance="distance"
@@ -88,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -97,11 +96,12 @@ import { useTimer } from '@/composables/useTimer'
 import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue'
-import type { RoundRecord } from '@/types'
+import type { LatLng, RoundRecord } from '@/types'
 import type { GetTodayChallenge200ResponseRoundsInner } from '@/services'
 import { ROUNDS } from '@/consts'
 import useDailyChallengeQuery from '@/composables/useDailyChallengeQuery'
 import useDailyScoreQuery from '@/composables/useDailyScoreQuery'
+import useUserQuery from '@/composables/useUserQuery'
 
 const TIME_LIMIT = 60
 
@@ -120,6 +120,7 @@ const {
   isErrorOnFetchTodayChallenge,
 } = useDailyChallengeQuery()
 const { mutateDailyScoreCreate, mutateDailyScoreUpdate } = useDailyScoreQuery()
+const { user } = useUserQuery()
 
 const hasMarker = ref(false)
 const showResult = ref(false)
@@ -129,8 +130,8 @@ const distance = ref(0)
 const score = ref(0)
 const totalScore = ref(0)
 const currentRound = ref(1)
-const imagePosition = ref<{ lat: number; lng: number } | null>(null)
-const markerPosition = ref<{ lat: number; lng: number } | null>(null)
+const imagePosition = ref<LatLng | null>(null)
+const markerPosition = ref<LatLng | null>(null)
 const mapRef = ref<InstanceType<typeof MapComponent> | null>(null)
 const streetViewRef = ref<InstanceType<typeof StreetViewComponent> | null>(null)
 const gameStarted = ref(false)
@@ -159,7 +160,18 @@ const saveRoundRecord = () => {
     score: score.value,
     distance: distance.value,
     correctLocation: imagePosition.value,
-    playerLocation: markerPosition.value,
+    playerLocations:
+      markerPosition.value && user.value
+        ? [
+            {
+              lat: markerPosition.value.lat,
+              lng: markerPosition.value.lng,
+              avatarEmoji: user.value.avatarEmoji,
+              avatarBg: user.value.avatarBg,
+              id: user.value.id,
+            },
+          ]
+        : [],
     mapCenter: [centerLng, centerLat],
     mapZoom: zoom,
     imageId: currentImageId.value,
@@ -171,6 +183,17 @@ const averageScore = computed(() => {
   const sum = gameRecords.value.reduce((acc, record) => acc + record.score, 0)
   return Math.round(sum / gameRecords.value.length)
 })
+
+watch(
+  () => currentImageId.value,
+  async (newImageId) => {
+    // Make sure DOM updates are complete
+    await nextTick()
+    if (streetViewRef.value && newImageId) {
+      await streetViewRef.value.loadViewFromImageId(newImageId)
+    }
+  },
+)
 
 watch(
   () => isTimerExpired.value,
@@ -215,7 +238,7 @@ const handleTimeExpired = () => {
   saveRoundRecord()
 }
 
-const onImageLoaded = (position: { lat: number; lng: number }) => {
+const onImageLoaded = (position: LatLng) => {
   imagePosition.value = position
   isLoadingImage.value = false
 
@@ -235,7 +258,7 @@ const onImageLoadingStart = () => {
   isLoadingImage.value = true
 }
 
-const onMarkerPlaced = (position: { lat: number; lng: number }) => {
+const onMarkerPlaced = (position: LatLng) => {
   markerPosition.value = position
   hasMarker.value = true
 }
@@ -294,10 +317,4 @@ const showSummary = () => {
 const returnToMenu = () => {
   router.push('/game')
 }
-
-onMounted(async () => {
-  if (streetViewRef.value && dailyChallenge.value) {
-    await streetViewRef.value.loadRandomView()
-  }
-})
 </script>

@@ -74,7 +74,7 @@
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <div class="h-64">
                 <MapComponent
-                  :player-location="record.playerLocation"
+                  :player-locations="record.playerLocations"
                   :correct-location="record.correctLocation"
                   :center="record.mapCenter"
                   :zoom="record.mapZoom"

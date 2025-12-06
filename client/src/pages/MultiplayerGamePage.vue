@@ -10,11 +10,19 @@
       @start-game="startGame"
       @leave-room="handleLeaveRoom"
     />
+    <div v-else-if="isLoading" class="flex min-h-screen items-center justify-center">
+      <div class="text-center">
+        <div class="mb-4 font-[JetBrains_Mono] text-2xl">
+          Creating the game.. It might take a while..
+        </div>
+        <div class="font-[JetBrains_Mono] text-lg">Waiting for all players to load</div>
+      </div>
+    </div>
     <template v-else>
       <HeaderComponent v-if="showSummaryView" />
       <header v-else class="flex items-center justify-between border-b px-4 py-4 sm:px-8">
         <div class="font-[JetBrains_Mono] text-lg font-semibold sm:text-xl">
-          <span>Room #{{ props.roomId }} - Round {{ currentRound }} / {{ ROUNDS }}</span>
+          <span>Room #{{ props.roomId }} - Round {{ displayedRound }} / {{ ROUNDS }}</span>
         </div>
         <nav class="flex gap-2 sm:gap-4">
           <div
@@ -25,7 +33,7 @@
           <div
             class="text-muted-foreground h-9 px-2 py-2 font-[JetBrains_Mono] text-sm sm:px-4 sm:text-lg"
           >
-            [Score: {{ totalScore }}]
+            [Score: {{ displayedTotalScore }}]
           </div>
         </nav>
       </header>
@@ -38,8 +46,8 @@
           :allow-moving="gameConfig.allowMoving"
           :allow-zooming="gameConfig.allowZooming"
           :show-result="showResult"
-          :result-score="score"
-          :result-distance="distance"
+          :result-score="displayedScore"
+          :result-distance="displayedDistance"
           @image-loaded="onImageLoaded"
           @image-loading-start="onImageLoadingStart"
         />
@@ -56,21 +64,21 @@
           <div class="flex gap-2">
             <Button
               v-if="!showResult"
-              :disabled="!hasMarker || isLoadingImage"
+              :disabled="!hasMarker || isLoadingImage || hasUserGuessed"
               @click="makeGuess"
               class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {{ isLoadingImage ? 'Loading...' : 'Make Guess' }}
+              {{ isLoadingImage ? 'Loading...' : hasUserGuessed ? 'Guessed' : 'Make Guess' }}
             </Button>
             <Button
-              v-else-if="currentRound < ROUNDS"
+              v-else-if="isPlaying"
               @click="nextRound"
               class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
             >
               Next Round
             </Button>
             <Button
-              v-else
+              v-else-if="isFinished"
               @click="showSummary"
               class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
             >
@@ -123,7 +131,7 @@
       </main>
       <GameSummaryMultiplayerComponent
         v-else
-        :players="playersWithTotals"
+        :players="players"
         :game-records="multiplayerGameRecords"
         @play-again="playAgain"
         @return-to-menu="returnToMenu"
@@ -133,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
+import { ref, watch, computed, onMounted, nextTick } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -143,11 +151,13 @@ import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummaryMultiplayerComponent from '@/components/GameSummaryMultiplayerComponent.vue'
 import LobbyComponent from '@/components/LobbyComponent.vue'
-import type { RoundRecord } from '@/types'
+import type { GuessNode, LatLng, MultiplayerRoundRecord, RoundRecord } from '@/types'
 import { ROUNDS, AVATAR_CLASS_MAP } from '@/consts'
 import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
 import useUserQuery from '@/composables/useUserQuery'
 import useMultiplayerRoundsApi from '@/composables/useMultiplayerRoundsApi'
+import { ref as dbRef, update } from 'firebase/database'
+import { db } from '@/lib/firebase'
 
 const props = defineProps({
   roomId: {
@@ -156,21 +166,37 @@ const props = defineProps({
   },
 })
 
+const router = useRouter()
+const {
+  currentRoom,
+  isWaiting,
+  isLoading,
+  isLoaded,
+  isPlaying,
+  isFinished,
+  roomCurrentRound,
+  currentRoundImageId,
+  hasEveryoneLoaded,
+  hasEveryoneGuessed,
+  gameConfig,
+  players,
+  getRoomById,
+  leaveRoom,
+  updateCurrentRoundImageId,
+} = useMultiplayerRoom()
 const {
   isExpired: isTimerExpired,
   formattedTime,
   start: startTimer,
   stop: stopTimer,
   reset: resetTimer,
-} = useTimer(60)
-const router = useRouter()
-const { currentRoom, getRoomById, leaveRoom } = useMultiplayerRoom()
-const { user } = useUserQuery()
+} = useTimer(gameConfig.value.timeLimit)
+const { user, mutateUserUpdate } = useUserQuery()
 const { multiplayerRoundsApi } = useMultiplayerRoundsApi()
 
 onMounted(() => {
   if (props.roomId) {
-    getRoomById(props.roomId)
+    getRoomById(props.roomId, user.value?.id)
   }
 })
 
@@ -180,183 +206,95 @@ const handleLeaveRoom = async () => {
   try {
     await leaveRoom(user.value.id)
     router.push({ name: 'game' })
-  } catch {}
+  } catch (err) {
+    console.error('Failed to leave room:', err)
+  }
 }
 
 const hasMarker = ref(false)
 const showResult = ref(false)
 const isLoadingImage = ref(false)
-const showSummaryView = ref(true)
+const showSummaryView = ref(false)
 const showPlayersList = ref(true)
-const isWaiting = ref(true)
 const isCreatingRounds = ref(false)
-const distance = ref(0)
-const score = ref(0)
-const totalScore = ref(2450)
-const currentRound = ref(2)
+const currentRound = computed(() => roomCurrentRound.value)
+const displayedDistance = ref(0)
+const displayedScore = ref(0)
+const displayedTotalScore = ref(0)
+const displayedRound = ref(1)
 const currentImageId = ref<string | null>(null)
-const imagePosition = ref<{ lat: number; lng: number } | null>(null)
-const markerPosition = ref<{ lat: number; lng: number } | null>(null)
+const imagePosition = ref<LatLng | null>(null)
+const markerPosition = ref<LatLng | null>(null)
 const mapRef = ref<InstanceType<typeof MapComponent> | null>(null)
 const streetViewRef = ref<InstanceType<typeof StreetViewComponent> | null>(null)
 
 const gameRecords = ref<RoundRecord[]>([])
 
-const multiplayerGameRecords = ref([
-  {
-    round: 1,
-    playerLocation: { lat: 35.6762, lng: 139.6503 },
-    correctLocation: { lat: 35.6895, lng: 139.6917 },
-    mapCenter: [139.671, 35.6829] as [number, number],
-    mapZoom: 10,
-    imageId: 'sample-image-1',
-    playerResults: [
-      {
-        id: '1',
-        name: 'You',
-        emoji: '🏆',
-        avatarClass: 'bg-yellow-100 border-yellow-200',
-        score: 4850,
-        distance: 2.1,
-      },
-      {
-        id: '2',
-        name: 'Alice',
-        emoji: '🌍',
-        avatarClass: 'bg-green-100 border-green-200',
-        score: 4320,
-        distance: 4.8,
-      },
-      {
-        id: '3',
-        name: 'Bob',
-        emoji: '🧭',
-        avatarClass: 'bg-blue-100 border-blue-200',
-        score: 3950,
-        distance: 7.2,
-      },
-      {
-        id: '4',
-        name: 'Carol',
-        emoji: '🚀',
-        avatarClass: 'bg-purple-100 border-purple-200',
-        score: 4650,
-        distance: 3.1,
-      },
-    ],
-  },
-  {
-    round: 2,
-    playerLocation: { lat: 48.8566, lng: 2.3522 },
-    correctLocation: { lat: 48.8584, lng: 2.2945 },
-    mapCenter: [2.3234, 48.8575] as [number, number],
-    mapZoom: 12,
-    imageId: 'sample-image-2',
-    playerResults: [
-      {
-        id: '1',
-        name: 'You',
-        emoji: '🏆',
-        avatarClass: 'bg-yellow-100 border-yellow-200',
-        score: 4200,
-        distance: 5.1,
-      },
-      {
-        id: '2',
-        name: 'Alice',
-        emoji: '🌍',
-        avatarClass: 'bg-green-100 border-green-200',
-        score: 4680,
-        distance: 2.8,
-      },
-      {
-        id: '3',
-        name: 'Bob',
-        emoji: '🧭',
-        avatarClass: 'bg-blue-100 border-blue-200',
-        score: 3850,
-        distance: 8.5,
-      },
-      {
-        id: '4',
-        name: 'Carol',
-        emoji: '🚀',
-        avatarClass: 'bg-purple-100 border-purple-200',
-        score: 4450,
-        distance: 3.9,
-      },
-    ],
-  },
-])
+const multiplayerGameRecords = computed<MultiplayerRoundRecord[]>(() => {
+  if (!currentRoom.value?.rounds || !currentRoom.value?.players) return []
 
-const players = computed(() => {
-  if (!currentRoom.value?.players) return []
+  const rounds = currentRoom.value.rounds
+  const players = currentRoom.value.players
+  const records = []
 
-  return Object.values(currentRoom.value.players).map((player) => ({
-    id: player.id,
-    name: player.name,
-    emoji: player.avatarEmoji,
-    avatarClass: AVATAR_CLASS_MAP[player.avatarBg] || 'bg-gray-100 border-gray-200',
-    score: 0,
-    status: 'Guessing',
-    isHost: player.isHost,
-  }))
+  for (let roundNum = 1; roundNum <= roomCurrentRound.value; roundNum++) {
+    const round = rounds[roundNum]
+    if (!round) continue
+
+    const guesses = round.guesses || {}
+    const playerResults = Object.values(players).map((player) => {
+      const guess = guesses[player.id]
+      return {
+        id: player.id,
+        name: player.name,
+        emoji: player.avatarEmoji,
+        avatarClass: AVATAR_CLASS_MAP[player.avatarBg] || 'bg-gray-100 border-gray-200',
+        score: guess?.score ?? 0,
+        distance: guess?.distance ?? -1,
+      }
+    })
+
+    const gameRecord = gameRecords.value.find((r) => r.round === roundNum)
+
+    records.push({
+      round: roundNum,
+      playerLocations: Object.entries(guesses).map(([playerId, guess]) => {
+        const player = players[playerId]
+        return {
+          lat: guess.lat,
+          lng: guess.lng,
+          avatarEmoji: player?.avatarEmoji ?? '👤',
+          avatarBg: player?.avatarBg ?? 'bg-gray-100',
+          id: playerId,
+        }
+      }),
+      correctLocation: gameRecord?.correctLocation ?? { lat: 0, lng: 0 },
+      mapCenter: gameRecord?.mapCenter ?? ([0, 0] as [number, number]),
+      mapZoom: gameRecord?.mapZoom ?? 10,
+      imageId: round.imageId,
+      playerResults,
+    })
+  }
+
+  return records
+})
+
+const hasUserGuessed = computed(() => {
+  if (!user.value || !currentRoom.value?.rounds) return false
+  const rounds = currentRoom.value.rounds
+  return rounds[currentRound.value]?.guesses?.[user.value.id] !== undefined
 })
 
 const myself = computed(() => {
   if (!user.value) return null
 
-  return players.value.find((player) => player.id === user.value!.id) || null
+  return players.value.find((player) => player.id === user.value!.id) ?? null
 })
 
-const gameConfig = computed(() => {
-  if (!currentRoom.value?.config) {
-    return {
-      mapType: 'World',
-      timeLimit: 60,
-      allowMoving: true,
-      allowZooming: true,
-    }
-  }
-
-  return {
-    mapType: currentRoom.value.config.mapType,
-    timeLimit: currentRoom.value.config.timeLimit,
-    allowMoving: currentRoom.value.config.allowMoving,
-    allowZooming: currentRoom.value.config.allowZooming,
-  }
-})
-
-const saveRoundRecord = () => {
-  if (!imagePosition.value || !currentImageId.value) return
-
-  const [centerLng, centerLat] = calculateCenter(
-    [markerPosition.value!.lng, markerPosition.value!.lat],
-    [imagePosition.value!.lng, imagePosition.value!.lat],
-  )
-  const zoom = calculateZoomLevel(distance.value)
-
-  gameRecords.value.push({
-    round: currentRound.value,
-    score: score.value,
-    distance: distance.value,
-    correctLocation: imagePosition.value,
-    playerLocation: markerPosition.value,
-    mapCenter: [centerLng, centerLat],
-    mapZoom: zoom,
-    imageId: currentImageId.value,
-  })
-}
-
-const playersWithTotals = computed(() => {
-  return players.value.map((player) => ({
-    id: player.id,
-    name: player.name,
-    emoji: player.emoji,
-    avatarClass: player.avatarClass,
-    totalScore: player.score,
-    totalDistance: Math.round(Math.random() * 20 + 5),
-  }))
+const currentRoundMyResult = computed<GuessNode | null>(() => {
+  if (!user.value || !currentRoom.value?.rounds) return null
+  const rounds = currentRoom.value.rounds
+  return rounds[currentRound.value]?.guesses?.[user.value.id] ?? null
 })
 
 watch(
@@ -368,30 +306,123 @@ watch(
   },
 )
 
-const handleTimeExpired = () => {
-  if (showResult.value) return
+watch(
+  () => isLoaded.value,
+  (loaded) => {
+    // Start round 1
+    if (loaded) {
+      updateCurrentRoundImageId()
+    }
+  },
+)
+
+watch(
+  () => currentRoundImageId.value,
+  async (imageId) => {
+    if (imageId && user.value) {
+      const playerRef = dbRef(db, `rooms/${props.roomId}/players/${user.value.id}`)
+      await update(playerRef, { loadedRound: roomCurrentRound.value })
+    }
+  },
+)
+
+watch(hasEveryoneLoaded, async (loaded) => {
+  // Make sure DOM updates are complete
+  await nextTick()
+  if (loaded && streetViewRef.value && currentRoundImageId.value) {
+    isLoadingImage.value = true
+    displayedRound.value = currentRound.value
+    await streetViewRef.value.loadViewFromImageId(currentRoundImageId.value)
+  }
+})
+
+watch(hasEveryoneGuessed, (guessed) => {
+  if (guessed && !showResult.value) {
+    displayedScore.value = currentRoundMyResult.value?.score ?? 0
+    displayedDistance.value = currentRoundMyResult.value?.distance ?? 0
+    displayedTotalScore.value += displayedScore.value
+    showResult.value = true
+
+    // Show all player markers and correct location
+    if (mapRef.value && imagePosition.value && currentRoom.value?.rounds) {
+      const currentRoundData = currentRoom.value.rounds[currentRound.value]
+      const guesses = currentRoundData?.guesses ?? {}
+      const playersData = currentRoom.value.players ?? {}
+
+      // Collect all player locations with avatar info
+      const allPlayerLocations = Object.entries(guesses).map(([playerId, guess]) => {
+        const player = playersData[playerId]
+        return {
+          lat: guess.lat,
+          lng: guess.lng,
+          avatarEmoji: player?.avatarEmoji ?? '👤',
+          avatarBg: player?.avatarBg ?? 'bg-gray-100',
+          id: playerId,
+        }
+      })
+
+      // Add all player markers
+      mapRef.value.addPlayerMarkers(allPlayerLocations)
+
+      // Show correct location
+      mapRef.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
+
+      // Center map if current user made a guess
+      if (markerPosition.value) {
+        mapRef.value.centerMapOnMarkers(
+          [markerPosition.value.lng, markerPosition.value.lat],
+          [imagePosition.value.lng, imagePosition.value.lat],
+          currentRoundMyResult.value?.distance ?? 0,
+        )
+      }
+    }
+  }
+})
+
+const handleTimeExpired = async () => {
+  if (showResult.value || !user.value) return
 
   stopTimer()
 
   if (markerPosition.value && imagePosition.value) {
-    distance.value = calculateDistance(imagePosition.value, markerPosition.value)
-    score.value = calculateScore(distance.value)
-    totalScore.value += score.value
-    showResult.value = true
+    const distance = calculateDistance(imagePosition.value, markerPosition.value)
+    const score = calculateScore(distance)
+
+    const guessRef = dbRef(
+      db,
+      `rooms/${props.roomId}/rounds/${roomCurrentRound.value}/guesses/${user.value.id}`,
+    )
+
+    try {
+      await update(guessRef, {
+        lat: markerPosition.value.lat,
+        lng: markerPosition.value.lng,
+        score: score,
+        distance: distance,
+      })
+    } catch (err) {
+      console.error('Failed to save time expired guess:', err)
+    }
 
     if (mapRef.value && imagePosition.value) {
       mapRef.value.disableClicks()
-      mapRef.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
-      mapRef.value.centerMapOnMarkers(
-        [markerPosition.value.lng, markerPosition.value.lat],
-        [imagePosition.value.lng, imagePosition.value.lat],
-        distance.value,
-      )
     }
   } else {
-    score.value = 0
-    distance.value = -1
-    showResult.value = true
+    const guessRef = dbRef(
+      db,
+      `rooms/${props.roomId}/rounds/${roomCurrentRound.value}/guesses/${user.value.id}`,
+    )
+
+    try {
+      await update(guessRef, {
+        lat: -1,
+        lng: -1,
+        score: 0,
+        distance: -1,
+      })
+    } catch (err) {
+      console.error('Failed to save no guess:', err)
+    }
 
     if (mapRef.value && imagePosition.value) {
       mapRef.value.disableClicks()
@@ -402,7 +433,7 @@ const handleTimeExpired = () => {
   saveRoundRecord()
 }
 
-const onImageLoaded = (position: { lat: number; lng: number }, imageId: string) => {
+const onImageLoaded = (position: LatLng, imageId: string) => {
   currentImageId.value = imageId
   imagePosition.value = position
   isLoadingImage.value = false
@@ -413,32 +444,76 @@ const onImageLoadingStart = () => {
   isLoadingImage.value = true
 }
 
-const onMarkerPlaced = (position: { lat: number; lng: number }) => {
+const onMarkerPlaced = (position: LatLng) => {
   markerPosition.value = position
   hasMarker.value = true
 }
 
-const makeGuess = () => {
-  if (!imagePosition.value || !markerPosition.value) return
+const togglePlayersList = () => {
+  showPlayersList.value = !showPlayersList.value
+}
+
+const makeGuess = async () => {
+  if (!imagePosition.value || !markerPosition.value || !user.value) return
 
   stopTimer()
 
-  distance.value = calculateDistance(imagePosition.value, markerPosition.value)
-  score.value = calculateScore(distance.value)
-  totalScore.value += score.value
-  showResult.value = true
+  const distance = calculateDistance(imagePosition.value, markerPosition.value)
+  const score = calculateScore(distance)
 
-  if (mapRef.value && imagePosition.value) {
+  const guessRef = dbRef(
+    db,
+    `rooms/${props.roomId}/rounds/${roomCurrentRound.value}/guesses/${user.value.id}`,
+  )
+
+  try {
+    await update(guessRef, {
+      lat: markerPosition.value.lat,
+      lng: markerPosition.value.lng,
+      score: score,
+      distance: distance,
+    })
+  } catch (err) {
+    console.error('Failed to save guess:', err)
+  }
+
+  if (mapRef.value) {
     mapRef.value.disableClicks()
-    mapRef.value.showCorrectLocation([imagePosition.value.lng, imagePosition.value.lat])
-    mapRef.value.centerMapOnMarkers(
-      [markerPosition.value.lng, markerPosition.value.lat],
-      [imagePosition.value.lng, imagePosition.value.lat],
-      distance.value,
-    )
   }
 
   saveRoundRecord()
+}
+
+const saveRoundRecord = () => {
+  if (!imagePosition.value || !currentImageId.value) return
+
+  const [centerLng, centerLat] = calculateCenter(
+    [markerPosition.value!.lng, markerPosition.value!.lat],
+    [imagePosition.value!.lng, imagePosition.value!.lat],
+  )
+  const zoom = calculateZoomLevel(currentRoundMyResult.value?.distance ?? 0)
+
+  gameRecords.value.push({
+    round: currentRound.value,
+    score: currentRoundMyResult.value?.score ?? 0,
+    distance: currentRoundMyResult.value?.distance ?? 0,
+    correctLocation: imagePosition.value,
+    playerLocations:
+      markerPosition.value && user.value
+        ? [
+            {
+              lat: markerPosition.value.lat,
+              lng: markerPosition.value.lng,
+              avatarEmoji: user.value.avatarEmoji,
+              avatarBg: user.value.avatarBg,
+              id: user.value.id,
+            },
+          ]
+        : [],
+    mapCenter: [centerLng, centerLat],
+    mapZoom: zoom,
+    imageId: currentImageId.value,
+  })
 }
 
 const resetRound = () => {
@@ -446,8 +521,8 @@ const resetRound = () => {
   hasMarker.value = false
   imagePosition.value = null
   markerPosition.value = null
-  distance.value = 0
-  score.value = 0
+  displayedDistance.value = 0
+  displayedScore.value = 0
   currentImageId.value = null
   resetTimer()
 
@@ -458,32 +533,50 @@ const resetRound = () => {
 }
 
 const nextRound = async () => {
-  currentRound.value += 1
+  if (!user.value) return
+
   resetRound()
 
-  if (streetViewRef.value) {
-    await streetViewRef.value.loadRandomView()
+  isLoadingImage.value = true
+  updateCurrentRoundImageId()
+  const playerRef = dbRef(db, `rooms/${props.roomId}/players/${user.value.id}`)
+
+  try {
+    await update(playerRef, { loadedRound: roomCurrentRound.value })
+  } catch (err) {
+    console.error('Failed to update player loaded round:', err)
   }
 }
 
 const showSummary = () => {
   showSummaryView.value = true
+
+  if (user.value) {
+    const newBestScore = Math.max(user.value.bestScore ?? 0, displayedTotalScore.value)
+    const newGamesPlayed = (user.value.gamesPlayed ?? 0) + 1
+    const totalRoundsSum =
+      (user.value.averageScore ?? 0) * (user.value.gamesPlayed ?? 0) * ROUNDS +
+      displayedTotalScore.value
+    const totalRoundsPlayed = newGamesPlayed * ROUNDS
+    const newAverageScore = Math.round(totalRoundsSum / totalRoundsPlayed)
+
+    mutateUserUpdate({
+      bestScore: newBestScore,
+      averageScore: newAverageScore,
+      gamesPlayed: newGamesPlayed,
+    })
+  }
 }
 
 const playAgain = () => {
   showSummaryView.value = false
-  currentRound.value = 1
-  totalScore.value = 0
+  displayedTotalScore.value = 0
   gameRecords.value = []
   resetRound()
 }
 
 const returnToMenu = () => {
   router.push('/game')
-}
-
-const togglePlayersList = () => {
-  showPlayersList.value = !showPlayersList.value
 }
 
 const startGame = async () => {

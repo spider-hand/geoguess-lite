@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, computed } from 'vue'
 import {
   getDatabase,
   ref as dbRef,
@@ -6,17 +6,133 @@ import {
   get,
   onValue,
   off,
+  onDisconnect,
   type DataSnapshot,
 } from 'firebase/database'
 import { firebaseApp } from '@/lib/firebase'
-import type { GameConfigNode, PlayerNode, RoomNode } from '@/types'
+import type { GameConfigNode, PlayerNode, PlayerResult, RoomNode } from '@/types'
+import { AVATAR_CLASS_MAP } from '@/consts'
 
 const db = getDatabase(firebaseApp)
 
 export const useMultiplayerRoom = () => {
   const currentRoom = ref<RoomNode | null>(null)
-  const isLoading = ref(false)
+  const isLoadingRoom = ref(false)
   const error = ref<string | null>(null)
+
+  const isWaiting = computed(() => currentRoom.value?.status === 'waiting')
+
+  const isLoading = computed(() => currentRoom.value?.status === 'loading')
+
+  const isLoaded = computed(() => currentRoom.value?.status === 'loaded')
+
+  const isPlaying = computed(() => currentRoom.value?.status === 'playing')
+
+  const isFinished = computed(() => currentRoom.value?.status === 'finished')
+
+  const roomCurrentRound = computed(() => currentRoom.value?.currentRound ?? 1)
+
+  const currentRoundImageId = ref<string | null>(null)
+
+  const updateCurrentRoundImageId = () => {
+    const rounds = currentRoom.value?.rounds
+    const currentRoundNum = roomCurrentRound.value
+    if (rounds && rounds[currentRoundNum]) {
+      currentRoundImageId.value = rounds[currentRoundNum].imageId
+    } else {
+      currentRoundImageId.value = null
+    }
+  }
+
+  const hasEveryoneLoaded = computed(() => {
+    const roundState = currentRoom.value?.roundState
+    const currentRoundNum = roomCurrentRound.value
+    if (roundState && roundState[currentRoundNum]) {
+      return roundState[currentRoundNum].hasEveryoneLoaded
+    }
+    return false
+  })
+
+  const hasEveryoneGuessed = computed(() => {
+    const roundState = currentRoom.value?.roundState
+    const currentRoundNum = roomCurrentRound.value
+    if (roundState && roundState[currentRoundNum]) {
+      return roundState[currentRoundNum].hasEveryoneGuessed
+    }
+    return false
+  })
+
+  const gameConfig = computed<GameConfigNode>(() => {
+    if (!currentRoom.value?.config) {
+      return {
+        mapType: 'World',
+        timeLimit: 60,
+        allowMoving: true,
+        allowZooming: true,
+      }
+    }
+
+    return {
+      mapType: currentRoom.value.config.mapType,
+      timeLimit: currentRoom.value.config.timeLimit,
+      allowMoving: currentRoom.value.config.allowMoving,
+      allowZooming: currentRoom.value.config.allowZooming,
+    }
+  })
+
+  const players = computed<PlayerResult[]>(() => {
+    if (!currentRoom.value?.players) return []
+
+    const rounds = currentRoom.value.rounds || {}
+    const currentRoundNum = roomCurrentRound.value
+    const everyoneGuessed = hasEveryoneGuessed.value
+
+    return Object.values(currentRoom.value.players).map((player) => {
+      let totalScore = 0
+      let totalDistance = 0
+
+      // Always include completed rounds
+      for (let roundNum = 1; roundNum < currentRoundNum; roundNum++) {
+        const round = rounds[roundNum]
+        if (round?.guesses?.[player.id]) {
+          const guess = round.guesses[player.id]
+          if (guess && guess.score > 0) {
+            totalScore += guess.score
+          }
+          if (guess && guess.distance >= 0) {
+            totalDistance += guess.distance
+          }
+        }
+      }
+
+      // Only include current round score if everyone has guessed to show the updated values when the round is complete
+      if (everyoneGuessed && currentRoundNum > 0 && rounds[currentRoundNum]?.guesses?.[player.id]) {
+        const currentGuess = rounds[currentRoundNum].guesses[player.id]
+        if (currentGuess && currentGuess.score > 0) {
+          totalScore += currentGuess.score
+        }
+        if (currentGuess && currentGuess.distance >= 0) {
+          totalDistance += currentGuess.distance
+        }
+      }
+
+      let status = 'Guessing'
+      if (currentRoundNum > 0 && rounds[currentRoundNum]?.guesses?.[player.id]) {
+        status = 'Guessed'
+      }
+
+      return {
+        id: player.id,
+        name: player.name,
+        emoji: player.avatarEmoji,
+        avatarClass: AVATAR_CLASS_MAP[player.avatarBg] || 'bg-gray-100 border-gray-200',
+        score: totalScore,
+        distance: totalDistance,
+        status,
+        isHost: player.isHost,
+      }
+    })
+  })
 
   let roomListener: ((snapshot: DataSnapshot) => void) | null = null
   let roomRef: ReturnType<typeof dbRef> | null = null
@@ -28,7 +144,7 @@ export const useMultiplayerRoom = () => {
   }
 
   const createRoom = async (hostPlayer: PlayerNode, config: GameConfigNode): Promise<string> => {
-    isLoading.value = true
+    isLoadingRoom.value = true
     error.value = null
 
     try {
@@ -43,10 +159,16 @@ export const useMultiplayerRoom = () => {
         },
         createdAt: Date.now(),
         status: 'waiting',
+        currentRound: 0,
       }
 
       await set(newRoomRef, roomData)
       currentRoom.value = roomData
+
+      // Set up disconnect handler for host player
+      const playersRef = dbRef(db, `rooms/${roomId}/players/${hostPlayer.id}`)
+      const playerDisconnectRef = onDisconnect(playersRef)
+      await playerDisconnectRef.update({ isConnected: false })
 
       // Listen for room updates
       roomRef = newRoomRef
@@ -61,12 +183,12 @@ export const useMultiplayerRoom = () => {
       error.value = err instanceof Error ? err.message : 'Failed to create room'
       throw err
     } finally {
-      isLoading.value = false
+      isLoadingRoom.value = false
     }
   }
 
   const joinRoom = async (roomId: string, player: PlayerNode): Promise<void> => {
-    isLoading.value = true
+    isLoadingRoom.value = true
     error.value = null
 
     try {
@@ -87,6 +209,10 @@ export const useMultiplayerRoom = () => {
       const playersRef = dbRef(db, `rooms/${roomId}/players/${player.id}`)
       await set(playersRef, { ...player, isHost: false })
 
+      // Set up disconnect handler
+      const playerDisconnectRef = onDisconnect(playersRef)
+      await playerDisconnectRef.update({ isConnected: false })
+
       currentRoom.value = room
 
       // Listen for room updates
@@ -100,7 +226,7 @@ export const useMultiplayerRoom = () => {
       error.value = err instanceof Error ? err.message : 'Failed to join room'
       throw err
     } finally {
-      isLoading.value = false
+      isLoadingRoom.value = false
     }
   }
 
@@ -142,8 +268,8 @@ export const useMultiplayerRoom = () => {
     }
   }
 
-  const getRoomById = async (roomId: string): Promise<void> => {
-    isLoading.value = true
+  const getRoomById = async (roomId: string, userId?: string): Promise<void> => {
+    isLoadingRoom.value = true
     error.value = null
 
     try {
@@ -156,6 +282,12 @@ export const useMultiplayerRoom = () => {
 
       currentRoom.value = snapshot.val() as RoomNode
 
+      if (userId && currentRoom.value?.players?.[userId]) {
+        const playersRef = dbRef(db, `rooms/${roomId}/players/${userId}`)
+        const playerDisconnectRef = onDisconnect(playersRef)
+        await playerDisconnectRef.update({ isConnected: false })
+      }
+
       roomRef = targetRoomRef
       roomListener = onValue(targetRoomRef, (snapshot) => {
         if (snapshot.exists()) {
@@ -166,7 +298,7 @@ export const useMultiplayerRoom = () => {
       error.value = err instanceof Error ? err.message : 'Failed to get room'
       throw err
     } finally {
-      isLoading.value = false
+      isLoadingRoom.value = false
     }
   }
 
@@ -186,12 +318,24 @@ export const useMultiplayerRoom = () => {
 
   return {
     currentRoom,
-    isLoading,
+    isLoadingRoom,
     error,
+    isWaiting,
+    isLoading,
+    isLoaded,
+    isPlaying,
+    isFinished,
+    roomCurrentRound,
+    currentRoundImageId,
+    hasEveryoneLoaded,
+    hasEveryoneGuessed,
+    gameConfig,
+    players,
     createRoom,
     joinRoom,
     leaveRoom,
     getRoomById,
     cleanup,
+    updateCurrentRoundImageId,
   }
 }

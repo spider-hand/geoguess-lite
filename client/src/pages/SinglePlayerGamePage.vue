@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -82,7 +82,7 @@ import { useTimer } from '@/composables/useTimer'
 import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue'
-import type { RoundRecord } from '@/types'
+import type { LatLng, RoundRecord } from '@/types'
 import { ROUNDS } from '@/consts'
 import useUserQuery from '@/composables/useUserQuery'
 
@@ -106,8 +106,8 @@ const score = ref(0)
 const totalScore = ref(0)
 const currentRound = ref(1)
 const currentImageId = ref<string | null>(null)
-const imagePosition = ref<{ lat: number; lng: number } | null>(null)
-const markerPosition = ref<{ lat: number; lng: number } | null>(null)
+const imagePosition = ref<LatLng | null>(null)
+const markerPosition = ref<LatLng | null>(null)
 const mapRef = ref<InstanceType<typeof MapComponent> | null>(null)
 const streetViewRef = ref<InstanceType<typeof StreetViewComponent> | null>(null)
 
@@ -127,7 +127,18 @@ const saveRoundRecord = () => {
     score: score.value,
     distance: distance.value,
     correctLocation: imagePosition.value,
-    playerLocation: markerPosition.value,
+    playerLocations:
+      markerPosition.value && user.value
+        ? [
+            {
+              lat: markerPosition.value.lat,
+              lng: markerPosition.value.lng,
+              avatarEmoji: user.value.avatarEmoji,
+              avatarBg: user.value.avatarBg,
+              id: user.value.id,
+            },
+          ]
+        : [],
     mapCenter: [centerLng, centerLat],
     mapZoom: zoom,
     imageId: currentImageId.value,
@@ -184,7 +195,7 @@ const handleTimeExpired = () => {
   saveRoundRecord()
 }
 
-const onImageLoaded = (position: { lat: number; lng: number }, imageId: string) => {
+const onImageLoaded = (position: LatLng, imageId: string) => {
   currentImageId.value = imageId
   imagePosition.value = position
   isLoadingImage.value = false
@@ -195,7 +206,7 @@ const onImageLoadingStart = () => {
   isLoadingImage.value = true
 }
 
-const onMarkerPlaced = (position: { lat: number; lng: number }) => {
+const onMarkerPlaced = (position: LatLng) => {
   markerPosition.value = position
   hasMarker.value = true
 }
@@ -278,4 +289,10 @@ const playAgain = () => {
 const returnToMenu = () => {
   router.push('/game')
 }
+
+onMounted(async () => {
+  if (streetViewRef.value) {
+    await streetViewRef.value.loadRandomView()
+  }
+})
 </script>

@@ -24,9 +24,10 @@
 import { onMounted, ref, watch } from 'vue'
 import { Viewer } from 'mapillary-js'
 import { CANDIDATE_LOCATIONS } from '@/consts'
+import type { LatLng } from '@/types'
 
 const emit = defineEmits<{
-  imageLoaded: [position: { lat: number; lng: number }, imageId: string]
+  imageLoaded: [position: LatLng, imageId: string]
   imageLoadingStart: []
 }>()
 
@@ -59,6 +60,16 @@ const props = defineProps({
 
 const viewer = ref<Viewer | null>(null)
 const viewerRef = ref<HTMLElement | null>(null)
+
+// When imageId pros is provided, load the view automatially
+watch(
+  () => props.imageId,
+  (newImageId) => {
+    if (newImageId) {
+      loadViewFromImageId(newImageId)
+    }
+  },
+)
 
 const getRandomLatLng = () => {
   const [baseLat, baseLng] =
@@ -99,7 +110,7 @@ const loadRandomView = async () => {
     if (!viewer.value) return
 
     emit('imageLoadingStart')
-    const imageId = props.imageId ?? (await getRandomImageId())
+    const imageId = await getRandomImageId()
     await viewer.value.moveTo(imageId)
 
     const pos = await viewer.value.getPosition()
@@ -112,41 +123,51 @@ const loadRandomView = async () => {
   }
 }
 
-defineExpose({
-  loadRandomView,
-})
-
-const initViewer = async () => {
+const loadViewFromImageId = async (imageId: string) => {
   try {
-    if (!viewerRef.value || viewer.value) return
+    console.log(`Loading image with ID: ${imageId}`)
+    if (!viewer.value) return
 
-    viewer.value = new Viewer({
-      container: viewerRef.value,
-      accessToken: import.meta.env.VITE_MAPILLARY_TOKEN,
-      component: {
-        pointer: props.allowZooming,
-        sequence: props.allowMoving,
-        direction: props.allowMoving,
-        zoom: props.allowZooming,
-      },
-    })
+    emit('imageLoadingStart')
+    await viewer.value.moveTo(imageId)
 
-    await loadRandomView()
+    const pos = await viewer.value.getPosition()
+    console.log(`Loaded image at lat: ${pos.lat}, lng: ${pos.lng}`)
+
+    emit('imageLoaded', { lat: pos.lat, lng: pos.lng }, imageId)
   } catch (err) {
-    console.error('Error loading Mapillary view:', err)
+    console.error('Error in loadViewFromImageId:', err)
+    throw err
   }
 }
 
-watch(
-  () => props.imageId,
-  async (newImageId) => {
-    if (viewer.value && newImageId) {
-      await loadRandomView()
-    }
-  },
-)
+const initViewer = () => {
+  if (!viewerRef.value || viewer.value) return
 
-onMounted(async () => {
-  await initViewer()
+  viewer.value = new Viewer({
+    container: viewerRef.value,
+    accessToken: import.meta.env.VITE_MAPILLARY_TOKEN,
+    component: {
+      pointer: props.allowZooming,
+      sequence: props.allowMoving,
+      direction: props.allowMoving,
+      zoom: props.allowZooming,
+    },
+  })
+
+  // Load the view automatically if imageId prop is provided
+  if (props.imageId) {
+    loadViewFromImageId(props.imageId)
+  }
+}
+
+onMounted(() => {
+  initViewer()
+})
+
+defineExpose({
+  // Exposing methods to parent components to handle the timing to load the view in the parent component
+  loadRandomView,
+  loadViewFromImageId,
 })
 </script>

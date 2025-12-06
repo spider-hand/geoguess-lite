@@ -40,11 +40,9 @@
             </div>
             <div class="flex items-center gap-4">
               <div class="text-right">
-                <div class="font-[JetBrains_Mono] text-lg font-bold">
-                  {{ player.totalScore }} pts
-                </div>
+                <div class="font-[JetBrains_Mono] text-lg font-bold">{{ player.score }} points</div>
                 <div class="text-muted-foreground font-[JetBrains_Mono] text-sm">
-                  {{ player.totalDistance }}km off
+                  {{ player.distance }}km off
                 </div>
               </div>
             </div>
@@ -71,7 +69,7 @@
               <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <div class="h-64">
                   <MapComponent
-                    :player-location="record.playerLocation"
+                    :player-locations="record.playerLocations"
                     :correct-location="record.correctLocation"
                     :center="record.mapCenter"
                     :zoom="record.mapZoom"
@@ -104,7 +102,7 @@
                   </div>
                   <div class="text-right">
                     <div class="font-[JetBrains_Mono] text-sm font-bold">
-                      {{ player.score }} pts
+                      {{ player.score }} points
                     </div>
                     <div class="text-muted-foreground font-[JetBrains_Mono] text-xs">
                       {{ player.distance }}km
@@ -148,38 +146,11 @@ import AccordionTrigger from './ui/accordion/AccordionTrigger.vue'
 import Card from './ui/card/Card.vue'
 import CardContent from './ui/card/CardContent.vue'
 import Button from './ui/button/Button.vue'
-
-interface PlayerResult {
-  id: string
-  name: string
-  emoji: string
-  avatarClass: string
-  score: number
-  distance: number
-}
-
-interface MultiplayerRoundRecord {
-  round: number
-  playerLocation: { lat: number; lng: number } | null
-  correctLocation: { lat: number; lng: number }
-  mapCenter: [number, number]
-  mapZoom: number
-  imageId: string
-  playerResults: PlayerResult[]
-}
-
-interface Player {
-  id: string
-  name: string
-  emoji: string
-  avatarClass: string
-  totalScore: number
-  totalDistance: number
-}
+import type { MultiplayerRoundRecord, PlayerResult } from '@/types'
 
 const props = defineProps({
   players: {
-    type: Array as PropType<Player[]>,
+    type: Array as PropType<PlayerResult[]>,
     required: true,
   },
   gameRecords: {
@@ -193,7 +164,7 @@ const props = defineProps({
 })
 
 const sortedPlayers = computed(() => {
-  return [...props.players].sort((a, b) => b.totalScore - a.totalScore)
+  return [...props.players].sort((a, b) => b.score - a.score)
 })
 
 defineEmits(['play-again', 'return-to-menu'])

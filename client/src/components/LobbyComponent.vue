@@ -103,6 +103,7 @@
 
             <div class="flex gap-4">
               <Button
+                v-if="!isCreatingRounds"
                 variant="ghost"
                 size="lg"
                 @click="leaveRoom"
@@ -114,9 +115,12 @@
                 size="lg"
                 @click="startGame"
                 :disabled="players.length < 2 || !myself?.isHost || isCreatingRounds"
-                class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+                :class="isCreatingRounds ? 'w-full' : 'flex-1'"
+                class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {{ isCreatingRounds ? 'Starting...' : 'Start Game' }}
+                {{
+                  isCreatingRounds ? 'Creating the game.. It might take a while..' : 'Start Game'
+                }}
               </Button>
             </div>
           </div>
@@ -130,6 +134,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { PropType } from 'vue'
+import type { GameConfigNode, PlayerResult } from '@/types'
 
 defineProps({
   roomId: {
@@ -148,24 +153,11 @@ defineProps({
     required: true,
   },
   players: {
-    type: Array as PropType<
-      Array<{
-        id: string
-        name: string
-        emoji: string
-        avatarClass: string
-        isHost: boolean
-      }>
-    >,
+    type: Array as PropType<Array<PlayerResult>>,
     required: true,
   },
   gameConfig: {
-    type: Object as PropType<{
-      mapType: string
-      timeLimit: number
-      allowMoving: boolean
-      allowZooming: boolean
-    }>,
+    type: Object as PropType<GameConfigNode>,
     required: true,
   },
   isCreatingRounds: {

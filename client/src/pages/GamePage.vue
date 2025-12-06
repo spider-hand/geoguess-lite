@@ -551,6 +551,8 @@ const startGame = async () => {
             avatarEmoji: user.value.avatarEmoji,
             avatarBg: user.value.avatarBg,
             isHost: true,
+            isConnected: true,
+            loadedRound: 0,
           }
 
           const config = {
@@ -574,6 +576,8 @@ const startGame = async () => {
             avatarEmoji: user.value.avatarEmoji,
             avatarBg: user.value.avatarBg,
             isHost: false,
+            isConnected: true,
+            loadedRound: 0,
           }
 
           await joinRoom(gameConfig.roomNumber, player)

@@ -15,6 +15,9 @@ async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
         initialize_firebase_with_database()
         db = get_firebase_database()
 
+        room_ref = db.reference(f"rooms/{room_id}")
+        room_ref.update({"status": "loading", "currentRound": 1})
+
         for round_num in range(1, 6):
             logger.info(f"Getting image for room {room_id} round {round_num}/5")
             image_id = await get_random_image_id()
@@ -24,8 +27,7 @@ async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
 
             logger.info(f"Completed room {room_id} round {round_num}/5")
 
-        status_ref = db.reference(f"rooms/{room_id}/status")
-        status_ref.set("playing")
+        room_ref.update({"status": "loaded"})
 
         logger.info({"event": "multiplayer_rounds_created", "room_id": room_id})
 

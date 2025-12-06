@@ -8,14 +8,15 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { onMounted, onUnmounted, ref, type PropType } from 'vue'
 import useUserQuery from '@/composables/useUserQuery'
 import { calculateCenter, calculateZoomLevel, getAvatarClass } from '@/utils'
+import type { LatLng, PlayerMarker } from '@/types'
 
 const props = defineProps({
-  playerLocation: {
-    type: Object as PropType<{ lat: number; lng: number } | null>,
-    default: null,
+  playerLocations: {
+    type: Array as PropType<PlayerMarker[]>,
+    default: () => [],
   },
   correctLocation: {
-    type: Object as PropType<{ lat: number; lng: number } | null>,
+    type: Object as PropType<LatLng | null>,
     default: null,
   },
   center: {
@@ -29,7 +30,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  markerPlaced: [position: { lat: number; lng: number }]
+  markerPlaced: [position: LatLng]
   markerRemoved: []
 }>()
 
@@ -37,31 +38,36 @@ const mapRef = ref<HTMLElement | null>(null)
 const map = ref(null as maplibregl.Map | null)
 const currentMarker = ref<maplibregl.Marker | null>(null)
 const correctLocationMarker = ref<maplibregl.Marker | null>(null)
+const playerMarkers = ref<maplibregl.Marker[]>([])
 
 const { user } = useUserQuery()
 
-const createAvatarMarker = () => {
-  if (!user.value) return null
-
+const createAvatarMarker = (avatarEmoji: string, avatarBg: string) => {
   const markerElement = document.createElement('div')
-  markerElement.className = `flex h-10 w-10 items-center justify-center rounded-full text-lg border-2 border-white shadow-lg cursor-pointer ${getAvatarClass(user.value.avatarBg)}`
-  markerElement.innerHTML = user.value.avatarEmoji
+  markerElement.className = `flex h-10 w-10 items-center justify-center rounded-full text-lg border-2 border-white shadow-lg cursor-pointer ${getAvatarClass(avatarBg)}`
+  markerElement.innerHTML = avatarEmoji
 
   return markerElement
+}
+
+const createUserMarker = () => {
+  if (!user.value) return null
+  return createAvatarMarker(user.value.avatarEmoji, user.value.avatarBg)
 }
 
 const handleMapClick = (e: maplibregl.MapMouseEvent) => {
   addMarkerToMap([e.lngLat.lng, e.lngLat.lat])
 }
 
+// For user clicks during gameplay
 const addMarkerToMap = (lngLat: [number, number]) => {
-  if (!map.value || !user.value) return
+  if (!map.value) return
 
   if (currentMarker.value) {
     currentMarker.value.remove()
   }
 
-  const markerElement = createAvatarMarker()
+  const markerElement = createUserMarker()
   if (!markerElement) return
 
   currentMarker.value = new maplibregl.Marker({
@@ -73,6 +79,21 @@ const addMarkerToMap = (lngLat: [number, number]) => {
   currentMarker.value.addTo(map.value)
 
   emit('markerPlaced', { lat: lngLat[1], lng: lngLat[0] })
+}
+
+// For adding player markers with specific avatar info
+const addPlayerMarker = (lngLat: [number, number], avatarEmoji: string, avatarBg: string) => {
+  if (!map.value) return
+
+  const markerElement = createAvatarMarker(avatarEmoji, avatarBg)
+  const marker = new maplibregl.Marker({
+    element: markerElement,
+    anchor: 'center',
+  }).setLngLat(lngLat)
+
+  // @ts-expect-error maplibre type issue
+  marker.addTo(map.value)
+  playerMarkers.value.push(marker)
 }
 
 const showCorrectLocation = (lngLat: [number, number]) => {
@@ -116,6 +137,9 @@ const removeMarkers = () => {
     correctLocationMarker.value.remove()
     correctLocationMarker.value = null
   }
+  // Remove all player markers
+  playerMarkers.value.forEach((marker) => marker.remove())
+  playerMarkers.value = []
 }
 
 const disableClicks = () => {
@@ -128,7 +152,7 @@ const enableClicks = () => {
   map.value.on('click', handleMapClick)
 }
 
-const addCorrectLocationMarker = (location: { lat: number; lng: number }) => {
+const addCorrectLocationMarker = (location: LatLng) => {
   if (!map.value) return
 
   correctLocationMarker.value = new maplibregl.Marker({
@@ -178,9 +202,9 @@ const initializeMap = () => {
     if (props.correctLocation) {
       addCorrectLocationMarker(props.correctLocation)
 
-      if (props.playerLocation) {
-        addMarkerToMap([props.playerLocation.lng, props.playerLocation.lat])
-      }
+      props.playerLocations.forEach((loc) => {
+        addPlayerMarker([loc.lng, loc.lat], loc.avatarEmoji, loc.avatarBg)
+      })
     }
   })
 }
@@ -196,7 +220,27 @@ onUnmounted(() => {
   if (correctLocationMarker.value) {
     correctLocationMarker.value.remove()
   }
+  playerMarkers.value.forEach((marker) => marker.remove())
 })
+
+const addPlayerMarkers = (
+  locations: Array<{
+    lat: number
+    lng: number
+    avatarEmoji: string
+    avatarBg: string
+    id: string
+  }>,
+) => {
+  // Clear existing player markers first
+  playerMarkers.value.forEach((marker) => marker.remove())
+  playerMarkers.value = []
+
+  // Add new player markers
+  locations.forEach((loc) => {
+    addPlayerMarker([loc.lng, loc.lat], loc.avatarEmoji, loc.avatarBg)
+  })
+}
 
 defineExpose({
   showCorrectLocation,
@@ -204,5 +248,6 @@ defineExpose({
   removeMarkers,
   disableClicks,
   enableClicks,
+  addPlayerMarkers,
 })
 </script>

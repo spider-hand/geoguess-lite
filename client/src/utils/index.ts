@@ -5,15 +5,13 @@ import {
   MAX_SCORE,
   PERFECT_SCORE_THRESHOLD_KM,
 } from '@/consts'
+import type { LatLng } from '@/types'
 
 export const getAvatarClass = (avatarBg?: string) => {
   return avatarBg ? (AVATAR_CLASS_MAP[avatarBg] ?? '') : ''
 }
 
-export const calculateDistance = (
-  pos1: { lat: number; lng: number },
-  pos2: { lat: number; lng: number },
-): number => {
+export const calculateDistance = (pos1: LatLng, pos2: LatLng): number => {
   const dLat = ((pos2.lat - pos1.lat) * Math.PI) / 180
   const dLon = ((pos2.lng - pos1.lng) * Math.PI) / 180
   const a =
