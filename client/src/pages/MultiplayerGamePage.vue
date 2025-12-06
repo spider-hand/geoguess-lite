@@ -2,15 +2,18 @@
   <div class="flex min-h-screen flex-col">
     <LobbyComponent
       v-if="isWaiting"
+      :room-id="props.roomId"
+      :myself="myself"
       :players="players"
       :game-config="gameConfig"
       @start-game="startGameFromLobby"
+      @leave-room="handleLeaveRoom"
     />
     <template v-else>
       <HeaderComponent v-if="showSummaryView" />
       <header v-else class="flex items-center justify-between border-b px-4 py-4 sm:px-8">
         <div class="font-[JetBrains_Mono] text-lg font-semibold sm:text-xl">
-          <span>Room #12345 - Round {{ currentRound }} / {{ ROUNDS }}</span>
+          <span>Room #{{ props.roomId }} - Round {{ currentRound }} / {{ ROUNDS }}</span>
         </div>
         <nav class="flex gap-2 sm:gap-4">
           <div
@@ -31,8 +34,8 @@
       >
         <StreetViewComponent
           ref="streetViewRef"
-          :allow-moving="true"
-          :allow-zooming="true"
+          :allow-moving="gameConfig.allowMoving"
+          :allow-zooming="gameConfig.allowZooming"
           :show-result="showResult"
           :result-score="score"
           :result-distance="distance"
@@ -129,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -140,7 +143,16 @@ import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummaryMultiplayerComponent from '@/components/GameSummaryMultiplayerComponent.vue'
 import LobbyComponent from '@/components/LobbyComponent.vue'
 import type { RoundRecord } from '@/types'
-import { ROUNDS } from '@/consts'
+import { ROUNDS, AVATAR_CLASS_MAP } from '@/consts'
+import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
+import useUserQuery from '@/composables/useUserQuery'
+
+const props = defineProps({
+  roomId: {
+    type: String,
+    required: true,
+  },
+})
 
 const {
   isExpired: isTimerExpired,
@@ -150,6 +162,23 @@ const {
   reset: resetTimer,
 } = useTimer(60)
 const router = useRouter()
+const { currentRoom, getRoomById, leaveRoom } = useMultiplayerRoom()
+const { user } = useUserQuery()
+
+onMounted(() => {
+  if (props.roomId) {
+    getRoomById(props.roomId)
+  }
+})
+
+const handleLeaveRoom = async () => {
+  if (!user.value) return
+
+  try {
+    await leaveRoom(user.value.id)
+    router.push({ name: 'game' })
+  } catch {}
+}
 
 const hasMarker = ref(false)
 const showResult = ref(false)
@@ -256,50 +285,42 @@ const multiplayerGameRecords = ref([
   },
 ])
 
-const players = ref([
-  {
-    id: '1',
-    name: 'You',
-    emoji: '🏆',
-    avatarClass: 'bg-yellow-100 border-yellow-200',
-    score: 2450,
-    status: 'Guessing',
-    isHost: true,
-  },
-  {
-    id: '2',
-    name: 'Alice',
-    emoji: '🌍',
-    avatarClass: 'bg-green-100 border-green-200',
-    score: 2180,
-    status: 'Guessed',
-    isHost: false,
-  },
-  {
-    id: '3',
-    name: 'Bob',
-    emoji: '🧭',
-    avatarClass: 'bg-blue-100 border-blue-200',
-    score: 1920,
-    status: 'Guessing',
-    isHost: false,
-  },
-  {
-    id: '4',
-    name: 'Carol',
-    emoji: '🚀',
-    avatarClass: 'bg-purple-100 border-purple-200',
-    score: 2350,
-    status: 'Guessed',
-    isHost: false,
-  },
-])
+const players = computed(() => {
+  if (!currentRoom.value?.players) return []
 
-const gameConfig = ref({
-  mapType: 'World',
-  timeLimit: 60,
-  allowMoving: true,
-  allowZooming: true,
+  return Object.values(currentRoom.value.players).map((player) => ({
+    id: player.id,
+    name: player.name,
+    emoji: player.avatarEmoji,
+    avatarClass: AVATAR_CLASS_MAP[player.avatarBg] || 'bg-gray-100 border-gray-200',
+    score: 0,
+    status: 'Guessing',
+    isHost: player.isHost,
+  }))
+})
+
+const myself = computed(() => {
+  if (!user.value) return null
+
+  return players.value.find((player) => player.id === user.value!.id) || null
+})
+
+const gameConfig = computed(() => {
+  if (!currentRoom.value?.config) {
+    return {
+      mapType: 'World',
+      timeLimit: 60,
+      allowMoving: true,
+      allowZooming: true,
+    }
+  }
+
+  return {
+    mapType: currentRoom.value.config.mapType,
+    timeLimit: currentRoom.value.config.timeLimit,
+    allowMoving: currentRoom.value.config.allowMoving,
+    allowZooming: currentRoom.value.config.allowZooming,
+  }
 })
 
 const saveRoundRecord = () => {

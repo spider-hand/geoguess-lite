@@ -118,11 +118,15 @@
                 @click="startGame"
                 :disabled="
                   !user ||
+                  isRoomLoading ||
                   (gameConfig.selectedGameMode === 'daily-challenge' &&
-                    user.hasPlayedDailyChallenge)
+                    user.hasPlayedDailyChallenge) ||
+                  (gameConfig.selectedGameMode === 'multiplayer' &&
+                    !gameConfig.isHost &&
+                    !gameConfig.roomNumber)
                 "
               >
-                Start Game
+                {{ isRoomLoading ? 'Loading...' : 'Start Game' }}
               </Button>
             </div>
           </CardContent>
@@ -378,6 +382,7 @@ import useDailyScoreQuery from '@/composables/useDailyScoreQuery'
 import { AVATAR_CLASS_MAP } from '@/consts'
 import type { GameModeType } from '@/types'
 import useGameConfigStore from '@/stores/gameConfig'
+import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
 
 interface GameModeItem {
   id: GameModeType
@@ -451,6 +456,7 @@ const isDeletingAccount = ref(false)
 const deleteConfirmationText = ref('')
 
 const gameConfig = useGameConfigStore()
+const { createRoom, joinRoom, isLoading: isRoomLoading } = useMultiplayerRoom()
 
 const getGameModeCardClass = (modeId: GameModeType) => {
   const mode = gameModes.find((m) => m.id === modeId)
@@ -528,13 +534,52 @@ const confirmDeleteAccount = async () => {
   }
 }
 
-const startGame = () => {
+const startGame = async () => {
   switch (gameConfig.selectedGameMode) {
     case 'single-player':
       router.push({ name: 'game-single-player' })
       break
     case 'multiplayer':
-      router.push({ name: 'game-multiplayer' })
+      if (!user.value) return
+
+      try {
+        if (gameConfig.isHost) {
+          // Create room as host
+          const player = {
+            id: user.value.id,
+            name: user.value.name,
+            avatarEmoji: user.value.avatarEmoji,
+            avatarBg: user.value.avatarBg,
+            isHost: true,
+          }
+
+          const config = {
+            mapType: gameConfig.mapType,
+            timeLimit: gameConfig.timeLimit,
+            allowMoving: gameConfig.allowMoving,
+            allowZooming: gameConfig.allowZooming,
+          }
+
+          const roomId = await createRoom(player, config)
+          router.push({ name: 'game-multiplayer', params: { roomId } })
+        } else {
+          // Join existing room
+          if (!gameConfig.roomNumber) {
+            return
+          }
+
+          const player = {
+            id: user.value.id,
+            name: user.value.name,
+            avatarEmoji: user.value.avatarEmoji,
+            avatarBg: user.value.avatarBg,
+            isHost: false,
+          }
+
+          await joinRoom(gameConfig.roomNumber, player)
+          router.push({ name: 'game-multiplayer', params: { roomId: gameConfig.roomNumber } })
+        }
+      } catch {}
       break
     case 'daily-challenge':
       router.push({ name: 'game-daily-challenge' })

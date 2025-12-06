@@ -22,10 +22,11 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/game/multiplayer',
+      path: '/game/multiplayer/:roomId',
       name: 'game-multiplayer',
       component: () => import('@/pages/MultiplayerGamePage.vue'),
       meta: { requiresAuth: true },
+      props: (route) => ({ roomId: route.params.roomId as string }),
     },
     {
       path: '/game/daily-challenge',

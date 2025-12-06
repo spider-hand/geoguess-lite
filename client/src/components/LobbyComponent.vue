@@ -2,7 +2,7 @@
   <div class="flex min-h-screen flex-col">
     <header class="flex items-center justify-between border-b px-4 py-4 sm:px-8">
       <div class="font-[JetBrains_Mono] text-lg font-semibold sm:text-xl">
-        <span>Room #12345 - Lobby</span>
+        <span>Room #{{ roomId }} - Lobby</span>
       </div>
     </header>
     <main class="flex grow flex-col gap-8 bg-gray-50 p-8 lg:flex-row">
@@ -101,14 +101,24 @@
               </CardContent>
             </Card>
 
-            <Button
-              size="lg"
-              @click="startGame"
-              :disabled="players.length < 2"
-              class="w-full cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Start Game
-            </Button>
+            <div class="flex gap-4">
+              <Button
+                variant="ghost"
+                size="lg"
+                @click="leaveRoom"
+                class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+              >
+                Leave Room
+              </Button>
+              <Button
+                size="lg"
+                @click="startGame"
+                :disabled="players.length < 2 || !myself?.isHost"
+                class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Start Game
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -119,28 +129,57 @@
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import type { PropType } from 'vue'
+
+defineProps({
+  roomId: {
+    type: String,
+    required: true,
+  },
+  myself: {
+    type: Object as PropType<{
+      id: string
+      name: string
+      emoji: string
+      avatarClass: string
+      isHost: boolean
+    } | null>,
+    default: null,
+    required: true,
+  },
+  players: {
+    type: Array as PropType<
+      Array<{
+        id: string
+        name: string
+        emoji: string
+        avatarClass: string
+        isHost: boolean
+      }>
+    >,
+    required: true,
+  },
+  gameConfig: {
+    type: Object as PropType<{
+      mapType: string
+      timeLimit: number
+      allowMoving: boolean
+      allowZooming: boolean
+    }>,
+    required: true,
+  },
+})
 
 const emit = defineEmits<{
   startGame: []
-}>()
-
-defineProps<{
-  players: Array<{
-    id: string
-    name: string
-    emoji: string
-    avatarClass: string
-    isHost: boolean
-  }>
-  gameConfig: {
-    mapType: string
-    timeLimit: number
-    allowMoving: boolean
-    allowZooming: boolean
-  }
+  leaveRoom: []
 }>()
 
 const startGame = () => {
   emit('startGame')
+}
+
+const leaveRoom = () => {
+  emit('leaveRoom')
 }
 </script>
