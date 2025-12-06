@@ -1,6 +1,8 @@
 /* tslint:disable */
 
 export * from './CreateDailyScoreRequest'
+export * from './CreateMultiplayerRounds200Response'
+export * from './CreateMultiplayerRoundsRequest'
 export * from './DailyChallenge'
 export * from './DailyScore'
 export * from './ErrorResponse'

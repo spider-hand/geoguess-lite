@@ -10,6 +10,7 @@ class SecretsDict(TypedDict):
     neon_db_uri: str
     mapillary_token: str
     firebase_service_account: dict
+    firebase_database_url: str
 
 
 @lru_cache(maxsize=1)

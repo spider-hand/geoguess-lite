@@ -6,7 +6,8 @@
       :myself="myself"
       :players="players"
       :game-config="gameConfig"
-      @start-game="startGameFromLobby"
+      :is-creating-rounds="isCreatingRounds"
+      @start-game="startGame"
       @leave-room="handleLeaveRoom"
     />
     <template v-else>
@@ -146,6 +147,7 @@ import type { RoundRecord } from '@/types'
 import { ROUNDS, AVATAR_CLASS_MAP } from '@/consts'
 import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
 import useUserQuery from '@/composables/useUserQuery'
+import useMultiplayerRoundsApi from '@/composables/useMultiplayerRoundsApi'
 
 const props = defineProps({
   roomId: {
@@ -164,6 +166,7 @@ const {
 const router = useRouter()
 const { currentRoom, getRoomById, leaveRoom } = useMultiplayerRoom()
 const { user } = useUserQuery()
+const { multiplayerRoundsApi } = useMultiplayerRoundsApi()
 
 onMounted(() => {
   if (props.roomId) {
@@ -186,6 +189,7 @@ const isLoadingImage = ref(false)
 const showSummaryView = ref(true)
 const showPlayersList = ref(true)
 const isWaiting = ref(true)
+const isCreatingRounds = ref(false)
 const distance = ref(0)
 const score = ref(0)
 const totalScore = ref(2450)
@@ -482,7 +486,18 @@ const togglePlayersList = () => {
   showPlayersList.value = !showPlayersList.value
 }
 
-const startGameFromLobby = () => {
-  isWaiting.value = false
+const startGame = async () => {
+  try {
+    isCreatingRounds.value = true
+    await multiplayerRoundsApi.createMultiplayerRounds({
+      createMultiplayerRoundsRequest: {
+        roomId: props.roomId,
+      },
+    })
+  } catch (err) {
+    console.error('Failed to start game:', err)
+  } finally {
+    isCreatingRounds.value = false
+  }
 }
 </script>

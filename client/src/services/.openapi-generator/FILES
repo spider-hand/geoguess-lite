@@ -1,10 +1,14 @@
+.openapi-generator-ignore
 apis/DailyChallengesApi.ts
 apis/DailyScoresApi.ts
 apis/HealthApi.ts
+apis/MultiplayerRoundsApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/CreateDailyScoreRequest.ts
+models/CreateMultiplayerRounds200Response.ts
+models/CreateMultiplayerRoundsRequest.ts
 models/DailyChallenge.ts
 models/DailyScore.ts
 models/ErrorResponse.ts

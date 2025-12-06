@@ -1,0 +1,10 @@
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        room_id:
+          type: string
+      required:
+        - room_id

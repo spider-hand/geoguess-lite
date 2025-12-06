@@ -12,12 +12,10 @@ from .repository import (
     delete_daily_scores_by_date,
 )
 from core.logger import logger
-from aws_lambda_powertools.utilities.parser.models import APIGatewayProxyEventModel
+from core.events import CustomEvent
 
 
-def create_daily_score_service(
-    user_id: str, event: APIGatewayProxyEventModel
-) -> DailyScore:
+def create_daily_score_service(user_id: str, event: CustomEvent) -> DailyScore:
     try:
         body = CreateDailyScoreRequest.model_validate_json(event.body)
         today = date.today()
@@ -45,9 +43,7 @@ def get_today_top_scores_service() -> GetTopDailyScoresResponse:
         raise
 
 
-def update_daily_score_service(
-    user_id: str, event: APIGatewayProxyEventModel
-) -> DailyScore:
+def update_daily_score_service(user_id: str, event: CustomEvent) -> DailyScore:
     try:
         body = UpdateDailyScoreRequest.model_validate_json(event.body)
         today = date.today()

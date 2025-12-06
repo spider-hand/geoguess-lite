@@ -113,10 +113,10 @@
               <Button
                 size="lg"
                 @click="startGame"
-                :disabled="players.length < 2 || !myself?.isHost"
+                :disabled="players.length < 2 || !myself?.isHost || isCreatingRounds"
                 class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Start Game
+                {{ isCreatingRounds ? 'Starting...' : 'Start Game' }}
               </Button>
             </div>
           </div>
@@ -166,6 +166,10 @@ defineProps({
       allowMoving: boolean
       allowZooming: boolean
     }>,
+    required: true,
+  },
+  isCreatingRounds: {
+    type: Boolean,
     required: true,
   },
 })

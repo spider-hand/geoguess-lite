@@ -11,6 +11,8 @@ paths:
     $ref: ./paths/daily-challenges-today.yml
   /daily-scores:
     $ref: ./paths/daily-scores.yml
+  /multiplayer-rounds:
+    $ref: ./paths/multiplayer-rounds.yml
 components:
   schemas:
     User:
@@ -32,3 +34,6 @@ components:
       $ref: ./components/requestBodies/daily-score-post.yml
     UpdateDailyScoreRequest:
       $ref: ./components/requestBodies/daily-score-patch.yml
+    CreateMultiplayerRoundsRequest:
+      $ref: ./components/requestBodies/multiplayer-rounds-post.yml
+
