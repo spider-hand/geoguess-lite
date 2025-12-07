@@ -15,7 +15,9 @@
         <div class="mb-4 font-[JetBrains_Mono] text-2xl">
           Creating the game.. It might take a while..
         </div>
-        <div class="font-[JetBrains_Mono] text-lg">Waiting for all players to load</div>
+        <div class="mb-4">
+          <Progress :model-value="progressPercentage" class="h-2 [&>div]:bg-indigo-700" />
+        </div>
       </div>
     </div>
     <template v-else>
@@ -145,6 +147,7 @@ import { ref, watch, computed, onMounted, nextTick } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
+import Progress from '@/components/ui/progress/Progress.vue'
 import { calculateCenter, calculateDistance, calculateScore, calculateZoomLevel } from '@/utils'
 import { useTimer } from '@/composables/useTimer'
 import { useRouter } from 'vue-router'
@@ -180,6 +183,7 @@ const {
   hasEveryoneGuessed,
   gameConfig,
   players,
+  progressPercentage,
   getRoomById,
   leaveRoom,
   updateCurrentRoundImageId,

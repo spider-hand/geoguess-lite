@@ -11,7 +11,7 @@ import {
 } from 'firebase/database'
 import { firebaseApp } from '@/lib/firebase'
 import type { GameConfigNode, PlayerNode, PlayerResult, RoomNode } from '@/types'
-import { AVATAR_CLASS_MAP } from '@/consts'
+import { AVATAR_CLASS_MAP, ROUNDS } from '@/consts'
 
 const db = getDatabase(firebaseApp)
 
@@ -132,6 +132,15 @@ export const useMultiplayerRoom = () => {
         isHost: player.isHost,
       }
     })
+  })
+
+  const roundsGenerated = computed(() => {
+    if (!currentRoom.value?.rounds) return 0
+    return Object.keys(currentRoom.value.rounds).length
+  })
+
+  const progressPercentage = computed(() => {
+    return Math.min((roundsGenerated.value / ROUNDS) * 100, 100)
   })
 
   let roomListener: ((snapshot: DataSnapshot) => void) | null = null
@@ -331,6 +340,8 @@ export const useMultiplayerRoom = () => {
     hasEveryoneGuessed,
     gameConfig,
     players,
+    roundsGenerated,
+    progressPercentage,
     createRoom,
     joinRoom,
     leaveRoom,
