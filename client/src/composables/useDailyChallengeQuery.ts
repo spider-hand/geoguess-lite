@@ -17,6 +17,7 @@ const useDailyChallengeQuery = () => {
       const resp = await dailyChallengesApi.getTodayChallenge()
       return resp
     },
+    staleTime: Infinity,
   })
 
   return {

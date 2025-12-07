@@ -27,6 +27,7 @@ const useUserQuery = () => {
       return resp
     },
     enabled: () => !!currentUser.value,
+    staleTime: Infinity,
   })
 
   const {

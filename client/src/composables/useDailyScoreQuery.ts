@@ -22,6 +22,7 @@ const useDailyScoreQuery = () => {
       const resp = await dailyScoresApi.getTodayTopScores()
       return resp
     },
+    staleTime: Infinity,
   })
 
   const {
