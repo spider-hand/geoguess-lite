@@ -190,7 +190,7 @@ const {
   start: startTimer,
   stop: stopTimer,
   reset: resetTimer,
-} = useTimer(gameConfig.value.timeLimit)
+} = useTimer(() => gameConfig.value.timeLimit)
 const { user, mutateUserUpdate } = useUserQuery()
 const { multiplayerRoundsApi } = useMultiplayerRoundsApi()
 

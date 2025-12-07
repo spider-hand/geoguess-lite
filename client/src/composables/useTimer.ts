@@ -1,22 +1,25 @@
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, toValue, type MaybeRefOrGetter } from 'vue'
 
-export function useTimer(timeLimitInSeconds: number) {
+export function useTimer(timeLimitInSeconds: MaybeRefOrGetter<number>) {
   const isActive = ref(false)
   const startTime = ref(0)
   const elapsedTime = ref(0)
   let animationFrame: number | null = null
 
   const remainingTime = computed(() => {
-    if (timeLimitInSeconds <= 0) return Infinity // Unlimited time
-    return Math.max(0, timeLimitInSeconds - elapsedTime.value)
+    const timeLimit = toValue(timeLimitInSeconds)
+    if (timeLimit <= 0) return Infinity // Unlimited time
+    return Math.max(0, timeLimit - elapsedTime.value)
   })
 
   const isExpired = computed(() => {
-    return timeLimitInSeconds > 0 && remainingTime.value <= 0
+    const timeLimit = toValue(timeLimitInSeconds)
+    return timeLimit > 0 && remainingTime.value <= 0
   })
 
   const formattedTime = computed(() => {
-    if (timeLimitInSeconds <= 0) return 'Unlimited'
+    const timeLimit = toValue(timeLimitInSeconds)
+    if (timeLimit <= 0) return 'Unlimited'
 
     const time = Math.ceil(remainingTime.value)
     const minutes = Math.floor(time / 60)
@@ -31,7 +34,8 @@ export function useTimer(timeLimitInSeconds: number) {
     const currentTime = performance.now()
     elapsedTime.value = (currentTime - startTime.value) / 1000 // Convert to seconds
 
-    if (timeLimitInSeconds > 0 && elapsedTime.value >= timeLimitInSeconds) {
+    const timeLimit = toValue(timeLimitInSeconds)
+    if (timeLimit > 0 && elapsedTime.value >= timeLimit) {
       stop()
       return
     }
