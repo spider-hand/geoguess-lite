@@ -383,6 +383,7 @@ import { AVATAR_CLASS_MAP } from '@/consts'
 import type { GameModeType } from '@/types'
 import useGameConfigStore from '@/stores/gameConfig'
 import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
+import { getAvatarClass } from '@/utils'
 
 interface GameModeItem {
   id: GameModeType
@@ -473,10 +474,6 @@ const getGameModeCardClass = (modeId: GameModeType) => {
   }
 
   return baseClass
-}
-
-const getAvatarClass = (avatarBg?: string) => {
-  return avatarBg ? (AVATAR_CLASS_MAP[avatarBg] ?? '') : ''
 }
 
 const startEditProfile = () => {

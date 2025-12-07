@@ -88,6 +88,8 @@ export interface MultiplayerRoundRecord {
   }[]
 }
 
+export type PlayerResultStatus = 'Guessing' | 'Guessed'
+
 export interface PlayerResult {
   id: string
   name: string
@@ -95,6 +97,6 @@ export interface PlayerResult {
   avatarClass: string
   score: number
   distance: number
-  status: string
+  status: PlayerResultStatus
   isHost: boolean
 }

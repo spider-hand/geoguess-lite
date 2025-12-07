@@ -135,7 +135,6 @@
         v-else
         :players="players"
         :game-records="multiplayerGameRecords"
-        @play-again="playAgain"
         @return-to-menu="returnToMenu"
       />
     </template>
@@ -177,7 +176,7 @@ const {
   isLoaded,
   isPlaying,
   isFinished,
-  roomCurrentRound,
+  currentRound,
   currentRoundImageId,
   hasEveryoneLoaded,
   hasEveryoneGuessed,
@@ -221,7 +220,6 @@ const isLoadingImage = ref(false)
 const showSummaryView = ref(false)
 const showPlayersList = ref(true)
 const isCreatingRounds = ref(false)
-const currentRound = computed(() => roomCurrentRound.value)
 const displayedDistance = ref(0)
 const displayedScore = ref(0)
 const displayedTotalScore = ref(0)
@@ -231,7 +229,6 @@ const imagePosition = ref<LatLng | null>(null)
 const markerPosition = ref<LatLng | null>(null)
 const mapRef = ref<InstanceType<typeof MapComponent> | null>(null)
 const streetViewRef = ref<InstanceType<typeof StreetViewComponent> | null>(null)
-
 const gameRecords = ref<RoundRecord[]>([])
 
 const multiplayerGameRecords = computed<MultiplayerRoundRecord[]>(() => {
@@ -241,7 +238,7 @@ const multiplayerGameRecords = computed<MultiplayerRoundRecord[]>(() => {
   const players = currentRoom.value.players
   const records = []
 
-  for (let roundNum = 1; roundNum <= roomCurrentRound.value; roundNum++) {
+  for (let roundNum = 1; roundNum <= currentRound.value; roundNum++) {
     const round = rounds[roundNum]
     if (!round) continue
 
@@ -325,7 +322,7 @@ watch(
   async (imageId) => {
     if (imageId && user.value) {
       const playerRef = dbRef(db, `rooms/${props.roomId}/players/${user.value.id}`)
-      await update(playerRef, { loadedRound: roomCurrentRound.value })
+      await update(playerRef, { loadedRound: currentRound.value })
     }
   },
 )
@@ -394,7 +391,7 @@ const handleTimeExpired = async () => {
 
     const guessRef = dbRef(
       db,
-      `rooms/${props.roomId}/rounds/${roomCurrentRound.value}/guesses/${user.value.id}`,
+      `rooms/${props.roomId}/rounds/${currentRound.value}/guesses/${user.value.id}`,
     )
 
     try {
@@ -414,7 +411,7 @@ const handleTimeExpired = async () => {
   } else {
     const guessRef = dbRef(
       db,
-      `rooms/${props.roomId}/rounds/${roomCurrentRound.value}/guesses/${user.value.id}`,
+      `rooms/${props.roomId}/rounds/${currentRound.value}/guesses/${user.value.id}`,
     )
 
     try {
@@ -467,7 +464,7 @@ const makeGuess = async () => {
 
   const guessRef = dbRef(
     db,
-    `rooms/${props.roomId}/rounds/${roomCurrentRound.value}/guesses/${user.value.id}`,
+    `rooms/${props.roomId}/rounds/${currentRound.value}/guesses/${user.value.id}`,
   )
 
   try {
@@ -546,7 +543,7 @@ const nextRound = async () => {
   const playerRef = dbRef(db, `rooms/${props.roomId}/players/${user.value.id}`)
 
   try {
-    await update(playerRef, { loadedRound: roomCurrentRound.value })
+    await update(playerRef, { loadedRound: currentRound.value })
   } catch (err) {
     console.error('Failed to update player loaded round:', err)
   }
@@ -570,13 +567,6 @@ const showSummary = () => {
       gamesPlayed: newGamesPlayed,
     })
   }
-}
-
-const playAgain = () => {
-  showSummaryView.value = false
-  displayedTotalScore.value = 0
-  gameRecords.value = []
-  resetRound()
 }
 
 const returnToMenu = () => {

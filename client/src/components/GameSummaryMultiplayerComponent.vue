@@ -118,13 +118,6 @@
 
     <div class="flex justify-center gap-4">
       <Button
-        v-if="isPlayAgainEnabled"
-        @click="$emit('play-again')"
-        class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
-      >
-        Play Again
-      </Button>
-      <Button
         @click="$emit('return-to-menu')"
         variant="ghost"
         class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
@@ -157,15 +150,11 @@ const props = defineProps({
     type: Array as PropType<MultiplayerRoundRecord[]>,
     required: true,
   },
-  isPlayAgainEnabled: {
-    type: Boolean,
-    default: true,
-  },
 })
 
 const sortedPlayers = computed(() => {
   return [...props.players].sort((a, b) => b.score - a.score)
 })
 
-defineEmits(['play-again', 'return-to-menu'])
+defineEmits(['return-to-menu'])
 </script>

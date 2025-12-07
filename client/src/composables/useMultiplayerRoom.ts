@@ -1,6 +1,5 @@
 import { ref, onUnmounted, computed } from 'vue'
 import {
-  getDatabase,
   ref as dbRef,
   set,
   get,
@@ -9,11 +8,15 @@ import {
   onDisconnect,
   type DataSnapshot,
 } from 'firebase/database'
-import { firebaseApp } from '@/lib/firebase'
-import type { GameConfigNode, PlayerNode, PlayerResult, RoomNode } from '@/types'
+import { db } from '@/lib/firebase'
+import type {
+  GameConfigNode,
+  PlayerNode,
+  PlayerResult,
+  PlayerResultStatus,
+  RoomNode,
+} from '@/types'
 import { AVATAR_CLASS_MAP, ROUNDS } from '@/consts'
-
-const db = getDatabase(firebaseApp)
 
 export const useMultiplayerRoom = () => {
   const currentRoom = ref<RoomNode | null>(null)
@@ -30,13 +33,13 @@ export const useMultiplayerRoom = () => {
 
   const isFinished = computed(() => currentRoom.value?.status === 'finished')
 
-  const roomCurrentRound = computed(() => currentRoom.value?.currentRound ?? 1)
+  const currentRound = computed(() => currentRoom.value?.currentRound ?? 1)
 
   const currentRoundImageId = ref<string | null>(null)
 
   const updateCurrentRoundImageId = () => {
     const rounds = currentRoom.value?.rounds
-    const currentRoundNum = roomCurrentRound.value
+    const currentRoundNum = currentRound.value
     if (rounds && rounds[currentRoundNum]) {
       currentRoundImageId.value = rounds[currentRoundNum].imageId
     } else {
@@ -46,7 +49,7 @@ export const useMultiplayerRoom = () => {
 
   const hasEveryoneLoaded = computed(() => {
     const roundState = currentRoom.value?.roundState
-    const currentRoundNum = roomCurrentRound.value
+    const currentRoundNum = currentRound.value
     if (roundState && roundState[currentRoundNum]) {
       return roundState[currentRoundNum].hasEveryoneLoaded
     }
@@ -55,7 +58,7 @@ export const useMultiplayerRoom = () => {
 
   const hasEveryoneGuessed = computed(() => {
     const roundState = currentRoom.value?.roundState
-    const currentRoundNum = roomCurrentRound.value
+    const currentRoundNum = currentRound.value
     if (roundState && roundState[currentRoundNum]) {
       return roundState[currentRoundNum].hasEveryoneGuessed
     }
@@ -84,7 +87,7 @@ export const useMultiplayerRoom = () => {
     if (!currentRoom.value?.players) return []
 
     const rounds = currentRoom.value.rounds || {}
-    const currentRoundNum = roomCurrentRound.value
+    const currentRoundNum = currentRound.value
     const everyoneGuessed = hasEveryoneGuessed.value
 
     return Object.values(currentRoom.value.players).map((player) => {
@@ -116,7 +119,7 @@ export const useMultiplayerRoom = () => {
         }
       }
 
-      let status = 'Guessing'
+      let status: PlayerResultStatus = 'Guessing'
       if (currentRoundNum > 0 && rounds[currentRoundNum]?.guesses?.[player.id]) {
         status = 'Guessed'
       }
@@ -128,7 +131,7 @@ export const useMultiplayerRoom = () => {
         avatarClass: AVATAR_CLASS_MAP[player.avatarBg] || 'bg-gray-100 border-gray-200',
         score: totalScore,
         distance: totalDistance,
-        status,
+        status: status,
         isHost: player.isHost,
       }
     })
@@ -334,7 +337,7 @@ export const useMultiplayerRoom = () => {
     isLoaded,
     isPlaying,
     isFinished,
-    roomCurrentRound,
+    currentRound,
     currentRoundImageId,
     hasEveryoneLoaded,
     hasEveryoneGuessed,
