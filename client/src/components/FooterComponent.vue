@@ -33,6 +33,7 @@
           <Button
             variant="ghost"
             class="text-muted-foreground cursor-pointer font-[Roboto] text-base"
+            @click="openGithub"
           >
             Github
           </Button>
@@ -68,4 +69,8 @@ import { Button } from '@/components/ui/button'
 import useAuth from '@/composables/useAuth'
 
 const { currentUser, isCurrentUserLoaded, signUpWithGoogle, signOut } = useAuth()
+
+const openGithub = () => {
+  window.open('https://github.com/spider-hand/geoguess-lite', '_blank')
+}
 </script>
