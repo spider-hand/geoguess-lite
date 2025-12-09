@@ -10,6 +10,7 @@
 
 - [Client](./client/README.md)
 - [Server](./server/README.md)
+- [Functions](./functions/README.md)
 
 ## Contribution
 
