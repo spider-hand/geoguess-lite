@@ -58,7 +58,7 @@ export interface RoundStateNode {
   hasEveryoneGuessed: boolean // flag to notify when all players have made their guesses to proceed to showing results
 }
 
-export type RoomStatus = 'waiting' | 'loading' | 'loaded' | 'playing' | 'finished'
+export type RoomStatus = 'waiting' | 'loading' | 'loaded' | 'playing' | 'finished' | 'error'
 
 export interface RoomNode {
   id: string

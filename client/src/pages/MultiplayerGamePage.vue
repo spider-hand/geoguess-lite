@@ -10,13 +10,29 @@
       @start-game="startGame"
       @leave-room="handleLeaveRoom"
     />
-    <div v-else-if="isLoading" class="flex min-h-screen items-center justify-center">
+    <div v-else-if="isLoading || isError" class="flex min-h-screen items-center justify-center">
       <div class="text-center">
-        <div class="mb-4 font-[JetBrains_Mono] text-2xl">
-          Creating the game.. It might take a while..
+        <div class="mb-4 flex flex-col gap-2 font-[JetBrains_Mono]">
+          <span class="text-2xl">Creating the game.. It might take a while..</span>
+          <span v-if="isError" class="text-lg text-red-600">
+            An error occurred while setting up the game. Please try again.
+          </span>
         </div>
-        <div class="mb-4">
-          <Progress :model-value="progressPercentage" class="h-2 [&>div]:bg-indigo-700" />
+        <div class="mb-8">
+          <Progress
+            :model-value="progressPercentage"
+            class="h-2"
+            :class="isError ? '[&>div]:bg-red-700' : '[&>div]:bg-indigo-700'"
+          />
+        </div>
+        <div v-if="isError && myself?.isHost && !isCreatingRounds">
+          <Button
+            variant="ghost"
+            class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
+            @click="startGame"
+          >
+            [Retry]
+          </Button>
         </div>
       </div>
     </div>
@@ -176,6 +192,7 @@ const {
   isLoaded,
   isPlaying,
   isFinished,
+  isError,
   currentRound,
   currentRoundImageId,
   hasEveryoneLoaded,

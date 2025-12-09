@@ -19,10 +19,18 @@ async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
         room_ref.update({"status": "loading", "currentRound": 1})
 
         for round_num in range(1, 6):
+            round_ref = db.reference(f"rooms/{room_id}/rounds/{round_num}")
+            existing_round = round_ref.get()
+
+            if existing_round and existing_round.get("imageId"):
+                logger.info(
+                    f"Skipping room {room_id} round {round_num}/5 - already exists"
+                )
+                continue
+
             logger.info(f"Getting image for room {room_id} round {round_num}/5")
             image_id = await get_random_image_id()
 
-            round_ref = db.reference(f"rooms/{room_id}/rounds/{round_num}")
             round_ref.set({"imageId": image_id, "guesses": {}})
 
             logger.info(f"Completed room {room_id} round {round_num}/5")
@@ -33,5 +41,7 @@ async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
 
         return room_id
     except Exception:
+        room_ref.update({"status": "error"})
+
         logger.exception(f"Failed to create multiplayer rounds for room {room_id}")
         raise

@@ -33,6 +33,8 @@ export const useMultiplayerRoom = () => {
 
   const isFinished = computed(() => currentRoom.value?.status === 'finished')
 
+  const isError = computed(() => currentRoom.value?.status === 'error')
+
   const currentRound = computed(() => currentRoom.value?.currentRound ?? 1)
 
   const currentRoundImageId = ref<string | null>(null)
@@ -337,6 +339,7 @@ export const useMultiplayerRoom = () => {
     isLoaded,
     isPlaying,
     isFinished,
+    isError,
     currentRound,
     currentRoundImageId,
     hasEveryoneLoaded,
