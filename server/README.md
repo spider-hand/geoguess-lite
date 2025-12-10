@@ -16,19 +16,19 @@ docker compose up -d
 2. Save secrets:
 
 ```bash
-awslocal --region ap-northeast-1 secretsmanager create-secret --name geoguess-lite-localstack-secret --secret-string file://secret.localstack.json
+awslocal --region us-east-1 secretsmanager create-secret --name geoguess-lite-localstack --secret-string file://secret.localstack.json
 ```
 
 Check if the secrets have been saved:
 
 ```bash
-awslocal --region ap-northeast-1 secretsmanager describe-secret --secret-id geoguess-lite-localstack-secret
+awslocal --region us-east-1 secretsmanager describe-secret --secret-id geoguess-lite-localstack
 ```
 
 You can delete the secrets by running the following command:
 
 ```bash
-awslocal --region ap-northeast-1 secretsmanager delete-secret --secret-id geoguess-lite-localstack-secret --force-delete-without-recovery
+awslocal --region us-east-1 secretsmanager delete-secret --secret-id geoguess-lite-localstack --force-delete-without-recovery
 ```
 
 3. Build SAM:
@@ -40,7 +40,7 @@ sam build --use-container
 4. Run SAM:
 
 ```bash
-sam local start-api --region ap-northeast-1 --docker-network <localstack-network-id> --port 3001 --parameter-overrides Environment=localstack
+sam local start-api --region us-east-1 --docker-network <localstack-network-id> --port 3001 --parameter-overrides Environment=localstack
 ```
 
 5. Test scheduled functions locally:

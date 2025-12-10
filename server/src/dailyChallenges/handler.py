@@ -3,6 +3,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities.parser import event_parser
 from core.logger import dynamic_inject_lambda_context, logger
 from core.events import CustomEvent
+from core.auth import CORS_HEADERS
 
 
 @dynamic_inject_lambda_context
@@ -16,15 +17,18 @@ def lambda_handler(event: CustomEvent, context: LambdaContext) -> dict:
         if not challenge:
             return {
                 "statusCode": 404,
+                "headers": CORS_HEADERS,
                 "body": "No challenge found for today",
             }
 
         return {
             "statusCode": 200,
+            "headers": CORS_HEADERS,
             "body": challenge.model_dump_json(),
         }
 
     return {
         "statusCode": 405,
+        "headers": CORS_HEADERS,
         "body": "Method Not Allowed",
     }

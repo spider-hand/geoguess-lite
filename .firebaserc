@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "geoguess-lite-dev"
-  }
+    "default": "geoguess-lite-dev",
+    "prod": "geoguess-lite-prod"
+  },
+  "targets": {},
+  "etags": {}
 }

@@ -1,14 +1,20 @@
+import json
 import firebase_admin
 from firebase_admin import credentials, auth, db
 from core.secret import get_secret
 
 
+def get_service_account_info() -> dict:
+    secrets = get_secret()
+    service_account_info = secrets.get("firebase_service_account")
+    service_account_info = json.loads(service_account_info)
+    return service_account_info
+
+
 def initialize_firebase_app():
     if not firebase_admin._apps:
         try:
-            secrets = get_secret()
-            service_account_info = secrets.get("firebase_service_account")
-
+            service_account_info = get_service_account_info()
             cred = credentials.Certificate(service_account_info)
             firebase_admin.initialize_app(cred)
         except Exception as e:
@@ -18,11 +24,11 @@ def initialize_firebase_app():
 def initialize_firebase_with_database():
     if not firebase_admin._apps:
         try:
-            secrets = get_secret()
-            service_account_info = secrets.get("firebase_service_account")
-            database_url = secrets.get("firebase_database_url")
-
+            service_account_info = get_service_account_info()
             cred = credentials.Certificate(service_account_info)
+
+            secrets = get_secret()
+            database_url = secrets.get("firebase_database_url")
             firebase_admin.initialize_app(cred, {"databaseURL": database_url})
         except Exception as e:
             raise Exception(

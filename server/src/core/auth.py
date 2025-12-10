@@ -3,6 +3,12 @@ from core.secret import get_secret
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from core.logger import dynamic_inject_lambda_context, logger
 
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
+}
+
 
 @dynamic_inject_lambda_context
 def lambda_handler(event: dict, context: LambdaContext) -> dict:

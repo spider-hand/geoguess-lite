@@ -5,6 +5,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities.parser import event_parser
 from core.logger import dynamic_inject_lambda_context, logger
 from core.events import CustomEvent
+from core.auth import CORS_HEADERS
 
 
 @dynamic_inject_lambda_context
@@ -20,11 +21,13 @@ async def create_rounds(event: CustomEvent) -> dict:
 
         return {
             "statusCode": 200,
+            "headers": CORS_HEADERS,
             "body": json.dumps({"message": f"Created rounds for room {room_id}"}),
         }
     except Exception as e:
         logger.exception("Failed to create rounds")
         return {
             "statusCode": 500,
+            "headers": CORS_HEADERS,
             "body": json.dumps({"message": f"Error creating rounds: {str(e)}"}),
         }

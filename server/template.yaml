@@ -7,11 +7,6 @@ Description: >
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
-  Api:
-    Cors:
-      AllowMethods: "'GET,POST,PATCH,DELETE,OPTIONS'"
-      AllowHeaders: "'Content-Type,Authorization'"
-      AllowOrigin: "'*'"
   Function:
     Timeout: 30
     Environment:
@@ -36,8 +31,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,PATCH,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
       Auth:
         DefaultAuthorizer: FirebaseAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
         Authorizers:
           FirebaseAuthorizer:
             FunctionArn: !GetAtt FirebaseAuthFunction.Arn
@@ -50,7 +50,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: core.auth.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Environment:
@@ -65,7 +65,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: health.handler.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Environment:
@@ -87,7 +87,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: users.handler.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Environment:
@@ -121,7 +121,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: dailyChallenges.handler.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Environment:
@@ -143,7 +143,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: dailyScores.handler.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Environment:
@@ -177,7 +177,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: multiplayerRounds.handler.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Timeout: 600
@@ -200,7 +200,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: scheduled.daily_challenge_creator.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Timeout: 600
@@ -222,7 +222,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: scheduled.daily_challenge_cleaner.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Environment:
@@ -243,7 +243,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: scheduled.daily_score_cleaner.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.13
       Architectures:
         - x86_64
       Environment:

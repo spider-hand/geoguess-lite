@@ -17,9 +17,9 @@ class SecretsDict(TypedDict):
 def get_secret() -> SecretsDict:
     environment = os.getenv("Environment", "localstack")
 
-    secret_name = f"geoguess-lite-{environment}-secret"
+    secret_name = f"geoguess-lite-{environment}"
     service_name = "secretsmanager"
-    region_name = "ap-northeast-1"
+    region_name = "us-east-1"
 
     if environment == "local":
         secret_files = "/var/task/secret.local.json"
