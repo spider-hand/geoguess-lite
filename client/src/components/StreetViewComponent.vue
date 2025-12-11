@@ -114,7 +114,6 @@ const loadRandomView = async () => {
     await viewer.value.moveTo(imageId)
 
     const pos = await viewer.value.getPosition()
-    console.log(`Loaded image at lat: ${pos.lat}, lng: ${pos.lng}`)
 
     emit('imageLoaded', { lat: pos.lat, lng: pos.lng }, imageId)
   } catch (err) {
@@ -125,14 +124,12 @@ const loadRandomView = async () => {
 
 const loadViewFromImageId = async (imageId: string) => {
   try {
-    console.log(`Loading image with ID: ${imageId}`)
     if (!viewer.value) return
 
     emit('imageLoadingStart')
     await viewer.value.moveTo(imageId)
 
     const pos = await viewer.value.getPosition()
-    console.log(`Loaded image at lat: ${pos.lat}, lng: ${pos.lng}`)
 
     emit('imageLoaded', { lat: pos.lat, lng: pos.lng }, imageId)
   } catch (err) {
