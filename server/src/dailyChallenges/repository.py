@@ -36,6 +36,9 @@ def insert_daily_challenge(challenge_date: date) -> DailyChallenge:
         logger.exception("Failed to insert daily challenge into database")
         raise e
 
+    finally:
+        conn.close()
+
 
 def insert_daily_challenge_round(
     daily_challenge_id: str, round_num: int, image_id: str
@@ -77,6 +80,9 @@ def insert_daily_challenge_round(
     except Exception as e:
         logger.exception("Failed to insert daily challenge round into database")
         raise e
+
+    finally:
+        conn.close()
 
 
 def get_daily_challenge_with_rounds_by_date(
@@ -134,6 +140,9 @@ def get_daily_challenge_with_rounds_by_date(
         logger.exception("Failed to fetch daily challenge with rounds from database")
         raise e
 
+    finally:
+        conn.close()
+
 
 def delete_daily_challenge_by_date(date: date) -> None:
     try:
@@ -176,3 +185,6 @@ def delete_daily_challenge_by_date(date: date) -> None:
     except Exception as e:
         logger.exception("Failed to delete daily challenge from database")
         raise e
+
+    finally:
+        conn.close()

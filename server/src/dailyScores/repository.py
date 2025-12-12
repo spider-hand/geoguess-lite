@@ -41,6 +41,9 @@ def insert_daily_score(
         logger.exception("Failed to insert daily score into database")
         raise e
 
+    finally:
+        conn.close()
+
 
 def get_top_daily_scores_by_date(
     score_date: date, limit: int = 5
@@ -87,6 +90,9 @@ def get_top_daily_scores_by_date(
         logger.exception("Failed to fetch top daily scores from database")
         raise e
 
+    finally:
+        conn.close()
+
 
 def delete_daily_scores_by_date(score_date: date) -> int:
     try:
@@ -116,6 +122,9 @@ def delete_daily_scores_by_date(score_date: date) -> int:
     except Exception as e:
         logger.exception("Failed to delete daily scores from database")
         raise e
+
+    finally:
+        conn.close()
 
 
 def update_daily_score(
@@ -174,6 +183,9 @@ def update_daily_score(
         logger.exception("Failed to update daily score in database")
         raise e
 
+    finally:
+        conn.close()
+
 
 def has_user_played_today(user_id: str, score_date: date) -> bool:
     try:
@@ -212,3 +224,6 @@ def has_user_played_today(user_id: str, score_date: date) -> bool:
     except Exception as e:
         logger.exception("Failed to check if user played today")
         raise e
+
+    finally:
+        conn.close()

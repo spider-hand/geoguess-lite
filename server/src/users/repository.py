@@ -30,6 +30,9 @@ def get_user_by_id(user_id: str) -> User | None:
         logger.exception("Failed to fetch user from database")
         raise e
 
+    finally:
+        conn.close()
+
 
 def insert_user(user: User) -> User:
     try:
@@ -61,6 +64,9 @@ def insert_user(user: User) -> User:
     except Exception as e:
         logger.exception("Failed to insert user into database")
         raise e
+
+    finally:
+        conn.close()
 
 
 def update_user(user_id: str, update_fields: dict) -> User:
@@ -117,6 +123,9 @@ def update_user(user_id: str, update_fields: dict) -> User:
         logger.exception("Failed to update user in database")
         raise e
 
+    finally:
+        conn.close()
+
 
 def delete_user(user_id: str) -> None:
     try:
@@ -137,3 +146,6 @@ def delete_user(user_id: str) -> None:
     except Exception as e:
         logger.exception("Failed to delete user from database")
         raise e
+
+    finally:
+        conn.close()
