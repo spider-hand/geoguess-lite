@@ -7,7 +7,12 @@ from core.secret import get_secret
 def get_service_account_info() -> dict:
     secrets = get_secret()
     service_account_info = secrets.get("firebase_service_account")
-    service_account_info = json.loads(service_account_info)
+
+    # Parse JSON string to dict if it's a string (Secrets Manager on prod)
+    # If it's already a dict, return as is (local)
+    if isinstance(service_account_info, str):
+        service_account_info = json.loads(service_account_info)
+
     return service_account_info
 
 
