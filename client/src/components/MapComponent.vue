@@ -173,10 +173,12 @@ const initializeMap = () => {
       sources: {
         'raster-tiles': {
           type: 'raster',
-          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-          tileSize: 256,
+          tiles: [
+            `https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`,
+          ],
+          tileSize: 512,
           attribution:
-            '©<a href="https://www.openstreetmap.org/copyright/ja">OpenStreetMap</a> contributors',
+            '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
         },
       },
       layers: [
