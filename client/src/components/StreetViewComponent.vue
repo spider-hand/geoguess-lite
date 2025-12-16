@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative h-[300px] w-full rounded-4xl sm:h-[400px] lg:min-h-[500px] lg:w-2/3 lg:flex-1"
+    class="relative h-[300px] w-full rounded-4xl sm:h-[400px] lg:h-[calc(100vh-120px)] lg:w-2/3 lg:flex-1"
   >
     <div ref="viewerRef" class="h-full w-full rounded-4xl"></div>
     <div v-if="showResult" class="absolute inset-0 flex items-center justify-center">
