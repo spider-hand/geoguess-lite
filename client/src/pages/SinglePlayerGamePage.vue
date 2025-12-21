@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
+import { ref, watch, computed, onMounted, nextTick } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -280,12 +280,19 @@ const showSummary = () => {
   }
 }
 
-const playAgain = () => {
+const playAgain = async () => {
   showSummaryView.value = false
   currentRound.value = 1
   totalScore.value = 0
   gameRecords.value = []
   resetRound()
+
+  // Apply showSummaryView change
+  await nextTick()
+
+  if (streetViewRef.value) {
+    await streetViewRef.value.loadRandomView()
+  }
 }
 
 const returnToMenu = () => {
