@@ -67,7 +67,22 @@ export interface User {
    * @memberof User
    */
   hasPlayedDailyChallenge: boolean
+  /**
+   * Preferred distance unit
+   * @type {string}
+   * @memberof User
+   */
+  distanceUnit: UserDistanceUnitEnum
 }
+
+/**
+ * @export
+ */
+export const UserDistanceUnitEnum = {
+  Km: 'km',
+  Mile: 'mile',
+} as const
+export type UserDistanceUnitEnum = (typeof UserDistanceUnitEnum)[keyof typeof UserDistanceUnitEnum]
 
 /**
  * Check if a given object implements the User interface.
@@ -82,6 +97,7 @@ export function instanceOfUser(value: object): value is User {
   if (!('averageScore' in value) || value['averageScore'] === undefined) return false
   if (!('hasPlayedDailyChallenge' in value) || value['hasPlayedDailyChallenge'] === undefined)
     return false
+  if (!('distanceUnit' in value) || value['distanceUnit'] === undefined) return false
   return true
 }
 
@@ -102,6 +118,7 @@ export function UserFromJSONTyped(json: any, ignoreDiscriminator: boolean): User
     bestScore: json['best_score'],
     averageScore: json['average_score'],
     hasPlayedDailyChallenge: json['has_played_daily_challenge'],
+    distanceUnit: json['distance_unit'],
   }
 }
 
@@ -123,5 +140,6 @@ export function UserToJSONTyped(value?: User | null, ignoreDiscriminator: boolea
     best_score: value['bestScore'],
     average_score: value['averageScore'],
     has_played_daily_challenge: value['hasPlayedDailyChallenge'],
+    distance_unit: value['distanceUnit'],
   }
 }

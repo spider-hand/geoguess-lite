@@ -66,6 +66,7 @@
           :show-result="showResult"
           :result-score="displayedScore"
           :result-distance="displayedDistance"
+          :distance-unit="user?.distanceUnit ?? 'km'"
           @image-loaded="onImageLoaded"
           @image-loading-start="onImageLoadingStart"
         />
@@ -151,6 +152,7 @@
         v-else
         :players="players"
         :game-records="multiplayerGameRecords"
+        :distance-unit="user?.distanceUnit ?? 'km'"
         @return-to-menu="returnToMenu"
       />
     </template>

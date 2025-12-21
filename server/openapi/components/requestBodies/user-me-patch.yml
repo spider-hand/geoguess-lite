@@ -17,3 +17,7 @@ content:
         average_score:
           type: number
           format: float
+        distance_unit:
+          type: string
+          enum: [km, mile]
+          description: Preferred distance unit

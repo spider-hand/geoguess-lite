@@ -67,7 +67,23 @@ export interface GetMe200Response {
    * @memberof GetMe200Response
    */
   hasPlayedDailyChallenge: boolean
+  /**
+   * Preferred distance unit
+   * @type {string}
+   * @memberof GetMe200Response
+   */
+  distanceUnit: GetMe200ResponseDistanceUnitEnum
 }
+
+/**
+ * @export
+ */
+export const GetMe200ResponseDistanceUnitEnum = {
+  Km: 'km',
+  Mile: 'mile',
+} as const
+export type GetMe200ResponseDistanceUnitEnum =
+  (typeof GetMe200ResponseDistanceUnitEnum)[keyof typeof GetMe200ResponseDistanceUnitEnum]
 
 /**
  * Check if a given object implements the GetMe200Response interface.
@@ -82,6 +98,7 @@ export function instanceOfGetMe200Response(value: object): value is GetMe200Resp
   if (!('averageScore' in value) || value['averageScore'] === undefined) return false
   if (!('hasPlayedDailyChallenge' in value) || value['hasPlayedDailyChallenge'] === undefined)
     return false
+  if (!('distanceUnit' in value) || value['distanceUnit'] === undefined) return false
   return true
 }
 
@@ -105,6 +122,7 @@ export function GetMe200ResponseFromJSONTyped(
     bestScore: json['best_score'],
     averageScore: json['average_score'],
     hasPlayedDailyChallenge: json['has_played_daily_challenge'],
+    distanceUnit: json['distance_unit'],
   }
 }
 
@@ -129,5 +147,6 @@ export function GetMe200ResponseToJSONTyped(
     best_score: value['bestScore'],
     average_score: value['averageScore'],
     has_played_daily_challenge: value['hasPlayedDailyChallenge'],
+    distance_unit: value['distanceUnit'],
   }
 }

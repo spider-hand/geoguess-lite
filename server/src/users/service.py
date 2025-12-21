@@ -22,6 +22,7 @@ def build_get_user_response(user_db: User) -> GetUserResponse:
         best_score=user_db.best_score,
         average_score=user_db.average_score,
         has_played_daily_challenge=has_played,
+        distance_unit=user_db.distance_unit,
     )
 
 
@@ -76,6 +77,7 @@ def get_or_create_user_service(user_id: str, event: APIGatewayProxyEventModel) -
             games_played=0,
             best_score=0,
             average_score=0,
+            distance_unit="km",
         )
         created_user_db = insert_user(user_db)
 

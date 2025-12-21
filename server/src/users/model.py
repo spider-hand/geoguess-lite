@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Literal
 
 
 class User(BaseModel):
@@ -11,6 +12,7 @@ class User(BaseModel):
     games_played: int
     best_score: int
     average_score: float
+    distance_unit: Literal["km", "mile"] = "km"
 
 
 class GetUserResponse(BaseModel):
@@ -22,6 +24,7 @@ class GetUserResponse(BaseModel):
     best_score: int
     average_score: float
     has_played_daily_challenge: bool
+    distance_unit: Literal["km", "mile"] = "km"
 
 
 class CreateUserRequest(BaseModel):
@@ -35,3 +38,4 @@ class UpdateUserRequest(BaseModel):
     games_played: int | None = None
     best_score: int | None = None
     average_score: float | None = None
+    distance_unit: Literal["km", "mile"] | None = None

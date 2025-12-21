@@ -55,7 +55,23 @@ export interface UpdateMeRequest {
    * @memberof UpdateMeRequest
    */
   averageScore?: number
+  /**
+   * Preferred distance unit
+   * @type {string}
+   * @memberof UpdateMeRequest
+   */
+  distanceUnit?: UpdateMeRequestDistanceUnitEnum
 }
+
+/**
+ * @export
+ */
+export const UpdateMeRequestDistanceUnitEnum = {
+  Km: 'km',
+  Mile: 'mile',
+} as const
+export type UpdateMeRequestDistanceUnitEnum =
+  (typeof UpdateMeRequestDistanceUnitEnum)[keyof typeof UpdateMeRequestDistanceUnitEnum]
 
 /**
  * Check if a given object implements the UpdateMeRequest interface.
@@ -82,6 +98,7 @@ export function UpdateMeRequestFromJSONTyped(
     gamesPlayed: json['games_played'] == null ? undefined : json['games_played'],
     bestScore: json['best_score'] == null ? undefined : json['best_score'],
     averageScore: json['average_score'] == null ? undefined : json['average_score'],
+    distanceUnit: json['distance_unit'] == null ? undefined : json['distance_unit'],
   }
 }
 
@@ -104,5 +121,6 @@ export function UpdateMeRequestToJSONTyped(
     games_played: value['gamesPlayed'],
     best_score: value['bestScore'],
     average_score: value['averageScore'],
+    distance_unit: value['distanceUnit'],
   }
 }

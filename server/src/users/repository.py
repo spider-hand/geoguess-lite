@@ -11,7 +11,7 @@ def get_user_by_id(user_id: str) -> User | None:
 
         row = conn.execute(
             """
-            SELECT id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score
+            SELECT id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score, distance_unit
             FROM users
             WHERE id = %s
             """,
@@ -42,9 +42,9 @@ def insert_user(user: User) -> User:
 
         row = conn.execute(
             """
-            INSERT INTO users (id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            RETURNING id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score
+            INSERT INTO users (id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score, distance_unit)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score, distance_unit
             """,
             (
                 user.id,
@@ -54,6 +54,7 @@ def insert_user(user: User) -> User:
                 user.games_played,
                 user.best_score,
                 user.average_score,
+                user.distance_unit,
             ),
         ).fetchone()
 
@@ -91,6 +92,7 @@ def update_user(user_id: str, update_fields: dict) -> User:
             "games_played",
             "best_score",
             "average_score",
+            "distance_unit",
         ]
 
         for field, value in update_fields.items():
@@ -107,7 +109,7 @@ def update_user(user_id: str, update_fields: dict) -> User:
             UPDATE users
             SET {", ".join(set_clauses)}
             WHERE id = %s
-            RETURNING id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score
+            RETURNING id, name, avatar_emoji, avatar_bg, games_played, best_score, average_score, distance_unit
         """
 
         row = conn.execute(sql, tuple(values)).fetchone()

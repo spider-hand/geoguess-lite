@@ -12,7 +12,7 @@
           {{
             resultDistance === -1
               ? "Time's up! No guess made."
-              : `You were ${resultDistance}km away!`
+              : `You were ${formatDistance(resultDistance, props.distanceUnit)} away!`
           }}
         </div>
       </div>
@@ -25,6 +25,8 @@ import { onMounted, ref, watch } from 'vue'
 import { Viewer } from 'mapillary-js'
 import { CANDIDATE_LOCATIONS } from '@/consts'
 import type { LatLng } from '@/types'
+import { formatDistance } from '@/utils'
+import type { UserDistanceUnitEnum } from '@/services/models'
 
 const emit = defineEmits<{
   imageLoaded: [position: LatLng, imageId: string]
@@ -55,6 +57,10 @@ const props = defineProps({
   imageId: {
     type: String,
     default: null,
+  },
+  distanceUnit: {
+    type: String as () => UserDistanceUnitEnum,
+    default: 'km' as UserDistanceUnitEnum,
   },
 })
 

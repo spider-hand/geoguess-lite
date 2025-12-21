@@ -177,6 +177,16 @@
                     user?.bestScore
                   }}</span>
                 </div>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                    >Distance Unit</span
+                  >
+                  <span
+                    v-if="user && user.distanceUnit"
+                    class="text-foreground font-[JetBrains_Mono] text-sm font-medium"
+                    >{{ user.distanceUnit === 'km' ? 'Kilometers' : 'Miles' }}</span
+                  >
+                </div>
               </div>
               <div class="flex flex-col gap-3">
                 <Button
@@ -248,6 +258,27 @@
                           ></div>
                           <span class="font-[JetBrains_Mono] capitalize">{{ color }}</span>
                         </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium"
+                    >Distance Unit</label
+                  >
+                  <Select v-model="editForm.distanceUnit">
+                    <SelectTrigger class="w-full">
+                      <SelectValue
+                        class="font-[JetBrains_Mono]"
+                        placeholder="Select distance unit"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="km" class="font-[JetBrains_Mono]">
+                        Kilometers (km)
+                      </SelectItem>
+                      <SelectItem value="mile" class="font-[JetBrains_Mono]">
+                        Miles (mi)
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -384,6 +415,7 @@ import type { GameModeType } from '@/types'
 import useGameConfigStore from '@/stores/gameConfig'
 import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
 import { getAvatarClass } from '@/utils'
+import type { UserDistanceUnitEnum } from '@/services'
 
 interface GameModeItem {
   id: GameModeType
@@ -451,6 +483,7 @@ const editForm = ref({
   name: '',
   avatarEmoji: '',
   avatarBg: '',
+  distanceUnit: 'km' as UserDistanceUnitEnum,
 })
 
 const isDeletingAccount = ref(false)
@@ -482,6 +515,7 @@ const startEditProfile = () => {
       name: user.value.name,
       avatarEmoji: user.value.avatarEmoji,
       avatarBg: user.value.avatarBg,
+      distanceUnit: user.value.distanceUnit,
     }
   }
   isEditingProfile.value = true
@@ -489,7 +523,7 @@ const startEditProfile = () => {
 
 const cancelEditProfile = () => {
   isEditingProfile.value = false
-  editForm.value = { name: '', avatarEmoji: '', avatarBg: '' }
+  editForm.value = { name: '', avatarEmoji: '', avatarBg: '', distanceUnit: 'km' }
 }
 
 const saveProfile = async () => {
@@ -499,6 +533,7 @@ const saveProfile = async () => {
         name: editForm.value.name,
         avatarEmoji: editForm.value.avatarEmoji,
         avatarBg: editForm.value.avatarBg,
+        distanceUnit: editForm.value.distanceUnit,
       })
     }
   } catch (error) {

@@ -42,7 +42,7 @@
               <div class="text-right">
                 <div class="font-[JetBrains_Mono] text-lg font-bold">{{ player.score }} points</div>
                 <div class="text-muted-foreground font-[JetBrains_Mono] text-sm">
-                  {{ player.distance }}km off
+                  {{ formatDistance(player.distance, props.distanceUnit) }} off
                 </div>
               </div>
             </div>
@@ -105,7 +105,7 @@
                       {{ player.score }} points
                     </div>
                     <div class="text-muted-foreground font-[JetBrains_Mono] text-xs">
-                      {{ player.distance }}km
+                      {{ formatDistance(player.distance, props.distanceUnit) }}
                     </div>
                   </div>
                 </div>
@@ -140,6 +140,8 @@ import Card from './ui/card/Card.vue'
 import CardContent from './ui/card/CardContent.vue'
 import Button from './ui/button/Button.vue'
 import type { MultiplayerRoundRecord, PlayerResult } from '@/types'
+import { formatDistance } from '@/utils'
+import type { UserDistanceUnitEnum } from '@/services/models'
 
 const props = defineProps({
   players: {
@@ -149,6 +151,10 @@ const props = defineProps({
   gameRecords: {
     type: Array as PropType<MultiplayerRoundRecord[]>,
     required: true,
+  },
+  distanceUnit: {
+    type: String as () => UserDistanceUnitEnum,
+    default: 'km' as UserDistanceUnitEnum,
   },
 })
 

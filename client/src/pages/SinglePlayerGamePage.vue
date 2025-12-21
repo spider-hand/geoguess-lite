@@ -29,6 +29,7 @@
         :show-result="showResult"
         :result-score="score"
         :result-distance="distance"
+        :distance-unit="user?.distanceUnit ?? 'km'"
         @image-loaded="onImageLoaded"
         @image-loading-start="onImageLoadingStart"
       />
@@ -65,6 +66,7 @@
       :total-score="totalScore"
       :average-score="averageScore"
       :game-records="gameRecords"
+      :distance-unit="user?.distanceUnit ?? 'km'"
       @play-again="playAgain"
       @return-to-menu="returnToMenu"
     />

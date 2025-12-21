@@ -18,6 +18,11 @@ properties:
   has_played_daily_challenge:
     type: boolean
     description: Whether the user has played today's daily challenge
+  distance_unit:
+    type: string
+    enum: [km, mile]
+    default: km
+    description: Preferred distance unit
 required:
   - id
   - name
@@ -27,3 +32,4 @@ required:
   - best_score
   - average_score
   - has_played_daily_challenge
+  - distance_unit

@@ -130,6 +130,8 @@ import { MAX_SCORE, ROUNDS } from '@/consts'
 import Button from './ui/button/Button.vue'
 import Progress from './ui/progress/Progress.vue'
 import type { RoundRecord } from '@/types'
+import { formatDistance } from '@/utils'
+import type { UserDistanceUnitEnum } from '@/services/models'
 
 const props = defineProps({
   totalScore: {
@@ -148,16 +150,20 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  distanceUnit: {
+    type: String as () => UserDistanceUnitEnum,
+    default: 'km' as UserDistanceUnitEnum,
+  },
 })
 
 const totalDistance = computed(() => {
-  if (props.gameRecords.length === 0) return '0km'
+  if (props.gameRecords.length === 0) return formatDistance(0, props.distanceUnit)
 
   const sum = props.gameRecords.reduce((acc, record) => {
     return record.distance >= 0 ? acc + record.distance : acc
   }, 0)
 
-  return `${Math.round(sum)}km`
+  return formatDistance(Math.round(sum), props.distanceUnit)
 })
 
 const averageTime = computed(() => {
