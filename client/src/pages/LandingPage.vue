@@ -12,20 +12,32 @@
               <p class="text-muted-foreground mb-8 font-[JetBrains_Mono] text-2xl">
                 Explore the world, no paywalls, no limits.
               </p>
-              <Button
-                size="lg"
-                class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-                @click="
-                  currentUser
-                    ? router.push({
-                        name: 'game',
-                      })
-                    : signUpWithGoogle()
-                "
-                :disabled="!isCurrentUserLoaded"
-              >
-                Get Started
-              </Button>
+              <div class="flex flex-col gap-4 sm:flex-row">
+                <Button
+                  size="lg"
+                  class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                  @click="
+                    currentUser
+                      ? router.push({
+                          name: 'game',
+                        })
+                      : signUpWithGoogle()
+                  "
+                  :disabled="!isCurrentUserLoaded"
+                >
+                  Get Started
+                </Button>
+                <Button
+                  v-if="!currentUser"
+                  variant="ghost"
+                  size="lg"
+                  class="text-muted-foreground cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                  @click="router.push({ name: 'game' })"
+                  :disabled="!isCurrentUserLoaded"
+                >
+                  [Continue as Guest]
+                </Button>
+              </div>
             </div>
             <div class="flex justify-center">
               <img

@@ -129,18 +129,17 @@ const saveRoundRecord = () => {
     score: score.value,
     distance: distance.value,
     correctLocation: imagePosition.value,
-    playerLocations:
-      markerPosition.value && user.value
-        ? [
-            {
-              lat: markerPosition.value.lat,
-              lng: markerPosition.value.lng,
-              avatarEmoji: user.value.avatarEmoji,
-              avatarBg: user.value.avatarBg,
-              id: user.value.id,
-            },
-          ]
-        : [],
+    playerLocations: markerPosition.value
+      ? [
+          {
+            lat: markerPosition.value.lat,
+            lng: markerPosition.value.lng,
+            avatarEmoji: user.value?.avatarEmoji ?? '🌍',
+            avatarBg: user.value?.avatarBg ?? 'blue',
+            id: user.value?.id ?? 'guest',
+          },
+        ]
+      : [],
     mapCenter: [centerLng, centerLat],
     mapZoom: zoom,
     imageId: currentImageId.value,

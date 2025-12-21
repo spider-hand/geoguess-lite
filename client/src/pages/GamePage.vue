@@ -13,8 +13,12 @@
           <div
             v-for="(mode, index) in gameModes"
             :key="index"
-            @click="gameConfig.selectedGameMode = mode.id"
-            class="h-full"
+            @click="isGameModeAvailable(mode.id) && (gameConfig.selectedGameMode = mode.id)"
+            class="relative h-full"
+            :class="{
+              'cursor-not-allowed opacity-50': !isGameModeAvailable(mode.id),
+              'cursor-pointer': isGameModeAvailable(mode.id),
+            }"
           >
             <CustomCardComponent
               :title="mode.title"
@@ -23,6 +27,12 @@
               :bg-class="getGameModeCardClass(mode.id)"
               :emoji-class="mode.emojiClass"
             />
+            <div
+              v-if="!isGameModeAvailable(mode.id)"
+              class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-black/90 px-3 py-1 text-center font-[JetBrains_Mono] text-sm text-white"
+            >
+              🔒 Sign up required
+            </div>
           </div>
         </div>
         <Card class="border">
@@ -117,9 +127,11 @@
                 class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
                 @click="startGame"
                 :disabled="
-                  !user ||
+                  !isCurrentUserLoaded ||
                   isRoomLoading ||
+                  !isGameModeAvailable(gameConfig.selectedGameMode) ||
                   (gameConfig.selectedGameMode === 'daily-challenge' &&
+                    user &&
                     user.hasPlayedDailyChallenge) ||
                   (gameConfig.selectedGameMode === 'multiplayer' &&
                     !gameConfig.isHost &&
@@ -133,7 +145,7 @@
         </Card>
       </div>
       <div class="order-2 flex flex-col gap-8 lg:order-1 lg:w-80">
-        <Card class="border">
+        <Card v-if="currentUser" class="border">
           <CardContent class="flex flex-col gap-6">
             <div>
               <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Profile</h2>
@@ -303,7 +315,36 @@
             </template>
           </CardContent>
         </Card>
-        <Card v-if="isDeletingAccount" class="borde">
+        <Card v-else-if="isGuest" class="border">
+          <CardContent class="flex flex-col gap-6">
+            <div>
+              <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Playing as Guest</h2>
+              <p class="text-muted-foreground mt-2 font-[JetBrains_Mono] text-sm">
+                Create an account to unlock all features!
+              </p>
+            </div>
+            <div class="flex flex-col gap-3">
+              <div class="rounded-lg bg-blue-50 p-4">
+                <p class="text-foreground mb-2 font-[JetBrains_Mono] text-sm font-semibold">
+                  Sign up to unlock:
+                </p>
+                <ul class="text-muted-foreground space-y-1 font-[JetBrains_Mono] text-sm">
+                  <li>• Save your stats and progress</li>
+                  <li>• Play Multiplayer with friends</li>
+                  <li>• Compete in Daily Challenges</li>
+                </ul>
+              </div>
+              <Button
+                @click="signUpWithGoogle"
+                class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+              >
+                Sign Up
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card v-if="isDeletingAccount && currentUser" class="borde">
           <CardContent class="flex flex-col gap-6">
             <div>
               <h2 class="font-[Roboto] text-2xl font-semibold text-red-500">Delete Account</h2>
@@ -416,6 +457,7 @@ import useGameConfigStore from '@/stores/gameConfig'
 import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
 import { getAvatarClass } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services'
+import useAuth from '@/composables/useAuth'
 
 interface GameModeItem {
   id: GameModeType
@@ -453,6 +495,10 @@ const gameModes: GameModeItem[] = [
   },
 ]
 
+const router = useRouter()
+
+const { currentUser, isCurrentUserLoaded, signUpWithGoogle } = useAuth()
+
 const { todayTopScores } = useDailyScoreQuery()
 
 const leaderboard = computed(() => {
@@ -468,8 +514,6 @@ const leaderboard = computed(() => {
   }))
 })
 
-const router = useRouter()
-
 const {
   user,
   mutateUserUpdateAsync,
@@ -477,6 +521,8 @@ const {
   mutateUserDeleteAsync,
   isPendingOnDeleteUser,
 } = useUserQuery()
+
+const isGuest = computed(() => isCurrentUserLoaded.value && !currentUser.value)
 
 const isEditingProfile = ref(false)
 const editForm = ref({
@@ -491,6 +537,13 @@ const deleteConfirmationText = ref('')
 
 const gameConfig = useGameConfigStore()
 const { createRoom, joinRoom, isLoading: isRoomLoading } = useMultiplayerRoom()
+
+const isGameModeAvailable = (modeId: GameModeType) => {
+  if (isGuest.value && (modeId === 'multiplayer' || modeId === 'daily-challenge')) {
+    return false
+  }
+  return true
+}
 
 const getGameModeCardClass = (modeId: GameModeType) => {
   const mode = gameModes.find((m) => m.id === modeId)

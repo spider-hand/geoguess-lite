@@ -5,11 +5,14 @@ import {
 } from '@/services'
 import useApi from './useApi'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useCurrentUser, useIsCurrentUserLoaded } from 'vuefire'
 
 const useDailyScoreQuery = () => {
   const { apiConfig } = useApi()
   const dailyScoresApi = new DailyScoresApi(apiConfig)
   const queryClient = useQueryClient()
+  const currentUser = useCurrentUser()
+  const isCurrentUserLoaded = useIsCurrentUserLoaded()
 
   const {
     data: todayTopScores,
@@ -22,6 +25,7 @@ const useDailyScoreQuery = () => {
       const resp = await dailyScoresApi.getTodayTopScores()
       return resp
     },
+    enabled: () => isCurrentUserLoaded.value && !!currentUser.value,
     staleTime: Infinity,
   })
 

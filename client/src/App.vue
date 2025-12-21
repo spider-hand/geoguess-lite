@@ -21,10 +21,13 @@ const { isErrorOnFetchUser } = useUserQuery()
 watch(
   currentUser,
   async (newVal, oldVal) => {
-    // Redirect to landing page if user logs out on a protected route
-    if (!newVal && oldVal && route.meta.requiresAuth) {
+    if (!newVal && oldVal) {
       queryClient.clear()
-      return router.push({ name: 'landing' })
+
+      // Redirect to landing page if user logs out on a protected route
+      if (route.meta.requiresAuth) {
+        return router.push({ name: 'landing' })
+      }
     } else if (newVal) {
       return router.push({ name: 'game' })
     }

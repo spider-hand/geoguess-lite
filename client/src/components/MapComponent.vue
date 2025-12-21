@@ -51,8 +51,9 @@ const createAvatarMarker = (avatarEmoji: string, avatarBg: string) => {
 }
 
 const createUserMarker = () => {
-  if (!user.value) return null
-  return createAvatarMarker(user.value.avatarEmoji, user.value.avatarBg)
+  const avatarEmoji = user.value?.avatarEmoji ?? '🌍'
+  const avatarBg = user.value?.avatarBg ?? 'blue'
+  return createAvatarMarker(avatarEmoji, avatarBg)
 }
 
 const handleMapClick = (e: maplibregl.MapMouseEvent) => {
