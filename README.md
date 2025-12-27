@@ -12,6 +12,17 @@
 - [Server](./server/README.md)
 - [Functions](./functions/README.md)
 
+## Tech Stack
+
+- Frontend: Vue
+- Backend: AWS Lambda, Firebase Functions
+- Authentication: Firebase Authentication
+- DB: Firebase Realtime Database, PostgreSQL
+- Hosting: Cloudflare
+- Infrastructure: AWS SAM
+- Local Development: Docker, LocalStack
+- Others: OpenStreetMap, Mapbox, Mapillary, Maplibre
+
 ## Contribution
 
 - Bug fix PRs are always appreciated.
