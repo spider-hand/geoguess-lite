@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { Viewer } from 'mapillary-js'
 import { CANDIDATE_LOCATIONS } from '@/consts'
 import type { LatLng } from '@/types'
@@ -166,6 +166,13 @@ const initViewer = () => {
 
 onMounted(() => {
   initViewer()
+})
+
+onUnmounted(() => {
+  if (viewer.value) {
+    viewer.value.remove()
+    viewer.value = null
+  }
 })
 
 defineExpose({
