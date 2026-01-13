@@ -3,6 +3,9 @@
     class="relative h-[300px] w-full rounded-4xl sm:h-[400px] lg:h-[calc(100vh-120px)] lg:w-2/3 lg:flex-1"
   >
     <div ref="viewerRef" class="h-full w-full rounded-4xl"></div>
+    <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center">
+      <Spinner class="text-muted-foreground size-12" />
+    </div>
     <div v-if="showResult" class="absolute inset-0 flex items-center justify-center">
       <div class="rounded-lg bg-black px-8 py-6 text-center opacity-80 shadow-lg">
         <div class="font-bolds font-[JetBrains_Mono] text-2xl text-white">
@@ -27,6 +30,7 @@ import { CANDIDATE_LOCATIONS } from '@/consts'
 import type { LatLng } from '@/types'
 import { formatDistance } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services/models'
+import Spinner from './ui/spinner/Spinner.vue'
 
 const emit = defineEmits<{
   imageLoaded: [position: LatLng, imageId: string]
@@ -61,6 +65,10 @@ const props = defineProps({
   distanceUnit: {
     type: String as () => UserDistanceUnitEnum,
     default: 'km' as UserDistanceUnitEnum,
+  },
+  isLoading: {
+    type: Boolean,
+    default: false,
   },
 })
 

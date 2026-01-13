@@ -30,6 +30,7 @@
         :result-score="score"
         :result-distance="distance"
         :distance-unit="user?.distanceUnit ?? 'km'"
+        :is-loading="isLoadingImage"
         @image-loaded="onImageLoaded"
         @image-loading-start="onImageLoadingStart"
       />
