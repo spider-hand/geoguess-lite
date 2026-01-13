@@ -35,7 +35,7 @@ def get_secret() -> SecretsDict:
         client = boto3.client(
             service_name=service_name,
             region_name=region_name,
-            endpoint_url="http://localstack-main:4566",
+            endpoint_url="http://localstack-geoguess-lite:4566",
         )
     else:
         client = boto3.client(
