@@ -3,12 +3,14 @@
 </template>
 
 <script setup lang="ts">
-import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
-import { onMounted, onUnmounted, ref, type PropType } from 'vue'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
+import { onMounted, onUnmounted, ref, shallowRef, type PropType } from 'vue'
 import useUserQuery from '@/composables/useUserQuery'
 import { calculateCenter, calculateZoomLevel, getAvatarClass } from '@/utils'
 import type { LatLng, PlayerMarker } from '@/types'
+
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
 const props = defineProps({
   playerLocations: {
@@ -35,10 +37,10 @@ const emit = defineEmits<{
 }>()
 
 const mapRef = ref<HTMLElement | null>(null)
-const map = ref(null as maplibregl.Map | null)
-const currentMarker = ref<maplibregl.Marker | null>(null)
-const correctLocationMarker = ref<maplibregl.Marker | null>(null)
-const playerMarkers = ref<maplibregl.Marker[]>([])
+const map = shallowRef<mapboxgl.Map | null>(null)
+const currentMarker = shallowRef<mapboxgl.Marker | null>(null)
+const correctLocationMarker = shallowRef<mapboxgl.Marker | null>(null)
+const playerMarkers = shallowRef<mapboxgl.Marker[]>([])
 
 const { user } = useUserQuery()
 
@@ -56,7 +58,7 @@ const createUserMarker = () => {
   return createAvatarMarker(avatarEmoji, avatarBg)
 }
 
-const handleMapClick = (e: maplibregl.MapMouseEvent) => {
+const handleMapClick = (e: mapboxgl.MapMouseEvent) => {
   addMarkerToMap([e.lngLat.lng, e.lngLat.lat])
 }
 
@@ -71,12 +73,11 @@ const addMarkerToMap = (lngLat: [number, number]) => {
   const markerElement = createUserMarker()
   if (!markerElement) return
 
-  currentMarker.value = new maplibregl.Marker({
+  currentMarker.value = new mapboxgl.Marker({
     element: markerElement,
     anchor: 'center',
   }).setLngLat(lngLat)
 
-  // @ts-expect-error maplibre type issue
   currentMarker.value.addTo(map.value)
 
   emit('markerPlaced', { lat: lngLat[1], lng: lngLat[0] })
@@ -87,12 +88,11 @@ const addPlayerMarker = (lngLat: [number, number], avatarEmoji: string, avatarBg
   if (!map.value) return
 
   const markerElement = createAvatarMarker(avatarEmoji, avatarBg)
-  const marker = new maplibregl.Marker({
+  const marker = new mapboxgl.Marker({
     element: markerElement,
     anchor: 'center',
   }).setLngLat(lngLat)
 
-  // @ts-expect-error maplibre type issue
   marker.addTo(map.value)
   playerMarkers.value.push(marker)
 }
@@ -104,11 +104,10 @@ const showCorrectLocation = (lngLat: [number, number]) => {
     correctLocationMarker.value.remove()
   }
 
-  correctLocationMarker.value = new maplibregl.Marker({
+  correctLocationMarker.value = new mapboxgl.Marker({
     color: '#ef4444',
   }).setLngLat(lngLat)
 
-  // @ts-expect-error maplibre type issue
   correctLocationMarker.value.addTo(map.value)
 }
 
@@ -156,44 +155,22 @@ const enableClicks = () => {
 const addCorrectLocationMarker = (location: LatLng) => {
   if (!map.value) return
 
-  correctLocationMarker.value = new maplibregl.Marker({
+  correctLocationMarker.value = new mapboxgl.Marker({
     color: '#ef4444',
   }).setLngLat([location.lng, location.lat])
 
-  // @ts-expect-error maplibre type issue
   correctLocationMarker.value.addTo(map.value)
 }
 
 const initializeMap = () => {
   if (!mapRef.value || map.value) return
 
-  map.value = new maplibregl.Map({
+  map.value = new mapboxgl.Map({
     container: mapRef.value as HTMLElement,
-    style: {
-      version: 8,
-      sources: {
-        'raster-tiles': {
-          type: 'raster',
-          tiles: [
-            `https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`,
-          ],
-          tileSize: 512,
-          attribution:
-            '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-        },
-      },
-      layers: [
-        {
-          id: 'simple-tiles',
-          type: 'raster',
-          source: 'raster-tiles',
-          minzoom: 0,
-          maxzoom: 19,
-        },
-      ],
-      center: props.center || [6.82, 50.06],
-      zoom: props.zoom || 3,
-    },
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: (props.center as [number, number]) || [6.82, 50.06],
+    zoom: props.zoom || 3,
+    projection: 'mercator',
   })
 
   // Disable click event and show the markers when initializing the map for summary view

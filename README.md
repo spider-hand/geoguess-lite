@@ -21,7 +21,7 @@
 - Hosting: Cloudflare
 - Infrastructure: AWS SAM
 - Local Development: Docker, LocalStack
-- Others: OpenStreetMap, Mapbox, Mapillary, Maplibre
+- Others: OpenStreetMap, Mapbox, Mapillary
 
 ## Contribution
 
