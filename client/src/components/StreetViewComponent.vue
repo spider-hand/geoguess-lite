@@ -132,6 +132,17 @@ const loadRandomView = async () => {
     emit('imageLoaded', { lat: pos.lat, lng: pos.lng }, imageId)
   } catch (err) {
     console.error('Error in loadRandomView:', err)
+
+    const isOnFirefox = /Firefox/i.test(navigator.userAgent)
+
+    if (isOnFirefox) {
+      // NOTE: Facebook container on Firefox blocks requests to Mapillary API
+      // @see: https://github.com/mozilla/contain-facebook/blob/main/src/background.js
+      alert(
+        'It looks like you’re using Firefox. If Facebook Container is enabled, please disable it for this site to load images properly.',
+      )
+    }
+
     throw err
   }
 }
