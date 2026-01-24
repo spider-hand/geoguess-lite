@@ -53,12 +53,13 @@
 
     <div class="mb-6">
       <h2 class="mb-4 font-[Roboto] text-2xl font-bold">Round Breakdown</h2>
-      <Accordion type="single" collapsible>
-        <AccordionItem
-          v-for="record in gameRecords"
-          :key="record.round"
-          :value="`round-${record.round}`"
-        >
+      <Accordion
+        type="single"
+        collapsible
+        :unmount-on-hide="false"
+        @update:model-value="onAccordionChange"
+      >
+        <AccordionItem v-for="record in gameRecords" :key="record.round" :value="`${record.round}`">
           <AccordionTrigger class="flex items-center">
             <div class="flex items-center gap-2">
               <span class="font-[Roboto] text-xl">Round {{ record.round }}</span>
@@ -69,6 +70,7 @@
               <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <div class="h-64">
                   <MapComponent
+                    v-if="openedRounds.has(`${record.round}`)"
                     :player-locations="record.playerLocations"
                     :correct-location="record.correctLocation"
                     :center="record.mapCenter"
@@ -77,6 +79,7 @@
                 </div>
                 <div class="flex h-64 flex-col">
                   <StreetViewComponent
+                    v-if="openedRounds.has(`${record.round}`)"
                     class="h-full! min-h-full! w-full! flex-1!"
                     :allow-moving="false"
                     :allow-zooming="false"
@@ -129,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from 'vue'
+import { computed, ref, type PropType } from 'vue'
 import MapComponent from './MapComponent.vue'
 import StreetViewComponent from './StreetViewComponent.vue'
 import Accordion from './ui/accordion/Accordion.vue'
@@ -157,6 +160,13 @@ const props = defineProps({
     default: 'km' as UserDistanceUnitEnum,
   },
 })
+
+// Track which rounds have been opened for lazy loading the content
+const openedRounds = ref<Set<string>>(new Set())
+
+const onAccordionChange = (value: string | string[] | undefined) => {
+  openedRounds.value.add(value as string)
+}
 
 const sortedPlayers = computed(() => {
   return [...props.players].sort((a, b) => b.score - a.score)
