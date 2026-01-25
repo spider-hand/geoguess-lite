@@ -45,6 +45,24 @@ Resources:
               Headers:
                 - Authorization
 
+  # Set a rate limit for public endpoints
+  PublicApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,PATCH,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization,x-api-key'"
+        AllowOrigin: "'*'"
+      Auth:
+        # Require API key at method level. If this is set at gateway level, the preflight OPTIONS request will be blocked.
+        ApiKeyRequired: false
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttle:
+            BurstLimit: 20
+            RateLimit: 5
+
   FirebaseAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -171,6 +189,30 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /daily-scores
             Method: get
+
+  ImagesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: images.handler.lambda_handler
+      Runtime: python3.13
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          Environment: !Ref Environment
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+      Events:
+        GetImages:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PublicApiGateway
+            Path: /images
+            Method: get
+            Auth:
+              ApiKeyRequired: true
 
   MultiplayerRoundsFunction:
     Type: AWS::Serverless::Function

@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, nextTick } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import MapComponent from '@/components/MapComponent.vue'
 import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -88,6 +88,7 @@ import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlay
 import type { LatLng, RoundRecord } from '@/types'
 import { ROUNDS } from '@/consts'
 import useUserQuery from '@/composables/useUserQuery'
+import useImagesQuery from '@/composables/useImagesQuery'
 
 const gameConfig = useGameConfigStore()
 const {
@@ -99,6 +100,7 @@ const {
 } = useTimer(gameConfig.timeLimit)
 const router = useRouter()
 const { user, mutateUserUpdate } = useUserQuery()
+const { images, isSuccessOnFetchImages, refetchImages } = useImagesQuery()
 
 const hasMarker = ref(false)
 const showResult = ref(false)
@@ -252,13 +254,19 @@ const resetRound = () => {
   }
 }
 
+const loadCurrentRoundImage = async () => {
+  if (!streetViewRef.value || !images.value) return
+
+  const imageId = images.value[currentRound.value - 1]?.id
+  if (imageId) {
+    await streetViewRef.value.loadRandomView(imageId)
+  }
+}
+
 const nextRound = async () => {
   currentRound.value += 1
   resetRound()
-
-  if (streetViewRef.value) {
-    await streetViewRef.value.loadRandomView()
-  }
+  await loadCurrentRoundImage()
 }
 
 const showSummary = () => {
@@ -287,21 +295,27 @@ const playAgain = async () => {
   gameRecords.value = []
   resetRound()
 
+  // Fetch new set of images for the new game
+  await refetchImages()
+
   // Apply showSummaryView change
   await nextTick()
 
-  if (streetViewRef.value) {
-    await streetViewRef.value.loadRandomView()
-  }
+  await loadCurrentRoundImage()
 }
 
 const returnToMenu = () => {
   router.push('/game')
 }
 
-onMounted(async () => {
-  if (streetViewRef.value) {
-    await streetViewRef.value.loadRandomView()
-  }
-})
+// Watch for images to be fetched, then load the first round image
+watch(
+  () => isSuccessOnFetchImages.value,
+  (isSuccess) => {
+    if (isSuccess) {
+      loadCurrentRoundImage()
+    }
+  },
+  { immediate: true },
+)
 </script>

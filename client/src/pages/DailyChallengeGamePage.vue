@@ -193,7 +193,7 @@ watch(
     // Make sure DOM updates are complete
     await nextTick()
     if (streetViewRef.value && newImageId) {
-      await streetViewRef.value.loadViewFromImageId(newImageId)
+      await streetViewRef.value.loadRandomView(newImageId)
     }
   },
 )

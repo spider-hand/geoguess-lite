@@ -26,7 +26,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { Viewer } from 'mapillary-js'
-import { CANDIDATE_LOCATIONS } from '@/consts'
 import type { LatLng } from '@/types'
 import { formatDistance } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services/models'
@@ -58,10 +57,6 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-  imageId: {
-    type: String,
-    default: null,
-  },
   distanceUnit: {
     type: String as () => UserDistanceUnitEnum,
     default: 'km' as UserDistanceUnitEnum,
@@ -70,61 +65,20 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  imageId: {
+    type: String,
+    default: undefined,
+  },
 })
 
 const viewer = ref<Viewer | null>(null)
 const viewerRef = ref<HTMLElement | null>(null)
 
-// When imageId pros is provided, load the view automatially
-watch(
-  () => props.imageId,
-  (newImageId) => {
-    if (newImageId) {
-      loadViewFromImageId(newImageId)
-    }
-  },
-)
-
-const getRandomLatLng = () => {
-  const [baseLat, baseLng] =
-    CANDIDATE_LOCATIONS[Math.floor(Math.random() * CANDIDATE_LOCATIONS.length)]!
-  return { lat: baseLat, lng: baseLng }
-}
-
-const buildBBox = (lat: number, lng: number) => {
-  const offset = 0.01
-  const minLat = lat - offset
-  const maxLat = lat + offset
-  const minLng = lng - offset
-  const maxLng = lng + offset
-  return `${minLng},${minLat},${maxLng},${maxLat}`
-}
-
-const getRandomImageId = async () => {
-  try {
-    const { lat, lng } = getRandomLatLng()
-    const bbox = buildBBox(lat, lng)
-    const response = await fetch(
-      `https://graph.mapillary.com/images?access_token=${import.meta.env.VITE_MAPILLARY_TOKEN}&fields=id&bbox=${bbox}&limit=50`,
-    )
-    const data = await response.json()
-    if (data.data && data.data.length > 0) {
-      const randomIndex = Math.floor(Math.random() * data.data.length)
-      return data.data[randomIndex].id
-    }
-    return await getRandomImageId()
-  } catch (err) {
-    console.error('Error in getRandomImageId:', err)
-    throw err
-  }
-}
-
-const loadRandomView = async () => {
+const loadRandomView = async (imageId: string) => {
   try {
     if (!viewer.value) return
 
     emit('imageLoadingStart')
-    const imageId = await getRandomImageId()
     await viewer.value.moveTo(imageId)
 
     const pos = await viewer.value.getPosition()
@@ -147,22 +101,6 @@ const loadRandomView = async () => {
   }
 }
 
-const loadViewFromImageId = async (imageId: string) => {
-  try {
-    if (!viewer.value) return
-
-    emit('imageLoadingStart')
-    await viewer.value.moveTo(imageId)
-
-    const pos = await viewer.value.getPosition()
-
-    emit('imageLoaded', { lat: pos.lat, lng: pos.lng }, imageId)
-  } catch (err) {
-    console.error('Error in loadViewFromImageId:', err)
-    throw err
-  }
-}
-
 const initViewer = () => {
   if (!viewerRef.value || viewer.value) return
 
@@ -176,16 +114,31 @@ const initViewer = () => {
       zoom: props.allowZooming,
     },
   })
-
-  // Load the view automatically if imageId prop is provided
-  if (props.imageId) {
-    loadViewFromImageId(props.imageId)
-  }
 }
 
 onMounted(() => {
   initViewer()
 })
+
+// Auto-load image if imageId prop is provided (used in summary views)
+watch(
+  () => props.imageId,
+  (newImageId) => {
+    if (newImageId && viewer.value) {
+      loadRandomView(newImageId)
+    }
+  },
+)
+
+// Also load when viewer becomes ready if imageId is already set
+watch(
+  () => viewer.value,
+  (newViewer) => {
+    if (newViewer && props.imageId) {
+      loadRandomView(props.imageId)
+    }
+  },
+)
 
 onUnmounted(() => {
   if (viewer.value) {
@@ -195,8 +148,6 @@ onUnmounted(() => {
 })
 
 defineExpose({
-  // Exposing methods to parent components to handle the timing to load the view in the parent component
   loadRandomView,
-  loadViewFromImageId,
 })
 </script>

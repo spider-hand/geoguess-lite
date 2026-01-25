@@ -353,7 +353,7 @@ watch(hasEveryoneLoaded, async (loaded) => {
   if (loaded && streetViewRef.value && currentRoundImageId.value) {
     isLoadingImage.value = true
     displayedRound.value = currentRound.value
-    await streetViewRef.value.loadViewFromImageId(currentRoundImageId.value)
+    await streetViewRef.value.loadRandomView(currentRoundImageId.value)
   }
 })
 

@@ -1,4 +1,3 @@
-import asyncio
 from datetime import date, timedelta
 
 from dailyChallenges.service import create_daily_challenge_service
@@ -8,15 +7,11 @@ from core.logger import dynamic_inject_lambda_context, logger
 
 @dynamic_inject_lambda_context
 def lambda_handler(event, context: LambdaContext) -> dict:
-    return asyncio.run(create_challenge())
-
-
-async def create_challenge():
     try:
         tomorrow = date.today() + timedelta(days=1)
         logger.info({"event": "create_challenge", "date": tomorrow.isoformat()})
 
-        await create_daily_challenge_service(tomorrow)
+        create_daily_challenge_service(tomorrow)
         logger.info(
             {
                 "event": "challenge_created",

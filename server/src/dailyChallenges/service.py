@@ -7,19 +7,20 @@ from .repository import (
     delete_daily_challenge_by_date,
 )
 from core.logger import logger
-from core.map import get_random_image_id
+from images.repository import get_random_images
 
 
-async def create_daily_challenge_service(
+def create_daily_challenge_service(
     challenge_date: date,
 ) -> GetDailyChallengeResponse:
     try:
         saved_challenge = insert_daily_challenge(challenge_date)
 
-        for round_num in range(1, 6):
-            logger.info(f"Getting image for round {round_num}/5")
-            image_id = await get_random_image_id()
-            insert_daily_challenge_round(saved_challenge.id, round_num, image_id)
+        images = get_random_images()
+
+        for round_num, image in enumerate(images, start=1):
+            logger.info(f"Setting image for round {round_num}/5")
+            insert_daily_challenge_round(saved_challenge.id, round_num, image.id)
             logger.info(f"Completed round {round_num}/5")
 
         logger.info(

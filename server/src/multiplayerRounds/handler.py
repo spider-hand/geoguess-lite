@@ -1,4 +1,3 @@
-import asyncio
 import json
 from multiplayerRounds.service import create_multiplayer_rounds_service
 from aws_lambda_powertools.utilities.typing import LambdaContext
@@ -11,12 +10,8 @@ from core.auth import CORS_HEADERS
 @dynamic_inject_lambda_context
 @event_parser(model=CustomEvent)
 def lambda_handler(event: CustomEvent, context: LambdaContext) -> dict:
-    return asyncio.run(create_rounds(event))
-
-
-async def create_rounds(event: CustomEvent) -> dict:
     try:
-        room_id = await create_multiplayer_rounds_service(event)
+        room_id = create_multiplayer_rounds_service(event)
         logger.info({"event": "rounds_created"})
 
         return {

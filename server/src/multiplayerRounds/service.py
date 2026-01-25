@@ -1,11 +1,12 @@
 from core.logger import logger
-from core.map import get_random_image_id
+from images.repository import get_random_images
 from core.firebase import get_firebase_database, initialize_firebase_with_database
 from core.events import CustomEvent
 from .model import CreateMultiplayerRoundRequest
 
 
-async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
+def create_multiplayer_rounds_service(event: CustomEvent) -> str:
+    room_ref = None
     try:
         body = CreateMultiplayerRoundRequest.model_validate_json(event.body)
         room_id = body.room_id
@@ -18,7 +19,9 @@ async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
         room_ref = db.reference(f"rooms/{room_id}")
         room_ref.update({"status": "loading", "currentRound": 1})
 
-        for round_num in range(1, 6):
+        images = get_random_images()
+
+        for round_num, image in enumerate(images, start=1):
             round_ref = db.reference(f"rooms/{room_id}/rounds/{round_num}")
             existing_round = round_ref.get()
 
@@ -28,10 +31,9 @@ async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
                 )
                 continue
 
-            logger.info(f"Getting image for room {room_id} round {round_num}/5")
-            image_id = await get_random_image_id()
+            logger.info(f"Setting image for room {room_id} round {round_num}/5")
 
-            round_ref.set({"imageId": image_id, "guesses": {}})
+            round_ref.set({"imageId": image.id, "guesses": {}})
 
             logger.info(f"Completed room {room_id} round {round_num}/5")
 
@@ -41,7 +43,8 @@ async def create_multiplayer_rounds_service(event: CustomEvent) -> str:
 
         return room_id
     except Exception:
-        room_ref.update({"status": "error"})
+        if room_ref:
+            room_ref.update({"status": "error"})
 
         logger.exception(f"Failed to create multiplayer rounds for room {room_id}")
         raise
