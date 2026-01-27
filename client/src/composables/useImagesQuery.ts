@@ -12,6 +12,7 @@ const useImagesQuery = (onlyPanorama: MaybeRefOrGetter<boolean>) => {
     isPending: isPendingOnFetchImages,
     isSuccess: isSuccessOnFetchImages,
     isError: isErrorOnFetchImages,
+    isFetching: isFetchingOnFetchImages,
     refetch: refetchImages,
   } = useQuery({
     queryKey: ['images'],
@@ -27,6 +28,7 @@ const useImagesQuery = (onlyPanorama: MaybeRefOrGetter<boolean>) => {
     isPendingOnFetchImages,
     isSuccessOnFetchImages,
     isErrorOnFetchImages,
+    isFetchingOnFetchImages,
     refetchImages,
   }
 }

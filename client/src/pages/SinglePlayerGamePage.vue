@@ -100,7 +100,9 @@ const {
 } = useTimer(gameConfig.timeLimit)
 const router = useRouter()
 const { user, mutateUserUpdate } = useUserQuery()
-const { images, isSuccessOnFetchImages, refetchImages } = useImagesQuery(gameConfig.onlyPanorama)
+const { images, isFetchingOnFetchImages, isSuccessOnFetchImages, refetchImages } = useImagesQuery(
+  gameConfig.onlyPanorama,
+)
 
 const hasMarker = ref(false)
 const showResult = ref(false)
@@ -309,10 +311,12 @@ const returnToMenu = () => {
 }
 
 // Watch for images to be fetched, then load the first round image
+// NOTE: isFetching can be updated in subsequent visits
+// Other states (e.g., isSuccess) are not updated in subsequent visits, even though data is refetched
 watch(
-  () => isSuccessOnFetchImages.value,
-  (isSuccess) => {
-    if (isSuccess) {
+  () => isFetchingOnFetchImages.value,
+  (isFetching) => {
+    if (!isFetching && isSuccessOnFetchImages.value) {
       loadCurrentRoundImage()
     }
   },
