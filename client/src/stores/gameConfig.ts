@@ -9,6 +9,7 @@ const useGameConfigStore = defineStore('gameConfig', () => {
 
   const mapType = ref<string>('world')
   const timeLimit = ref<number>(0)
+  const onlyPanorama = ref<boolean>(true)
   const allowMoving = ref<boolean>(true)
   const allowZooming = ref<boolean>(true)
 
@@ -18,6 +19,7 @@ const useGameConfigStore = defineStore('gameConfig', () => {
     roomNumber,
     mapType,
     timeLimit,
+    onlyPanorama,
     allowMoving,
     allowZooming,
   }

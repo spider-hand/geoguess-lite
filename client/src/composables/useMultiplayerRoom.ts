@@ -74,6 +74,7 @@ export const useMultiplayerRoom = () => {
         timeLimit: 60,
         allowMoving: true,
         allowZooming: true,
+        onlyPanorama: true,
       }
     }
 
@@ -82,6 +83,7 @@ export const useMultiplayerRoom = () => {
       timeLimit: currentRoom.value.config.timeLimit,
       allowMoving: currentRoom.value.config.allowMoving,
       allowZooming: currentRoom.value.config.allowZooming,
+      onlyPanorama: currentRoom.value.config.onlyPanorama,
     }
   })
 

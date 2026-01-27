@@ -109,6 +109,11 @@
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-4">
                   <CustomCheckboxComponent
+                    id="only-panorama"
+                    label="Only Panorama"
+                    v-model="gameConfig.onlyPanorama"
+                  />
+                  <CustomCheckboxComponent
                     id="allow-moving"
                     label="Allow Moving"
                     v-model="gameConfig.allowMoving"
@@ -643,6 +648,7 @@ const startGame = async () => {
           const config = {
             mapType: gameConfig.mapType,
             timeLimit: gameConfig.timeLimit,
+            onlyPanorama: gameConfig.onlyPanorama,
             allowMoving: gameConfig.allowMoving,
             allowZooming: gameConfig.allowZooming,
           }

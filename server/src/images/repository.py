@@ -18,7 +18,7 @@ def get_random_images(is_pano: bool = False) -> list[Image]:
                 ORDER BY RANDOM()
                 LIMIT 5
                 """,
-                (is_pano),
+                (is_pano,),
             ).fetchall()
         else:
             rows = conn.execute(

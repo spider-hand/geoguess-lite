@@ -599,6 +599,7 @@ const startGame = async () => {
     await multiplayerRoundsApi.createMultiplayerRounds({
       createMultiplayerRoundsRequest: {
         roomId: props.roomId,
+        onlyPanorama: gameConfig.value.onlyPanorama,
       },
     })
   } catch (err) {

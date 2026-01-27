@@ -10,6 +10,7 @@ def create_multiplayer_rounds_service(event: CustomEvent) -> str:
     try:
         body = CreateMultiplayerRoundRequest.model_validate_json(event.body)
         room_id = body.room_id
+        only_panorama = body.only_panorama
 
         logger.info(f"Creating multiplayer rounds for room {room_id}")
 
@@ -19,7 +20,7 @@ def create_multiplayer_rounds_service(event: CustomEvent) -> str:
         room_ref = db.reference(f"rooms/{room_id}")
         room_ref.update({"status": "loading", "currentRound": 1})
 
-        images = get_random_images()
+        images = get_random_images(is_pano=only_panorama)
 
         for round_num, image in enumerate(images, start=1):
             round_ref = db.reference(f"rooms/{room_id}/rounds/{round_num}")
@@ -39,7 +40,13 @@ def create_multiplayer_rounds_service(event: CustomEvent) -> str:
 
         room_ref.update({"status": "loaded"})
 
-        logger.info({"event": "multiplayer_rounds_created", "room_id": room_id})
+        logger.info(
+            {
+                "event": "multiplayer_rounds_created",
+                "room_id": room_id,
+                "only_panorama": only_panorama,
+            }
+        )
 
         return room_id
     except Exception:

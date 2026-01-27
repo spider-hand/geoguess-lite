@@ -29,6 +29,7 @@ export interface GameConfigNode {
   timeLimit: number
   allowMoving: boolean
   allowZooming: boolean
+  onlyPanorama: boolean
 }
 
 export interface PlayerNode {

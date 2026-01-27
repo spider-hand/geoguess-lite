@@ -25,6 +25,12 @@ export interface CreateMultiplayerRoundsRequest {
    * @memberof CreateMultiplayerRoundsRequest
    */
   roomId: string
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreateMultiplayerRoundsRequest
+   */
+  onlyPanorama: boolean
 }
 
 /**
@@ -34,6 +40,7 @@ export function instanceOfCreateMultiplayerRoundsRequest(
   value: object,
 ): value is CreateMultiplayerRoundsRequest {
   if (!('roomId' in value) || value['roomId'] === undefined) return false
+  if (!('onlyPanorama' in value) || value['onlyPanorama'] === undefined) return false
   return true
 }
 
@@ -50,6 +57,7 @@ export function CreateMultiplayerRoundsRequestFromJSONTyped(
   }
   return {
     roomId: json['room_id'],
+    onlyPanorama: json['only_panorama'],
   }
 }
 
@@ -67,5 +75,6 @@ export function CreateMultiplayerRoundsRequestToJSONTyped(
 
   return {
     room_id: value['roomId'],
+    only_panorama: value['onlyPanorama'],
   }
 }

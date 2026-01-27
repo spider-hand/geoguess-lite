@@ -83,6 +83,14 @@
                   </div>
                   <div class="flex flex-col gap-1">
                     <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
+                      Only Panorama Images
+                    </label>
+                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+                      {{ gameConfig.onlyPanorama ? 'Yes' : 'No' }}
+                    </span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
                       Allow Moving
                     </label>
                     <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">

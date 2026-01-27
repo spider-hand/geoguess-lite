@@ -6,5 +6,8 @@ content:
       properties:
         room_id:
           type: string
+        only_panorama:
+          type: boolean
       required:
         - room_id
+        - only_panorama

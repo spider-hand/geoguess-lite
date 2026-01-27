@@ -100,7 +100,7 @@ const {
 } = useTimer(gameConfig.timeLimit)
 const router = useRouter()
 const { user, mutateUserUpdate } = useUserQuery()
-const { images, isSuccessOnFetchImages, refetchImages } = useImagesQuery()
+const { images, isSuccessOnFetchImages, refetchImages } = useImagesQuery(gameConfig.onlyPanorama)
 
 const hasMarker = ref(false)
 const showResult = ref(false)
