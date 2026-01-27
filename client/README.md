@@ -77,5 +77,5 @@ npm run lint
 Run
 
 ```sh
-openapi-generator generate -i ../server/openapi/openapi.yaml -g typescript-fetch -o ./src/services/
+openapi-generator generate -i ../server/openapi/openapi.yml -g typescript-fetch -o ./src/services/
 ```
