@@ -30,7 +30,7 @@
         :result-score="score"
         :result-distance="distance"
         :distance-unit="user?.distanceUnit ?? 'km'"
-        :is-loading="isLoadingImage"
+        :is-loading="isLoading"
         @image-loaded="onImageLoaded"
         @image-loading-start="onImageLoadingStart"
       />
@@ -40,11 +40,11 @@
         </div>
         <Button
           v-if="!showResult"
-          :disabled="!hasMarker || isLoadingImage"
+          :disabled="!hasMarker || isLoading"
           @click="makeGuess"
           class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {{ isLoadingImage ? 'Loading...' : 'Make Guess' }}
+          {{ isLoading ? 'Loading...' : 'Make Guess' }}
         </Button>
         <Button
           v-else-if="currentRound < ROUNDS"
@@ -119,6 +119,8 @@ const mapRef = ref<InstanceType<typeof MapComponent> | null>(null)
 const streetViewRef = ref<InstanceType<typeof StreetViewComponent> | null>(null)
 
 const gameRecords = ref<RoundRecord[]>([])
+
+const isLoading = computed(() => isFetchingOnFetchImages.value || isLoadingImage.value)
 
 const saveRoundRecord = () => {
   if (!imagePosition.value || !currentImageId.value) return
