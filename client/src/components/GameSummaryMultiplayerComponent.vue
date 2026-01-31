@@ -7,13 +7,13 @@
       </p>
     </div>
 
-    <Card class="mb-6 border">
+    <Card class="mb-6 border-amber-100 bg-amber-50">
       <CardContent class="flex flex-col gap-8">
-        <div>
+        <div class="flex items-center gap-3">
           <div
-            class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl"
+            class="flex h-16 w-16 items-center justify-center rounded-xl border border-amber-200 bg-amber-100 text-amber-900"
           >
-            🏆
+            <Trophy class="h-5 w-5" />
           </div>
           <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Leaderboard</h2>
           <p class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-base">Final rankings</p>
@@ -145,6 +145,7 @@ import Button from './ui/button/Button.vue'
 import type { MultiplayerRoundRecord, PlayerResult } from '@/types'
 import { formatDistance } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services/models'
+import { Trophy } from 'lucide-vue-next'
 
 const props = defineProps({
   players: {

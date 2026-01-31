@@ -3,9 +3,9 @@
     <CardHeader>
       <div class="flex items-center gap-3">
         <div
-          :class="`mb-2 flex h-10 w-10 items-center justify-center rounded-xl border ${emojiClass} p-2 text-2xl`"
+          :class="`flex h-10 w-10 items-center justify-center rounded-xl border ${iconClass} p-2`"
         >
-          {{ emoji }}
+          <component :is="icon" class="h-5 w-5" />
         </div>
         <CardTitle class="text-muted-foreground font-[Roboto]">{{ title }}</CardTitle>
       </div>
@@ -21,6 +21,7 @@ import Card from './ui/card/Card.vue'
 import CardContent from './ui/card/CardContent.vue'
 import CardHeader from './ui/card/CardHeader.vue'
 import CardTitle from './ui/card/CardTitle.vue'
+import type { Component } from 'vue'
 
 defineProps({
   title: {
@@ -31,15 +32,15 @@ defineProps({
     type: String,
     required: true,
   },
-  emoji: {
-    type: String,
+  icon: {
+    type: Object as () => Component,
     required: true,
   },
   bgClass: {
     type: String,
     required: true,
   },
-  emojiClass: {
+  iconClass: {
     type: String,
     required: true,
   },

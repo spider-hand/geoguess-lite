@@ -11,11 +11,6 @@
           <Card class="border">
             <CardContent class="flex flex-col gap-8">
               <div>
-                <div
-                  class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl"
-                >
-                  👥
-                </div>
                 <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">
                   Players ({{ players.length }})
                 </h2>
@@ -52,11 +47,6 @@
             <Card class="border">
               <CardContent class="flex flex-col gap-8">
                 <div>
-                  <div
-                    class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl"
-                  >
-                    ⚙️
-                  </div>
                   <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">
                     Game Configuration
                   </h2>

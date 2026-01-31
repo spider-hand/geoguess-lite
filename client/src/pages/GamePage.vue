@@ -23,26 +23,21 @@
             <CustomCardComponent
               :title="mode.title"
               :description="mode.description"
-              :emoji="mode.emoji"
+              :icon="mode.icon"
               :bg-class="getGameModeCardClass(mode.id)"
-              :emoji-class="mode.emojiClass"
+              :icon-class="mode.iconClass"
             />
             <div
               v-if="!isGameModeAvailable(mode.id)"
               class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-black/90 px-3 py-1 text-center font-[JetBrains_Mono] text-sm text-white"
             >
-              🔒 Sign up required
+              Sign up required
             </div>
           </div>
         </div>
         <Card class="border">
           <CardContent class="flex flex-col gap-8">
             <div>
-              <div
-                class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 text-4xl"
-              >
-                ⚙️
-              </div>
               <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">
                 Game Configuration
               </h2>
@@ -463,14 +458,16 @@ import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
 import { getAvatarClass } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services'
 import useAuth from '@/composables/useAuth'
+import { Earth, Sword, Calendar } from 'lucide-vue-next'
+import type { Component } from 'vue'
 
 interface GameModeItem {
   id: GameModeType
   title: string
   description: string
-  emoji: string
+  icon: Component
   class: string
-  emojiClass: string
+  iconClass: string
 }
 
 const gameModes: GameModeItem[] = [
@@ -478,25 +475,25 @@ const gameModes: GameModeItem[] = [
     id: 'single-player',
     title: 'Single Player',
     description: 'Explore the world at your own pace',
-    emoji: '🌍',
+    icon: Earth,
     class: 'bg-blue-50 border-blue-100',
-    emojiClass: 'bg-blue-100 border-blue-200',
+    iconClass: 'bg-blue-100 border-blue-200 text-blue-900',
   },
   {
     id: 'multiplayer',
     title: 'Multiplayer',
     description: 'Challenge friends',
-    emoji: '👥',
+    icon: Sword,
     class: 'bg-green-50 border-green-100',
-    emojiClass: 'bg-green-100 border-green-200',
+    iconClass: 'bg-green-100 border-green-200 text-green-900',
   },
   {
     id: 'daily-challenge',
     title: 'Daily Challenge',
     description: "Compete in today's unique challenge",
-    emoji: '🏆',
+    icon: Calendar,
     class: 'bg-purple-50 border-purple-100',
-    emojiClass: 'bg-purple-100 border-purple-200',
+    iconClass: 'bg-purple-100 border-purple-200 text-purple-900',
   },
 ]
 

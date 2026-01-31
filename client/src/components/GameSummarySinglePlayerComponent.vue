@@ -11,9 +11,9 @@
       <CardHeader>
         <div class="flex items-center gap-3">
           <div
-            class="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-100 p-2 text-2xl"
+            class="flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-100 p-2 text-indigo-900"
           >
-            🎯
+            <Target class="h-5 w-5" />
           </div>
           <CardTitle class="text-muted-foreground font-[Roboto]">Score</CardTitle>
         </div>
@@ -36,23 +36,23 @@
       <SummaryCardComponent
         title="Total Distance Off"
         :value="totalDistance"
-        emoji="📍"
+        :icon="MapPinned"
         bg-class="bg-red-50 border-red-100"
-        emoji-class="bg-red-100 border-red-200"
+        icon-class="bg-red-100 border-red-200 text-red-900"
       />
       <SummaryCardComponent
         title="Average Score"
         :value="`${averageScore} points`"
-        emoji="📊"
+        :icon="ChartColumnBig"
         bg-class="bg-emerald-50 border-emerald-100"
-        emoji-class="bg-emerald-100 border-emerald-200"
+        icon-class="bg-emerald-100 border-emerald-200 text-emerald-900"
       />
       <SummaryCardComponent
         title="Average Time"
         :value="averageTime"
-        emoji="⏱️"
+        :icon="Timer"
         bg-class="bg-amber-50 border-amber-100"
-        emoji-class="bg-amber-100 border-amber-200"
+        icon-class="bg-amber-100 border-amber-200 text-amber-900"
       />
     </div>
 
@@ -135,6 +135,7 @@ import Progress from './ui/progress/Progress.vue'
 import type { RoundRecord } from '@/types'
 import { formatDistance } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services/models'
+import { Target, MapPinned, ChartColumnBig, Timer } from 'lucide-vue-next'
 
 const props = defineProps({
   totalScore: {

@@ -65,9 +65,9 @@
               :key="index"
               :title="content.title"
               :description="content.description"
-              :emoji="content.emoji"
+              :icon="content.icon"
               :bg-class="content.class"
-              :emoji-class="content.emojiClass"
+              :icon-class="content.iconClass"
               content-align="text-left"
               icon-align="justify-start"
             />
@@ -118,55 +118,56 @@ import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import FooterComponent from '@/components/FooterComponent.vue'
 import useAuth from '@/composables/useAuth'
+import { Feather, Zap, RefreshCcw, Handshake, Calendar, Puzzle } from 'lucide-vue-next'
 
 const cardContents = [
   {
     title: 'Zero Subscription',
     description:
       'Play freely — no paywalls. GeoGuess Lite is built to be fully open and free to explore.',
-    emoji: '🪶',
+    icon: Feather,
     class: 'bg-blue-50 border-blue-100',
-    emojiClass: 'bg-blue-100 border-blue-200',
+    iconClass: 'bg-blue-100 border-blue-200 text-blue-900',
   },
   {
     title: 'Lightweight and Fast',
     description:
       'Optimized for speed and simplicity, GeoGuess Lite loads quickly so you can start exploring without delay.',
-    emoji: '⚡',
+    icon: Zap,
     class: 'bg-green-50 border-green-100',
-    emojiClass: 'bg-green-100 border-green-200',
+    iconClass: 'bg-green-100 border-green-200 text-green-900',
   },
   {
     title: 'Community Driven',
     description:
       "We're constantly improving GeoGuess Lite with new features and locations based on community feedback.",
-    emoji: '🔄',
+    icon: RefreshCcw,
     class: 'bg-purple-50 border-purple-100',
-    emojiClass: 'bg-purple-100 border-purple-200',
+    iconClass: 'bg-purple-100 border-purple-200 text-purple-900',
   },
   {
     title: 'Open and Extendable',
     description:
       'Fully open-source under a permissive license. Fork it, modify it, and build your own twist on the experience.',
-    emoji: '🧩',
+    icon: Puzzle,
     class: 'bg-lime-50 border-lime-100',
-    emojiClass: 'bg-lime-100 border-lime-200',
+    iconClass: 'bg-lime-100 border-lime-200 text-lime-900',
   },
   {
     title: 'Multiplayer Mode',
     description:
       'Challenge friends in real-time. Compete for the closest guess and claim your spot at the top.',
-    emoji: '🤝',
+    icon: Handshake,
     class: 'bg-red-50 border-red-100',
-    emojiClass: 'bg-red-100 border-red-200',
+    iconClass: 'bg-red-100 border-red-200 text-red-900',
   },
   {
     title: 'Daily Challenge',
     description:
       'Take on a new location every day and compare your score with players around the world.',
-    emoji: '🗓️',
+    icon: Calendar,
     class: 'bg-amber-50 border-amber-100',
-    emojiClass: 'bg-amber-100 border-amber-200',
+    iconClass: 'bg-amber-100 border-amber-200 text-amber-900',
   },
 ]
 
