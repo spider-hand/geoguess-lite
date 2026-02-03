@@ -96,7 +96,7 @@ import StreetViewComponent from '@/components/StreetViewComponent.vue'
 import Button from '@/components/ui/button/Button.vue'
 import { calculateCenter, calculateDistance, calculateScore, calculateZoomLevel } from '@/utils'
 import { useTimer } from '@/composables/useTimer'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue'
 import type { LatLng, RoundRecord } from '@/types'
@@ -320,4 +320,11 @@ const showSummary = () => {
 const returnToMenu = () => {
   router.push('/game')
 }
+
+onBeforeRouteLeave(() => {
+  if (showSummaryView.value) {
+    return true
+  }
+  return window.confirm('Leave game? You cannot play daily challenge again today.')
+})
 </script>

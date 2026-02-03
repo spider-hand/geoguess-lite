@@ -82,7 +82,7 @@ import Button from '@/components/ui/button/Button.vue'
 import useGameConfigStore from '@/stores/gameConfig'
 import { calculateCenter, calculateDistance, calculateScore, calculateZoomLevel } from '@/utils'
 import { useTimer } from '@/composables/useTimer'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import GameSummarySinglePlayerComponent from '@/components/GameSummarySinglePlayerComponent.vue'
 import type { LatLng, RoundRecord } from '@/types'
@@ -324,4 +324,11 @@ watch(
   },
   { immediate: true },
 )
+
+onBeforeRouteLeave(() => {
+  if (showSummaryView.value) {
+    return true
+  }
+  return window.confirm('Leave game? Your progress will be lost.')
+})
 </script>
