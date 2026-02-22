@@ -102,6 +102,7 @@
             <div class="flex gap-4">
               <Button
                 v-if="!isCreatingRounds"
+                data-testid="leave-room-button"
                 variant="ghost"
                 size="lg"
                 @click="leaveRoom"
@@ -110,6 +111,7 @@
                 Leave Room
               </Button>
               <Button
+                data-testid="start-game-button"
                 size="lg"
                 @click="startGame"
                 :disabled="players.length < 2 || !myself?.isHost || isCreatingRounds"

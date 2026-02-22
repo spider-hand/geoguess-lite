@@ -41,6 +41,7 @@
         <Button
           v-if="!showResult"
           :disabled="!hasMarker || isLoadingImage"
+          data-testid="make-guess-button"
           @click="makeGuess"
           class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
@@ -48,6 +49,7 @@
         </Button>
         <Button
           v-else-if="currentRound < ROUNDS"
+          data-testid="next-round-button"
           @click="nextRound"
           class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
         >
@@ -55,6 +57,7 @@
         </Button>
         <Button
           v-else
+          data-testid="summary-button"
           @click="showSummary"
           class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
         >

@@ -85,6 +85,7 @@
             <Button
               v-if="!showResult"
               :disabled="!hasMarker || isLoadingImage || hasUserGuessed"
+              data-testid="make-guess-button"
               @click="makeGuess"
               class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -92,6 +93,7 @@
             </Button>
             <Button
               v-else-if="isPlaying"
+              data-testid="next-round-button"
               @click="nextRound"
               class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
             >
@@ -99,6 +101,7 @@
             </Button>
             <Button
               v-else-if="isFinished"
+              data-testid="summary-button"
               @click="showSummary"
               class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
             >

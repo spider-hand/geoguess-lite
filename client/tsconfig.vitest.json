@@ -2,6 +2,8 @@
   "extends": "./tsconfig.app.json",
   "include": [
     "src/**/__tests__/*",
+    "src/**/*.vue",
+    "src/**/*.ts",
     "env.d.ts"
   ],
   "exclude": [],
@@ -11,6 +13,11 @@
     "types": [
       "node",
       "jsdom"
-    ]
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   }
 }

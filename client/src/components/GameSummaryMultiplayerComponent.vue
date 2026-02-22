@@ -26,6 +26,7 @@
           >
             <div class="flex items-center gap-3">
               <div
+                data-testid="player-rank"
                 class="flex h-8 w-8 items-center justify-center rounded-full font-[JetBrains_Mono] text-sm font-bold"
               >
                 {{ index + 1 }}
@@ -36,7 +37,9 @@
               >
                 {{ player.emoji }}
               </div>
-              <span class="font-[Roboto] text-lg font-medium">{{ player.name }}</span>
+              <span data-testid="player-name" class="font-[Roboto] text-lg font-medium">{{
+                player.name
+              }}</span>
             </div>
             <div class="flex items-center gap-4">
               <div class="text-right">

@@ -100,12 +100,14 @@
     <div class="flex justify-center gap-4">
       <Button
         v-if="isPlayAgainEnabled"
+        data-testid="play-again-button"
         @click="$emit('play-again')"
         class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
       >
         Play Again
       </Button>
       <Button
+        data-testid="return-to-menu-button"
         @click="$emit('return-to-menu')"
         variant="ghost"
         class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"

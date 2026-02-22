@@ -41,13 +41,15 @@
       </Button>
       <Button
         v-if="isCurrentUserLoaded && !currentUser"
+        data-testid="sign-up-button"
         class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
         @click="signUpWithGoogle"
       >
         Sign Up
       </Button>
       <Button
-        v-else
+        v-else-if="isCurrentUserLoaded && currentUser"
+        data-testid="sign-out-button"
         variant="ghost"
         class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
         @click="signOut"

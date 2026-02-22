@@ -29,6 +29,7 @@
             />
             <div
               v-if="!isGameModeAvailable(mode.id)"
+              data-testid="sign-up-required"
               class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-black/90 px-3 py-1 text-center font-[JetBrains_Mono] text-sm text-white"
             >
               Sign up required

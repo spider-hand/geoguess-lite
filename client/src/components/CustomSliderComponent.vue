@@ -22,7 +22,11 @@
         <span>{{ formatValue(max) }}</span>
       </div>
     </div>
-    <p v-if="helpText" class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm">
+    <p
+      v-if="helpText"
+      data-testid="help-text"
+      class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm"
+    >
       {{ helpText }}
     </p>
   </div>

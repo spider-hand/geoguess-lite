@@ -14,6 +14,7 @@
               </p>
               <div class="flex flex-col gap-4 sm:flex-row">
                 <Button
+                  data-testid="get-started-button"
                   size="lg"
                   class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
                   @click="
@@ -29,6 +30,7 @@
                 </Button>
                 <Button
                   v-if="!currentUser"
+                  data-testid="continue-as-guest-button"
                   variant="ghost"
                   size="lg"
                   class="text-muted-foreground cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
