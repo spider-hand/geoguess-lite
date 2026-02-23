@@ -24,34 +24,19 @@
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import type { Component } from 'vue'
 
-defineProps({
-  title: {
-    type: String,
-    required: true,
+withDefaults(
+  defineProps<{
+    title: string
+    description: string
+    icon: Component
+    bgClass: string
+    iconClass: string
+    contentAlign?: string
+    iconAlign?: string
+  }>(),
+  {
+    contentAlign: 'text-center',
+    iconAlign: 'justify-center',
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  icon: {
-    type: Object as () => Component,
-    required: true,
-  },
-  bgClass: {
-    type: String,
-    required: true,
-  },
-  iconClass: {
-    type: String,
-    required: true,
-  },
-  contentAlign: {
-    type: String,
-    default: 'text-center',
-  },
-  iconAlign: {
-    type: String,
-    default: 'justify-center',
-  },
-})
+)
 </script>

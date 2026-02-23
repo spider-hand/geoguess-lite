@@ -5,31 +5,27 @@
 <script setup lang="ts">
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { onMounted, onUnmounted, ref, shallowRef, type PropType } from 'vue'
+import { onMounted, onUnmounted, ref, shallowRef } from 'vue'
 import useUserQuery from '@/composables/useUserQuery'
 import { calculateCenter, calculateZoomLevel, getAvatarClass } from '@/utils'
 import type { LatLng, PlayerMarker } from '@/types'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
-const props = defineProps({
-  playerLocations: {
-    type: Array as PropType<PlayerMarker[]>,
-    default: () => [],
+const props = withDefaults(
+  defineProps<{
+    playerLocations?: PlayerMarker[]
+    correctLocation?: LatLng | null
+    center?: number[] | null
+    zoom?: number
+  }>(),
+  {
+    playerLocations: () => [],
+    correctLocation: null,
+    center: null,
+    zoom: 2,
   },
-  correctLocation: {
-    type: Object as PropType<LatLng | null>,
-    default: null,
-  },
-  center: {
-    type: Array as PropType<number[] | null>,
-    default: null,
-  },
-  zoom: {
-    type: Number,
-    default: 2,
-  },
-})
+)
 
 const emit = defineEmits<{
   markerPlaced: [position: LatLng]

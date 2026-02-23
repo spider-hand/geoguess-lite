@@ -183,12 +183,9 @@ import useMultiplayerRoundsApi from '@/composables/useMultiplayerRoundsApi'
 import { ref as dbRef, update } from 'firebase/database'
 import { db } from '@/lib/firebase'
 
-const props = defineProps({
-  roomId: {
-    type: String,
-    required: true,
-  },
-})
+const props = defineProps<{
+  roomId: string
+}>()
 
 const router = useRouter()
 const {

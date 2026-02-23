@@ -23,26 +23,11 @@ import CardHeader from './ui/card/CardHeader.vue'
 import CardTitle from './ui/card/CardTitle.vue'
 import type { Component } from 'vue'
 
-defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  value: {
-    type: String,
-    required: true,
-  },
-  icon: {
-    type: Object as () => Component,
-    required: true,
-  },
-  bgClass: {
-    type: String,
-    required: true,
-  },
-  iconClass: {
-    type: String,
-    required: true,
-  },
-})
+defineProps<{
+  title: string
+  value: string
+  icon: Component
+  bgClass: string
+  iconClass: string
+}>()
 </script>

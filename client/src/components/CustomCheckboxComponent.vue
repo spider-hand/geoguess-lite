@@ -17,20 +17,11 @@
 <script setup lang="ts">
 import { Checkbox } from '@/components/ui/checkbox'
 
-defineProps({
-  id: {
-    type: String,
-    required: true,
-  },
-  label: {
-    type: String,
-    required: true,
-  },
-  modelValue: {
-    type: Boolean,
-    required: true,
-  },
-})
+defineProps<{
+  id: string
+  label: string
+  modelValue: boolean
+}>()
 
 const emit = defineEmits<{
   'update:modelValue': [checked: boolean]

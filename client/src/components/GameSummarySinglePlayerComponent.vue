@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type PropType } from 'vue'
+import { computed, ref } from 'vue'
 import MapComponent from './MapComponent.vue'
 import StreetViewComponent from './StreetViewComponent.vue'
 import SummaryCardComponent from './SummaryCardComponent.vue'
@@ -139,28 +139,19 @@ import { formatDistance } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services/models'
 import { Target, MapPinned, ChartColumnBig, Timer } from 'lucide-vue-next'
 
-const props = defineProps({
-  totalScore: {
-    type: Number,
-    required: true,
+const props = withDefaults(
+  defineProps<{
+    totalScore: number
+    averageScore: number
+    gameRecords: RoundRecord[]
+    isPlayAgainEnabled?: boolean
+    distanceUnit?: UserDistanceUnitEnum
+  }>(),
+  {
+    isPlayAgainEnabled: true,
+    distanceUnit: 'km',
   },
-  averageScore: {
-    type: Number,
-    required: true,
-  },
-  gameRecords: {
-    type: Array as PropType<RoundRecord[]>,
-    required: true,
-  },
-  isPlayAgainEnabled: {
-    type: Boolean,
-    default: true,
-  },
-  distanceUnit: {
-    type: String as () => UserDistanceUnitEnum,
-    default: 'km' as UserDistanceUnitEnum,
-  },
-})
+)
 
 // Track which rounds have been opened for lazy loading the content
 const openedRounds = ref<Set<string>>(new Set())

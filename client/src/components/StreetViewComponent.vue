@@ -36,40 +36,28 @@ const emit = defineEmits<{
   imageLoadingStart: []
 }>()
 
-const props = defineProps({
-  allowMoving: {
-    type: Boolean,
-    default: true,
+const props = withDefaults(
+  defineProps<{
+    allowMoving?: boolean
+    allowZooming?: boolean
+    showResult?: boolean
+    resultScore?: number
+    resultDistance?: number
+    distanceUnit?: UserDistanceUnitEnum
+    isLoading?: boolean
+    imageId?: string
+  }>(),
+  {
+    allowMoving: true,
+    allowZooming: true,
+    showResult: false,
+    resultScore: 0,
+    resultDistance: 0,
+    distanceUnit: 'km',
+    isLoading: false,
+    imageId: undefined,
   },
-  allowZooming: {
-    type: Boolean,
-    default: true,
-  },
-  showResult: {
-    type: Boolean,
-    default: false,
-  },
-  resultScore: {
-    type: Number,
-    default: 0,
-  },
-  resultDistance: {
-    type: Number,
-    default: 0,
-  },
-  distanceUnit: {
-    type: String as () => UserDistanceUnitEnum,
-    default: 'km' as UserDistanceUnitEnum,
-  },
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
-  imageId: {
-    type: String,
-    default: undefined,
-  },
-})
+)
 
 const viewer = ref<Viewer | null>(null)
 const viewerRef = ref<HTMLElement | null>(null)

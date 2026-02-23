@@ -36,44 +36,25 @@
 import { ref, computed, watch } from 'vue'
 import { Slider } from '@/components/ui/slider'
 
-const props = defineProps({
-  label: {
-    type: String,
-    required: true,
+const props = withDefaults(
+  defineProps<{
+    label: string
+    modelValue: number
+    min: number
+    max: number
+    step: number
+    unit?: string
+    unlimitedValue?: number
+    unlimitedText?: string
+    helpText?: string
+  }>(),
+  {
+    unit: '',
+    unlimitedValue: undefined,
+    unlimitedText: 'Unlimited',
+    helpText: '',
   },
-  modelValue: {
-    type: Number,
-    required: true,
-  },
-  min: {
-    type: Number,
-    required: true,
-  },
-  max: {
-    type: Number,
-    required: true,
-  },
-  step: {
-    type: Number,
-    required: true,
-  },
-  unit: {
-    type: String,
-    default: '',
-  },
-  unlimitedValue: {
-    type: Number,
-    default: undefined,
-  },
-  unlimitedText: {
-    type: String,
-    default: 'Unlimited',
-  },
-  helpText: {
-    type: String,
-    default: '',
-  },
-})
+)
 
 const emit = defineEmits<{
   'update:modelValue': [value: number]

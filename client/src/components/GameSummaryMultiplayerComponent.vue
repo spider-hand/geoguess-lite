@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type PropType } from 'vue'
+import { computed, ref } from 'vue'
 import MapComponent from './MapComponent.vue'
 import StreetViewComponent from './StreetViewComponent.vue'
 import Accordion from './ui/accordion/Accordion.vue'
@@ -150,20 +150,16 @@ import { formatDistance } from '@/utils'
 import type { UserDistanceUnitEnum } from '@/services/models'
 import { Trophy } from 'lucide-vue-next'
 
-const props = defineProps({
-  players: {
-    type: Array as PropType<PlayerResult[]>,
-    required: true,
+const props = withDefaults(
+  defineProps<{
+    players: PlayerResult[]
+    gameRecords: MultiplayerRoundRecord[]
+    distanceUnit?: UserDistanceUnitEnum
+  }>(),
+  {
+    distanceUnit: 'km',
   },
-  gameRecords: {
-    type: Array as PropType<MultiplayerRoundRecord[]>,
-    required: true,
-  },
-  distanceUnit: {
-    type: String as () => UserDistanceUnitEnum,
-    default: 'km' as UserDistanceUnitEnum,
-  },
-})
+)
 
 // Track which rounds have been opened for lazy loading the content
 const openedRounds = ref<Set<string>>(new Set())

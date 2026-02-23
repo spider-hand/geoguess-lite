@@ -133,38 +133,21 @@
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import type { PropType } from 'vue'
 import type { GameConfigNode, PlayerResult } from '@/types'
 
-defineProps({
-  roomId: {
-    type: String,
-    required: true,
-  },
+defineProps<{
+  roomId: string
   myself: {
-    type: Object as PropType<{
-      id: string
-      name: string
-      emoji: string
-      avatarClass: string
-      isHost: boolean
-    } | null>,
-    default: null,
-    required: true,
-  },
-  players: {
-    type: Array as PropType<Array<PlayerResult>>,
-    required: true,
-  },
-  gameConfig: {
-    type: Object as PropType<GameConfigNode>,
-    required: true,
-  },
-  isCreatingRounds: {
-    type: Boolean,
-    required: true,
-  },
-})
+    id: string
+    name: string
+    emoji: string
+    avatarClass: string
+    isHost: boolean
+  } | null
+  players: PlayerResult[]
+  gameConfig: GameConfigNode
+  isCreatingRounds: boolean
+}>()
 
 const emit = defineEmits<{
   startGame: []
