@@ -45,10 +45,19 @@
               <img
                 src="/images/hero.png"
                 alt="Hero Image"
+                width="480px"
                 class="floating-animation h-auto max-w-full rounded-full"
                 style="box-shadow: rgb(0 0 0 / 56%) 0 22px 70px 4px"
               />
             </div>
+          </div>
+        </div>
+      </section>
+      <section class="px-8 py-16">
+        <div class="mx-auto max-w-7xl">
+          <div class="mb-16 flex flex-col items-center justify-center text-center">
+            <h2 class="mb-4 font-[JetBrains_Mono] text-3xl lg:text-4xl">Featured in</h2>
+            <img src="/images/mapillary.png" alt="Mapillary" width="300px" />
           </div>
         </div>
       </section>
