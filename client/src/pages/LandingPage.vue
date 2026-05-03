@@ -1,230 +1,217 @@
 <template>
-  <div class="flex min-h-screen flex-col">
-    <HeaderComponent />
-    <main class="flex-1">
-      <section class="px-8 py-16">
-        <div class="mx-auto max-w-7xl">
-          <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <div>
-              <h1 class="mb-6 font-[JetBrains_Mono] text-4xl font-bold lg:text-6xl">
-                Lightweight, subscription-free Geoguess experience
-              </h1>
-              <p class="text-muted-foreground mb-8 font-[JetBrains_Mono] text-2xl">
-                Explore the world, no paywalls, no limits.
-              </p>
-              <div class="flex flex-col gap-4 sm:flex-row">
-                <Button
-                  data-testid="get-started-button"
-                  size="lg"
-                  class="cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-                  @click="
-                    currentUser
-                      ? router.push({
-                          name: 'game',
-                        })
-                      : signUpWithGoogle()
-                  "
-                  :disabled="!isCurrentUserLoaded"
-                >
-                  Get Started
-                </Button>
-                <Button
-                  v-if="!currentUser"
-                  data-testid="continue-as-guest-button"
-                  variant="ghost"
-                  size="lg"
-                  class="text-muted-foreground cursor-pointer rounded-none px-6 py-3 font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-                  @click="router.push({ name: 'game' })"
-                  :disabled="!isCurrentUserLoaded"
-                >
-                  [Continue as Guest]
-                </Button>
-              </div>
-            </div>
-            <div class="flex justify-center">
-              <img
-                src="/images/hero.png"
-                alt="Hero Image"
-                width="480px"
-                class="floating-animation h-auto max-w-full rounded-full"
-                style="box-shadow: rgb(0 0 0 / 56%) 0 22px 70px 4px"
-              />
-            </div>
+  <div>
+    <section>
+      <HeaderComponent />
+      <div class="bg-linear-to-t from-cyan-100 to-white md:relative">
+        <div
+          class="flex flex-col gap-6 px-5 pt-10 pb-8 md:absolute md:top-12 md:left-[120px] md:gap-4 md:px-0 md:pt-0 md:pb-0"
+        >
+          <h1
+            class="font-[JetBrains_Mono] text-4xl font-extrabold md:text-5xl"
+            style="line-height: 150%"
+          >
+            Light-weight, <br />Subscription-free<br />GeoGuessr Experience
+          </h1>
+          <div class="flex flex-col gap-3 md:flex-row md:gap-4">
+            <button
+              class="flex h-10 items-center justify-center bg-orange-600 px-6 py-3 font-[JetBrains_Mono] text-xl font-bold text-white transition-all duration-300 hover:-translate-y-1"
+              data-testid="get-started-button"
+              @click="
+                currentUser
+                  ? router.push({
+                      name: 'game',
+                    })
+                  : signUpWithGoogle()
+              "
+              :disabled="!isCurrentUserLoaded"
+            >
+              Get Started
+            </button>
+            <button
+              v-if="!currentUser"
+              class="flex items-center justify-center font-[JetBrains_Mono] text-lg font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
+              data-testid="continue-as-guest-button"
+              @click="router.push({ name: 'game' })"
+            >
+              [Continue as Guest]
+            </button>
           </div>
         </div>
-      </section>
-      <section class="px-8 py-16">
-        <div class="mx-auto max-w-7xl">
-          <div class="mb-16 flex flex-col items-center justify-center text-center">
-            <h2 class="mb-4 font-[JetBrains_Mono] text-3xl lg:text-4xl">Featured in</h2>
-            <img src="/images/mapillary.png" alt="Mapillary" width="300px" />
-          </div>
+        <img src="@/assets/images/hero.png" style="width: 100%" alt="Hero Image" />
+      </div>
+    </section>
+    <section
+      class="flex flex-col items-center gap-20 px-5 pt-20 pb-12 md:gap-32 md:px-16 md:pt-36 md:pb-20"
+    >
+      <h2 class="text-center font-[JetBrains_Mono] text-3xl font-medium md:text-4xl">
+        Explore the world, no limits
+      </h2>
+      <div class="flex flex-col gap-10 md:flex-row md:items-end md:gap-16">
+        <div class="flex flex-col gap-3 md:flex-1">
+          <h3 class="text-3xl font-bold md:text-4xl">Play without limits</h3>
+          <span class="text-muted-foreground font-[JetBrains_Mono] text-lg md:text-xl">
+            GeoGuess Lite offers a full GeoGuessr-style experience without the usual restrictions,
+            making it a free and accessible alternative for players who want to explore without
+            limits.
+          </span>
         </div>
-      </section>
-      <section class="bg-gray-50 px-8 py-16">
-        <div class="mx-auto max-w-7xl">
-          <div class="mb-16 text-center">
-            <h2 class="mb-4 font-[JetBrains_Mono] text-3xl lg:text-4xl">Why Geoguess Lite</h2>
-            <p class="text-muted-foreground font-[JetBrains_Mono] text-xl">
-              A lightweight, open-source take on the GeoGuessr experience — built for anyone who
-              wants to explore the world without limits or subscriptions.
-            </p>
-          </div>
-          <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <CustomCardComponent
-              v-for="(content, index) in cardContents"
-              :key="index"
-              :title="content.title"
-              :description="content.description"
-              :icon="content.icon"
-              :bg-class="content.class"
-              :icon-class="content.iconClass"
-              content-align="text-left"
-              icon-align="justify-start"
+        <div
+          class="relative h-[280px] w-full overflow-hidden rounded-2xl bg-slate-100 p-5 md:h-[480px] md:w-[640px] md:flex-1 md:p-6"
+        >
+          <img
+            src="@/assets/images/street-view-demo-1.png"
+            class="absolute top-5 -right-16 h-[88%] w-auto max-w-none rounded-xl object-cover shadow-lg sm:-right-14 md:top-6 md:-right-28 md:h-[84%] lg:-right-20"
+            alt="Street View Demo 1"
+          />
+          <div
+            class="absolute -bottom-4 -left-5 w-[48%] max-w-40 overflow-hidden rounded-xl bg-white shadow-xl sm:-bottom-5 sm:-left-6 sm:max-w-48 md:-bottom-8 md:-left-10 md:max-w-60 lg:max-w-72"
+          >
+            <img
+              src="@/assets/images/map-demo-1.png"
+              class="h-full w-full object-cover"
+              alt="Map Demo 1"
             />
           </div>
         </div>
-      </section>
-      <section class="px-8 py-16">
-        <div class="mx-auto max-w-4xl">
-          <div class="mb-16 text-center">
-            <h2 class="mb-4 font-[JetBrains_Mono] text-3xl lg:text-4xl">
-              Frequently Asked Questions
-            </h2>
-            <p class="text-muted-foreground font-[JetBrains_Mono] text-xl">
-              Everything you need to know about Geoguess Lite
-            </p>
+      </div>
+      <div class="flex flex-col gap-10 md:flex-row md:items-end md:gap-16">
+        <div
+          class="relative h-[280px] w-full overflow-hidden rounded-2xl bg-slate-100 p-5 md:h-[480px] md:w-[640px] md:flex-1 md:p-6"
+        >
+          <img
+            src="@/assets/images/map-demo-2.png"
+            class="absolute top-5 -left-16 h-[88%] w-auto max-w-none rounded-xl object-cover shadow-lg sm:-left-14 md:top-6 md:-left-28 md:h-[84%] lg:-left-20"
+            alt="Map Demo 2"
+          />
+          <div
+            class="absolute -right-5 -bottom-4 w-[48%] max-w-40 overflow-hidden rounded-xl bg-white shadow-xl sm:-right-6 sm:-bottom-5 sm:max-w-48 md:-right-10 md:-bottom-8 md:max-w-60 lg:max-w-72"
+          >
+            <img
+              src="@/assets/images/street-view-demo-2.png"
+              class="h-full w-full object-cover"
+              alt="Street View Demo 2"
+            />
           </div>
-          <Accordion type="single" collapsible class="w-full">
-            <AccordionItem
-              v-for="(content, index) in faqContents"
-              :key="index"
-              :value="`item-${index}`"
-            >
-              <AccordionTrigger class="text-left font-[Roboto] text-xl">
-                {{ content.question }}
-              </AccordionTrigger>
-              <AccordionContent class="text-muted-foreground font-[JetBrains_Mono] text-lg">
-                {{ content.answer }}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
         </div>
-      </section>
-    </main>
-    <FooterComponent />
+        <div class="flex flex-col gap-3 md:flex-1">
+          <h3 class="text-3xl font-bold md:text-4xl">A variety of game modes to explore</h3>
+          <span class="text-muted-foreground font-[JetBrains_Mono] text-lg md:text-xl">
+            GeoGuess Lite offers a range of game modes similar to GeoGuessr, designed for different
+            ways to play. From solo exploration to real-time multiplayer, you can challenge your
+            friends, compete on the same location, and see who gets closest in a shared experience.
+          </span>
+        </div>
+      </div>
+    </section>
+    <section
+      class="grid grid-cols-1 gap-6 px-5 pt-12 pb-12 md:grid-cols-3 md:px-16 md:pt-16 md:pb-20"
+    >
+      <div class="flex flex-col gap-4 rounded-xl bg-slate-50 px-6 py-6">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-600">
+          <Feather class="h-7 w-7 text-white" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <h4 class="text-lg font-bold">No subscriptions, no paywalls</h4>
+          <span class="text-muted-foreground font-[JetBrains_Mono] text-lg">
+            GeoGuess Lite is designed to stay accessible without locking features behind
+            subscriptions. You can play freely without creating an account or worrying about usage
+            limits getting in the way.
+          </span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-4 rounded-xl bg-slate-50 px-6 py-6">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-600">
+          <Puzzle class="h-7 w-7 text-white" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <h4 class="text-lg font-bold">Open source and transparent</h4>
+          <span class="text-muted-foreground font-[JetBrains_Mono] text-lg">
+            GeoGuess Lite is built as an open source project, allowing anyone to explore, modify,
+            and contribute. The code is fully accessible, giving you complete transparency and the
+            freedom to run or adapt the experience in your own way.
+          </span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-4 rounded-xl bg-slate-50 px-6 py-6">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-600">
+          <Recycle class="h-7 w-7 text-white" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <h4 class="text-lg font-bold">Community driven and flexible</h4>
+          <span class="text-muted-foreground font-[JetBrains_Mono] text-lg">
+            Designed to be flexible and community driven, GeoGuess Lite can be self hosted and
+            extended to fit different needs. Whether you want to play casually or build on top of
+            it, the platform is open to your ideas.
+          </span>
+        </div>
+      </div>
+    </section>
+    <section
+      class="flex flex-col items-center justify-center gap-4 px-5 pt-12 pb-12 md:px-16 md:pt-16 md:pb-20"
+    >
+      <h2 class="text-center font-[JetBrains_Mono] text-3xl font-medium md:text-4xl">
+        Featured in
+      </h2>
+      <img src="@/assets/images/mapillary.png" width="300" alt="Mapillary Logo" />
+    </section>
+    <section
+      class="flex flex-col gap-8 px-5 pt-12 pb-12 md:flex-row md:items-start md:gap-16 md:px-16 md:pt-16 md:pb-20"
+    >
+      <div class="flex flex-col items-start gap-4 md:flex-1">
+        <h2 class="font-[JetBrains_Mono] text-3xl font-medium md:text-4xl">Start exploring now</h2>
+        <button
+          class="flex h-10 items-center justify-center bg-orange-600 px-6 py-3 font-[JetBrains_Mono] text-xl font-bold text-white transition-all duration-300 hover:-translate-y-1"
+        >
+          Get Started
+        </button>
+      </div>
+      <span class="text-muted-foreground font-[JetBrains_Mono] text-lg md:flex-1 md:text-xl">
+        Jump into GeoGuess Lite and begin exploring the world instantly. No sign up, no setup, just
+        open the game and start playing.
+      </span>
+    </section>
+    <footer
+      class="flex flex-col gap-8 bg-slate-50 px-5 py-12 md:flex-row md:items-center md:justify-between md:px-20 md:py-16"
+    >
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-2">
+          <img src="@/assets/images/logo.svg" width="40" alt="GeoGuess Lite Logo" />
+          <span class="font-[JetBrains_Mono] text-xl font-extrabold md:text-2xl"
+            >GeoGuess Lite</span
+          >
+        </div>
+        <span class="text-medium font-[JetBrains_Mono]"
+          >© {{ new Date().getFullYear() }} GeoGuess Lite</span
+        >
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          class="font-[JetBrains_Mono] text-base font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
+        >
+          [Terms]
+        </button>
+        <button
+          class="font-[JetBrains_Mono] text-base font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
+        >
+          [Privacy]
+        </button>
+        <button
+          class="font-[JetBrains_Mono] text-base font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
+        >
+          [Contact]
+        </button>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
-import CustomCardComponent from '@/components/CustomCardComponent.vue'
-import { useRouter } from 'vue-router'
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import FooterComponent from '@/components/FooterComponent.vue'
+import { Feather, Puzzle, Recycle } from 'lucide-vue-next'
 import useAuth from '@/composables/useAuth'
-import { Feather, Zap, RefreshCcw, Handshake, Calendar, Puzzle } from 'lucide-vue-next'
-
-const cardContents = [
-  {
-    title: 'Zero Subscription',
-    description:
-      'Play freely — no paywalls. GeoGuess Lite is built to be fully open and free to explore.',
-    icon: Feather,
-    class: 'bg-blue-50 border-blue-100',
-    iconClass: 'bg-blue-100 border-blue-200 text-blue-900',
-  },
-  {
-    title: 'Lightweight and Fast',
-    description:
-      'Optimized for speed and simplicity, GeoGuess Lite loads quickly so you can start exploring without delay.',
-    icon: Zap,
-    class: 'bg-green-50 border-green-100',
-    iconClass: 'bg-green-100 border-green-200 text-green-900',
-  },
-  {
-    title: 'Community Driven',
-    description:
-      "We're constantly improving GeoGuess Lite with new features and locations based on community feedback.",
-    icon: RefreshCcw,
-    class: 'bg-purple-50 border-purple-100',
-    iconClass: 'bg-purple-100 border-purple-200 text-purple-900',
-  },
-  {
-    title: 'Open and Extendable',
-    description:
-      'Fully open-source under a permissive license. Fork it, modify it, and build your own twist on the experience.',
-    icon: Puzzle,
-    class: 'bg-lime-50 border-lime-100',
-    iconClass: 'bg-lime-100 border-lime-200 text-lime-900',
-  },
-  {
-    title: 'Multiplayer Mode',
-    description:
-      'Challenge friends in real-time. Compete for the closest guess and claim your spot at the top.',
-    icon: Handshake,
-    class: 'bg-red-50 border-red-100',
-    iconClass: 'bg-red-100 border-red-200 text-red-900',
-  },
-  {
-    title: 'Daily Challenge',
-    description:
-      'Take on a new location every day and compare your score with players around the world.',
-    icon: Calendar,
-    class: 'bg-amber-50 border-amber-100',
-    iconClass: 'bg-amber-100 border-amber-200 text-amber-900',
-  },
-]
-
-const faqContents = [
-  {
-    question: 'Is GeoGuess Lite really free?',
-    answer: "Yes - completely free. GeoGuess Lite doesn't require any subscription or payment.",
-  },
-  {
-    question: 'Are there any limitations?',
-    answer:
-      'You can play as much as you want. Both the map and imagery are powered by open data and open-source technology, so there are no quotas, usage limits, or fees.',
-  },
-  {
-    question: 'Can I self-host GeoGuess Lite?',
-    answer:
-      'GeoGuess Lite is fully open-source and built to be easily self-hosted. You can deploy it on any static hosting service and connect it with your own serverless backend if you prefer full control.',
-  },
-  {
-    question: 'Any other questions?',
-    answer:
-      'Feel free to reach out at creative.spider.hand@gmail.com or check out the GitHub repository for more information and contributions.',
-  },
-]
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const { currentUser, isCurrentUserLoaded, signUpWithGoogle } = useAuth()
 </script>
-
-<style scoped>
-@keyframes floating {
-  0% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-15px);
-  }
-
-  100% {
-    transform: translateY(0);
-  }
-}
-
-.floating-animation {
-  animation: floating 5s ease-in-out infinite;
-}
-</style>
