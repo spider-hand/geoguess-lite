@@ -37,7 +37,7 @@
         class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
         @click="openGithub"
       >
-        [Github]
+        [GitHub]
       </Button>
       <Button
         v-if="isCurrentUserLoaded && !currentUser"
