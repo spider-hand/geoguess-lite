@@ -9,7 +9,7 @@
         class="font-[JetBrains_Mono] text-base font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
         @click="openGithub"
       >
-        [Github]
+        [GitHub]
       </button>
       <button
         v-if="isCurrentUserLoaded && !currentUser"

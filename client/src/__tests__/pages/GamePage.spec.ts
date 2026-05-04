@@ -95,23 +95,35 @@ vi.mock('@/components/ui/card', () => ({
   CardContent: { template: '<div><slot /></div>' },
 }))
 
-vi.mock('@/components/ui/button', () => ({
-  Button: {
+vi.mock('@/components/ui/button/Button.vue', () => ({
+  default: {
     template: '<button :disabled="disabled"><slot /></button>',
     props: ['variant', 'size', 'disabled'],
   },
 }))
 
-vi.mock('@/components/ui/select', () => ({
-  Select: { template: '<div><slot /></div>', props: ['modelValue'] },
-  SelectContent: { template: '<div><slot /></div>' },
-  SelectItem: { template: '<div><slot /></div>', props: ['value'] },
-  SelectTrigger: { template: '<div><slot /></div>' },
-  SelectValue: { template: '<div><slot /></div>', props: ['placeholder'] },
+vi.mock('@/components/ui/select/Select.vue', () => ({
+  default: { template: '<div><slot /></div>', props: ['modelValue', 'disabled'] },
 }))
 
-vi.mock('@/components/ui/input', () => ({
-  Input: {
+vi.mock('@/components/ui/select/SelectContent.vue', () => ({
+  default: { template: '<div><slot /></div>' },
+}))
+
+vi.mock('@/components/ui/select/SelectItem.vue', () => ({
+  default: { template: '<div><slot /></div>', props: ['value'] },
+}))
+
+vi.mock('@/components/ui/select/SelectTrigger.vue', () => ({
+  default: { template: '<div><slot /></div>', props: ['disabled'] },
+}))
+
+vi.mock('@/components/ui/select/SelectValue.vue', () => ({
+  default: { template: '<div><slot /></div>', props: ['placeholder'] },
+}))
+
+vi.mock('@/components/ui/input/Input.vue', () => ({
+  default: {
     template: '<input />',
     props: ['modelValue', 'placeholder'],
   },
@@ -124,32 +136,52 @@ describe('GamePage', () => {
     mockIsCurrentUserLoaded.value = true
   })
 
-  it('should show Sign up required message for multiplayer when not logged in', () => {
+  const mountGamePage = () =>
+    mount(GamePage, {
+      global: {
+        stubs: {
+          'emoji-picker': true,
+        },
+      },
+    })
+
+  const findGameModeButton = (wrapper: ReturnType<typeof mount>, label: string) => {
+    return wrapper.findAll('button').find((button) => button.text().includes(label))
+  }
+
+  it('should apply unavailable styles to multiplayer when not logged in', () => {
     mockCurrentUser.value = null
     mockIsCurrentUserLoaded.value = true
 
-    const wrapper = mount(GamePage)
+    const wrapper = mountGamePage()
+    const multiplayerButton = findGameModeButton(wrapper, 'Multiplayer')
 
-    expect(wrapper.text()).toContain('Sign up required')
+    expect(multiplayerButton?.classes()).toContain('opacity-50')
+    expect(multiplayerButton?.classes()).toContain('cursor-not-allowed')
   })
 
-  it('should show Sign up required message for daily challenge when not logged in', () => {
+  it('should apply unavailable styles to daily challenge when not logged in', () => {
     mockCurrentUser.value = null
     mockIsCurrentUserLoaded.value = true
 
-    const wrapper = mount(GamePage)
+    const wrapper = mountGamePage()
+    const dailyChallengeButton = findGameModeButton(wrapper, 'Daily Challenge')
 
-    // Daily challenge and multiplayer require sign up
-    const signUpMessages = wrapper.findAll('[data-testid="sign-up-required"]')
-    expect(signUpMessages.length).toBeGreaterThanOrEqual(1)
+    expect(dailyChallengeButton?.classes()).toContain('opacity-50')
+    expect(dailyChallengeButton?.classes()).toContain('cursor-not-allowed')
   })
 
-  it('should not show Sign up required when logged in', () => {
+  it('should not apply unavailable styles when logged in', () => {
     mockCurrentUser.value = { uid: 'user123' }
     mockIsCurrentUserLoaded.value = true
 
-    const wrapper = mount(GamePage)
+    const wrapper = mountGamePage()
+    const multiplayerButton = findGameModeButton(wrapper, 'Multiplayer')
+    const dailyChallengeButton = findGameModeButton(wrapper, 'Daily Challenge')
 
-    expect(wrapper.text()).not.toContain('Sign up required')
+    expect(multiplayerButton?.classes()).not.toContain('opacity-50')
+    expect(multiplayerButton?.classes()).not.toContain('cursor-not-allowed')
+    expect(dailyChallengeButton?.classes()).not.toContain('opacity-50')
+    expect(dailyChallengeButton?.classes()).not.toContain('cursor-not-allowed')
   })
 })

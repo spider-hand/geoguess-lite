@@ -56,7 +56,7 @@
           </span>
         </div>
         <div
-          class="relative h-[280px] w-full overflow-hidden rounded-2xl bg-slate-100 p-5 md:h-[480px] md:w-[640px] md:flex-1 md:p-6"
+          class="relative h-[280px] w-full overflow-hidden rounded-2xl bg-slate-50 p-5 md:h-[480px] md:w-[640px] md:flex-1 md:p-6"
         >
           <img
             src="@/assets/images/street-view-demo-1.png"
@@ -76,7 +76,7 @@
       </div>
       <div class="flex flex-col gap-10 md:flex-row md:items-end md:gap-16">
         <div
-          class="relative h-[280px] w-full overflow-hidden rounded-2xl bg-slate-100 p-5 md:h-[480px] md:w-[640px] md:flex-1 md:p-6"
+          class="relative h-[280px] w-full overflow-hidden rounded-2xl bg-slate-50 p-5 md:h-[480px] md:w-[640px] md:flex-1 md:p-6"
         >
           <img
             src="@/assets/images/map-demo-2.png"

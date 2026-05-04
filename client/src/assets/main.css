@@ -72,7 +72,7 @@
   --card-foreground: oklch(14.1% 0.005 285.823deg);
   --popover: oklch(100% 0 0deg);
   --popover-foreground: oklch(14.1% 0.005 285.823deg);
-  --primary: oklch(21% 0.006 285.885deg);
+  --primary: var(--color-orange-600);
   --primary-foreground: oklch(98.5% 0 0deg);
   --secondary: oklch(96.7% 0.001 286.375deg);
   --secondary-foreground: oklch(21% 0.006 285.885deg);
