@@ -7,52 +7,51 @@
       </p>
     </div>
 
-    <Card class="mb-6 border-amber-100 bg-amber-50">
-      <CardContent class="flex flex-col gap-8">
-        <div class="flex items-center gap-3">
-          <div
-            class="flex h-16 w-16 items-center justify-center rounded-xl border border-amber-200 bg-amber-100 text-amber-900"
-          >
-            <Trophy class="h-5 w-5" />
-          </div>
-          <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Leaderboard</h2>
-          <p class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-base">Final rankings</p>
+    <div class="mb-6 flex flex-col gap-4 rounded-xl bg-slate-50 px-6 py-6">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-600">
+        <Trophy class="h-7 w-7 text-white" />
+      </div>
+      <div class="flex flex-col gap-3">
+        <div>
+          <h2 class="font-[JetBrains_Mono] text-lg font-bold">Final Results</h2>
         </div>
         <div class="space-y-3">
           <div
             v-for="(player, index) in sortedPlayers"
             :key="player.id"
-            class="flex items-center justify-between rounded border bg-white p-3"
+            class="flex items-center justify-between rounded-lg bg-white p-4"
           >
-            <div class="flex items-center gap-3">
+            <div class="flex min-w-0 items-center gap-3">
               <div
                 data-testid="player-rank"
-                class="flex h-8 w-8 items-center justify-center rounded-full font-[JetBrains_Mono] text-sm font-bold"
+                class="flex h-8 min-h-8 w-8 min-w-8 items-center justify-center rounded-full font-[JetBrains_Mono] text-sm font-bold"
+                :class="index === 0 ? 'bg-orange-600 text-white' : 'bg-slate-100'"
               >
                 {{ index + 1 }}
               </div>
               <div
-                class="flex h-10 w-10 items-center justify-center rounded-full border text-lg"
+                class="flex h-10 min-h-10 w-10 min-w-10 items-center justify-center rounded-full border text-lg"
                 :class="player.avatarClass"
               >
                 {{ player.emoji }}
               </div>
-              <span data-testid="player-name" class="font-[Roboto] text-lg font-medium">{{
-                player.name
-              }}</span>
+              <span
+                data-testid="player-name"
+                class="truncate font-[JetBrains_Mono] text-lg font-medium"
+              >
+                {{ player.name }}
+              </span>
             </div>
-            <div class="flex items-center gap-4">
-              <div class="text-right">
-                <div class="font-[JetBrains_Mono] text-lg font-bold">{{ player.score }} points</div>
-                <div class="text-muted-foreground font-[JetBrains_Mono] text-sm">
-                  {{ formatDistance(player.distance, props.distanceUnit) }} off
-                </div>
+            <div class="text-right">
+              <div class="font-[JetBrains_Mono] text-lg font-bold">{{ player.score }} points</div>
+              <div class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+                {{ formatDistance(player.distance, props.distanceUnit) }} off
               </div>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
 
     <div class="mb-6">
       <h2 class="mb-4 font-[Roboto] text-2xl font-bold">Round Breakdown</h2>
@@ -65,7 +64,7 @@
         <AccordionItem v-for="record in gameRecords" :key="record.round" :value="`${record.round}`">
           <AccordionTrigger class="flex items-center">
             <div class="flex items-center gap-2">
-              <span class="font-[Roboto] text-xl">Round {{ record.round }}</span>
+              <span class="font-[JetBrains_Mono] text-xl">Round {{ record.round }}</span>
             </div>
           </AccordionTrigger>
           <AccordionContent>
@@ -95,7 +94,7 @@
                 <div
                   v-for="player in record.playerResults"
                   :key="player.id"
-                  class="flex items-center justify-between rounded border p-3"
+                  class="flex items-center justify-between rounded bg-slate-50 p-3"
                 >
                   <div class="flex items-center gap-2">
                     <div
@@ -104,7 +103,7 @@
                     >
                       {{ player.emoji }}
                     </div>
-                    <span class="font-[JetBrains_Mono] text-sm">{{ player.name }}</span>
+                    <span class="font-[JetBrains_Mono] text-sm font-medium">{{ player.name }}</span>
                   </div>
                   <div class="text-right">
                     <div class="font-[JetBrains_Mono] text-sm font-bold">
@@ -126,7 +125,7 @@
       <Button
         @click="$emit('return-to-menu')"
         variant="ghost"
-        class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
+        class="text-muted-foreground rounded-none font-[JetBrains_Mono] text-lg"
       >
         [Return to Main Menu]
       </Button>
@@ -142,8 +141,6 @@ import Accordion from './ui/accordion/Accordion.vue'
 import AccordionContent from './ui/accordion/AccordionContent.vue'
 import AccordionItem from './ui/accordion/AccordionItem.vue'
 import AccordionTrigger from './ui/accordion/AccordionTrigger.vue'
-import Card from './ui/card/Card.vue'
-import CardContent from './ui/card/CardContent.vue'
 import Button from './ui/button/Button.vue'
 import type { MultiplayerRoundRecord, PlayerResult } from '@/types'
 import { formatDistance } from '@/utils'

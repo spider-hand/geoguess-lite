@@ -1,28 +1,25 @@
 <template>
   <div class="flex min-h-screen flex-col">
-    <header class="flex items-center justify-between border-b px-4 py-4 sm:px-8">
+    <header class="flex items-center justify-between px-4 py-4 sm:px-8">
       <div class="font-[JetBrains_Mono] text-lg font-semibold sm:text-xl">
         <span>Room #{{ roomId }} - Lobby</span>
       </div>
     </header>
-    <main class="flex grow flex-col gap-8 bg-gray-50 p-8 lg:flex-row">
+    <main class="flex grow flex-col gap-8 p-8 lg:flex-row">
       <div class="order-1 flex flex-col gap-8 lg:order-2 lg:flex-1">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <Card class="border">
-            <CardContent class="flex flex-col gap-8">
+          <section class="rounded-2xl bg-slate-50 p-6">
+            <div class="flex flex-col gap-6">
               <div>
-                <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">
+                <h2 class="text-foreground font-[JetBrains_Mono] text-xl font-bold">
                   Players ({{ players.length }})
                 </h2>
-                <p class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-base">
-                  Players in this room
-                </p>
               </div>
               <div class="flex flex-col gap-3">
                 <div
                   v-for="player in players"
                   :key="player.id"
-                  class="flex items-center gap-3 rounded border p-3"
+                  class="flex items-center gap-3 rounded-lg bg-white p-4"
                 >
                   <div
                     class="flex h-12 w-12 items-center justify-center rounded-full border text-lg"
@@ -30,74 +27,75 @@
                   >
                     {{ player.emoji }}
                   </div>
-                  <div class="flex flex-col">
-                    <span class="text-foreground font-[Roboto] text-base font-medium">{{
-                      player.name
-                    }}</span>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">{{
-                      player.isHost ? 'Host' : 'Player'
-                    }}</span>
+                  <div class="flex min-w-0 flex-1 flex-col">
+                    <span
+                      class="text-foreground truncate font-[JetBrains_Mono] text-base font-medium"
+                      >{{ player.name }}</span
+                    >
                   </div>
+                  <span
+                    v-if="player.isHost"
+                    class="rounded-full bg-orange-600 px-3 py-1 font-[JetBrains_Mono] text-xs font-bold text-white"
+                  >
+                    Host
+                  </span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
           <div class="flex flex-col gap-8">
-            <Card class="border">
-              <CardContent class="flex flex-col gap-8">
+            <section class="rounded-2xl bg-slate-50 p-6">
+              <div class="flex flex-col gap-6">
                 <div>
-                  <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">
+                  <h2 class="text-foreground font-[JetBrains_Mono] text-xl font-bold">
                     Game Configuration
                   </h2>
-                  <p class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-base">
-                    Settings for this game
-                  </p>
                 </div>
-                <div class="grid grid-cols-1 gap-4">
-                  <div class="flex flex-col gap-1">
+                <div class="grid grid-cols-1 gap-3">
+                  <div class="rounded-lg bg-white px-4 py-3">
                     <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
                       Map Type
                     </label>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">{{
-                      gameConfig.mapType
-                    }}</span>
+                    <div class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm">
+                      {{ gameConfig.mapType }}
+                    </div>
                   </div>
-                  <div class="flex flex-col gap-1">
+                  <div class="rounded-lg bg-white px-4 py-3">
                     <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
                       Time Limit
                     </label>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+                    <div class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm">
                       {{ gameConfig.timeLimit === 0 ? 'Unlimited' : `${gameConfig.timeLimit}s` }}
-                    </span>
+                    </div>
                   </div>
-                  <div class="flex flex-col gap-1">
+                  <div class="rounded-lg bg-white px-4 py-3">
                     <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
                       Only Panorama Images
                     </label>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+                    <div class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm">
                       {{ gameConfig.onlyPanorama ? 'Yes' : 'No' }}
-                    </span>
+                    </div>
                   </div>
-                  <div class="flex flex-col gap-1">
+                  <div class="rounded-lg bg-white px-4 py-3">
                     <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
                       Allow Moving
                     </label>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+                    <div class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm">
                       {{ gameConfig.allowMoving ? 'Yes' : 'No' }}
-                    </span>
+                    </div>
                   </div>
-                  <div class="flex flex-col gap-1">
+                  <div class="rounded-lg bg-white px-4 py-3">
                     <label class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
                       Allow Zooming
                     </label>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">
+                    <div class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-sm">
                       {{ gameConfig.allowZooming ? 'Yes' : 'No' }}
-                    </span>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </section>
 
             <div class="flex gap-4">
               <Button
@@ -106,9 +104,9 @@
                 variant="ghost"
                 size="lg"
                 @click="leaveRoom"
-                class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                class="flex-1 rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
               >
-                Leave Room
+                [Leave Room]
               </Button>
               <Button
                 data-testid="start-game-button"
@@ -116,7 +114,7 @@
                 @click="startGame"
                 :disabled="players.length < 2 || !myself?.isHost || isCreatingRounds"
                 :class="isCreatingRounds ? 'w-full' : 'flex-1'"
-                class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+                class="rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {{
                   isCreatingRounds ? 'Creating the game.. It might take a while..' : 'Start Game'
@@ -131,7 +129,6 @@
 </template>
 
 <script setup lang="ts">
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { GameConfigNode, PlayerResult } from '@/types'
 

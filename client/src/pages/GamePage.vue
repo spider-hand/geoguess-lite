@@ -1,225 +1,305 @@
 <template>
-  <div class="flex min-h-screen flex-col">
+  <div class="min-h-screen bg-white">
     <HeaderComponent />
-    <main class="flex flex-col gap-8 bg-gray-50 p-8 lg:flex-row">
-      <div class="order-1 flex flex-col gap-8 lg:order-2 lg:flex-1">
-        <div class="flex flex-col items-center gap-2 text-center">
-          <h1 class="font-[JetBrains_Mono] text-4xl font-bold lg:text-5xl">Start New Game</h1>
-          <p class="text-muted-foreground font-[JetBrains_Mono] text-xl">
-            Select a game mode to begin
-          </p>
-        </div>
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <div
-            v-for="(mode, index) in gameModes"
-            :key="index"
-            @click="isGameModeAvailable(mode.id) && (gameConfig.selectedGameMode = mode.id)"
-            class="relative h-full"
-            :class="{
-              'cursor-not-allowed opacity-50': !isGameModeAvailable(mode.id),
-              'cursor-pointer': isGameModeAvailable(mode.id),
-            }"
-          >
-            <CustomCardComponent
-              :title="mode.title"
-              :description="mode.description"
-              :icon="mode.icon"
-              :bg-class="getGameModeCardClass(mode.id)"
-              :icon-class="mode.iconClass"
-            />
+    <main class="min-h-[calc(100vh-3.75rem)] px-5 py-8 md:px-8 md:py-10 lg:px-8 lg:py-8">
+      <section
+        class="grid grid-cols-1 gap-8 xl:min-h-full xl:grid-cols-[minmax(0,2.4fr)_minmax(320px,1fr)]"
+      >
+        <div class="flex flex-col gap-8 xl:min-h-full">
+          <section class="overflow-hidden rounded-2xl bg-slate-50">
+            <img src="@/assets/images/main.png" class="h-64 w-full object-cover md:h-72 xl:h-80" />
+          </section>
+          <section class="relative z-10 xl:-mt-24 xl:flex-1">
             <div
-              v-if="!isGameModeAvailable(mode.id)"
-              data-testid="sign-up-required"
-              class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-black/90 px-3 py-1 text-center font-[JetBrains_Mono] text-sm text-white"
+              class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] xl:h-full"
             >
-              Sign up required
+              <section class="min-h-72 rounded-2xl bg-slate-50 p-6 xl:h-full">
+                <h2 class="mb-4 font-[JetBrains_Mono] text-xl font-bold">Game Mode Selection</h2>
+                <div class="flex flex-col gap-3">
+                  <GameModeCardComponent
+                    v-for="mode in gameModes"
+                    :key="mode.id"
+                    :title="mode.title"
+                    :description="mode.description"
+                    :icon="mode.icon"
+                    :is-selected="gameConfig.selectedGameMode === mode.id"
+                    :is-disabled="!isGameModeAvailable(mode.id as GameModeType)"
+                    @select="selectGameMode(mode.id as GameModeType)"
+                  />
+                </div>
+              </section>
+              <section class="min-h-72 rounded-2xl bg-slate-50 p-6 xl:h-full">
+                <h2 class="mb-4 font-[JetBrains_Mono] text-xl font-bold">Game Configuration</h2>
+                <div class="flex flex-col gap-6">
+                  <div
+                    v-if="gameConfig.selectedGameMode === 'multiplayer'"
+                    class="flex flex-col gap-4"
+                  >
+                    <CustomCheckboxComponent
+                      id="is-host"
+                      label="I am the host"
+                      v-model="gameConfig.isHost"
+                    />
+                  </div>
+                  <div
+                    v-if="gameConfig.selectedGameMode === 'multiplayer' && !gameConfig.isHost"
+                    class="flex flex-col gap-1"
+                  >
+                    <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
+                      Room Number
+                    </label>
+                    <Input
+                      v-model="gameConfig.roomNumber"
+                      placeholder="Enter room number"
+                      class="w-full bg-white font-[JetBrains_Mono]"
+                    />
+                  </div>
+                  <div
+                    v-if="gameConfig.selectedGameMode === 'daily-challenge'"
+                    class="flex flex-col gap-6"
+                  >
+                    <div class="flex flex-col gap-1">
+                      <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
+                        Map Type
+                      </label>
+                      <Select :model-value="dailyChallengeConfig.mapType" disabled>
+                        <SelectTrigger class="w-full bg-white" disabled>
+                          <SelectValue
+                            placeholder="Select map type"
+                            class="font-[JetBrains_Mono]"
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="world" class="font-[JetBrains_Mono]">World</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                      <div class="flex flex-col gap-8">
+                        <CustomSliderComponent
+                          label="Time Limit Per Round"
+                          :model-value="dailyChallengeConfig.timeLimit"
+                          :min="0"
+                          :max="300"
+                          :step="60"
+                          unit="s"
+                          :unlimited-value="0"
+                          unlimited-text="Unlimited"
+                          disabled
+                        />
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                      <CustomCheckboxComponent
+                        id="daily-only-panorama"
+                        label="Only Panorama"
+                        :model-value="dailyChallengeConfig.onlyPanorama"
+                        disabled
+                      />
+                      <CustomCheckboxComponent
+                        id="daily-allow-moving"
+                        label="Allow Moving"
+                        :model-value="dailyChallengeConfig.allowMoving"
+                        disabled
+                      />
+                      <CustomCheckboxComponent
+                        id="daily-allow-zooming"
+                        label="Allow Zooming"
+                        :model-value="dailyChallengeConfig.allowZooming"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div
+                    v-if="
+                      gameConfig.selectedGameMode === 'single-player' ||
+                      (gameConfig.selectedGameMode === 'multiplayer' && gameConfig.isHost)
+                    "
+                    class="flex flex-col gap-1"
+                  >
+                    <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
+                      Map Type
+                    </label>
+                    <Select v-model="gameConfig.mapType">
+                      <SelectTrigger class="w-full bg-white">
+                        <SelectValue placeholder="Select map type" class="font-[JetBrains_Mono]" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="world" class="font-[JetBrains_Mono]">World</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div
+                    v-if="
+                      gameConfig.selectedGameMode === 'single-player' ||
+                      (gameConfig.selectedGameMode === 'multiplayer' && gameConfig.isHost)
+                    "
+                    class="flex flex-col gap-4"
+                  >
+                    <div class="flex flex-col gap-8">
+                      <CustomSliderComponent
+                        label="Time Limit Per Round"
+                        v-model="gameConfig.timeLimit"
+                        :min="0"
+                        :max="300"
+                        :step="60"
+                        unit="s"
+                        :unlimited-value="0"
+                        unlimited-text="Unlimited"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    v-if="
+                      gameConfig.selectedGameMode === 'single-player' ||
+                      (gameConfig.selectedGameMode === 'multiplayer' && gameConfig.isHost)
+                    "
+                    class="flex flex-col gap-4"
+                  >
+                    <CustomCheckboxComponent
+                      id="only-panorama"
+                      label="Only Panorama"
+                      v-model="gameConfig.onlyPanorama"
+                    />
+                    <CustomCheckboxComponent
+                      id="allow-moving"
+                      label="Allow Moving"
+                      v-model="gameConfig.allowMoving"
+                    />
+                    <CustomCheckboxComponent
+                      id="allow-zooming"
+                      label="Allow Zooming"
+                      v-model="gameConfig.allowZooming"
+                    />
+                  </div>
+                  <Button
+                    class="self-end rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                    @click="startGame"
+                    :disabled="
+                      !isCurrentUserLoaded ||
+                      isRoomLoading ||
+                      !isGameModeAvailable(gameConfig.selectedGameMode) ||
+                      (gameConfig.selectedGameMode === 'daily-challenge' &&
+                        user &&
+                        user.hasPlayedDailyChallenge) ||
+                      (gameConfig.selectedGameMode === 'multiplayer' &&
+                        !gameConfig.isHost &&
+                        !gameConfig.roomNumber)
+                    "
+                    >{{ isRoomLoading ? 'Loading...' : 'Start Game' }}</Button
+                  >
+                </div>
+              </section>
             </div>
-          </div>
+          </section>
         </div>
-        <Card class="border">
-          <CardContent class="flex flex-col gap-8">
-            <div>
-              <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">
-                Game Configuration
-              </h2>
-              <p class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-base">
-                Customize your game experience
+        <aside class="flex flex-col gap-6">
+          <section class="flex min-h-72 flex-col rounded-2xl bg-slate-50 p-6">
+            <h2 class="font-[JetBrains_Mono] text-xl font-bold">Profile</h2>
+            <div v-if="isDeletingAccount && currentUser" class="mt-6 flex flex-col gap-4">
+              <h3 class="font-[JetBrains_Mono] text-xl font-semibold text-red-500">
+                Delete Account
+              </h3>
+              <p class="text-foreground font-[JetBrains_Mono] text-sm">
+                This action cannot be undone. This will permanently delete your account and remove
+                all your data.
               </p>
-            </div>
-            <div v-if="gameConfig.selectedGameMode === 'multiplayer'" class="flex flex-col gap-4">
-              <div class="flex flex-col gap-4">
-                <CustomCheckboxComponent
-                  id="is-host"
-                  label="I am the host"
-                  v-model="gameConfig.isHost"
-                />
-                <div v-if="!gameConfig.isHost" class="flex flex-col gap-1">
-                  <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
-                    Room Number
-                  </label>
-                  <Input
-                    v-model="gameConfig.roomNumber"
-                    placeholder="Enter room number"
-                    class="max-w-xs font-[JetBrains_Mono]"
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              v-if="
-                gameConfig.selectedGameMode === 'single-player' ||
-                (gameConfig.selectedGameMode === 'multiplayer' && gameConfig.isHost)
-              "
-              class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3"
-            >
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-col gap-1">
-                  <label class="text-foreground font-[JetBrains_Mono] text-base font-medium">
-                    Map Type
-                  </label>
-                  <Select v-model="gameConfig.mapType">
-                    <SelectTrigger class="w-full">
-                      <SelectValue placeholder="Select map type" class="font-[JetBrains_Mono]" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="world" class="font-[JetBrains_Mono]">World</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-col gap-8">
-                  <CustomSliderComponent
-                    label="Time Limit Per Round"
-                    v-model="gameConfig.timeLimit"
-                    :min="0"
-                    :max="300"
-                    :step="60"
-                    unit="s"
-                    :unlimited-value="0"
-                    unlimited-text="Unlimited"
-                    help-text="Set to 0 for unlimited time"
-                  />
-                </div>
-              </div>
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-col gap-4">
-                  <CustomCheckboxComponent
-                    id="only-panorama"
-                    label="Only Panorama"
-                    v-model="gameConfig.onlyPanorama"
-                  />
-                  <CustomCheckboxComponent
-                    id="allow-moving"
-                    label="Allow Moving"
-                    v-model="gameConfig.allowMoving"
-                  />
-                  <CustomCheckboxComponent
-                    id="allow-zooming"
-                    label="Allow Zooming"
-                    v-model="gameConfig.allowZooming"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="flex justify-end">
-              <Button
-                size="lg"
-                class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
-                @click="startGame"
-                :disabled="
-                  !isCurrentUserLoaded ||
-                  isRoomLoading ||
-                  !isGameModeAvailable(gameConfig.selectedGameMode) ||
-                  (gameConfig.selectedGameMode === 'daily-challenge' &&
-                    user &&
-                    user.hasPlayedDailyChallenge) ||
-                  (gameConfig.selectedGameMode === 'multiplayer' &&
-                    !gameConfig.isHost &&
-                    !gameConfig.roomNumber)
-                "
-              >
-                {{ isRoomLoading ? 'Loading...' : 'Start Game' }}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      <div class="order-2 flex flex-col gap-8 lg:order-1 lg:w-80">
-        <Card v-if="currentUser" class="border">
-          <CardContent class="flex flex-col gap-6">
-            <div>
-              <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Profile</h2>
-            </div>
-            <template v-if="!isEditingProfile">
-              <div class="flex flex-col items-center gap-4">
-                <div
-                  class="flex h-20 w-20 items-center justify-center rounded-full border text-4xl"
-                  :class="getAvatarClass(user?.avatarBg)"
-                >
-                  {{ user?.avatarEmoji }}
-                </div>
-                <div class="text-center">
-                  <h3 class="text-foreground font-[Roboto] text-lg font-semibold">
-                    {{ user?.name }}
-                  </h3>
-                </div>
-              </div>
-              <div class="flex flex-col gap-3">
-                <div class="flex justify-between">
-                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
-                    >Games Played</span
-                  >
-                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
-                    user?.gamesPlayed
-                  }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
-                    >Avg. Score</span
-                  >
-                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
-                    user?.averageScore
-                  }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
-                    >High Score</span
-                  >
-                  <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
-                    user?.bestScore
-                  }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
-                    >Distance Unit</span
-                  >
-                  <span
-                    v-if="user && user.distanceUnit"
-                    class="text-foreground font-[JetBrains_Mono] text-sm font-medium"
-                    >{{ user.distanceUnit === 'km' ? 'Kilometers' : 'Miles' }}</span
-                  >
-                </div>
-              </div>
-              <div class="flex flex-col gap-3">
+              <p class="text-foreground font-[JetBrains_Mono] text-sm">
+                Please type <strong>"Delete account"</strong> to confirm deletion.
+              </p>
+              <Input
+                v-model="deleteConfirmationText"
+                placeholder="Delete account"
+                class="bg-white font-[JetBrains_Mono]"
+              />
+              <div class="flex flex-col gap-2">
                 <Button
-                  variant="ghost"
-                  @click="startEditProfile"
-                  class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono]"
+                  @click="confirmDeleteAccount"
+                  :disabled="deleteConfirmationText !== 'Delete account' || isPendingOnDeleteUser"
+                  class="rounded-none bg-red-600 font-[JetBrains_Mono] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-red-600 hover:opacity-95"
                 >
-                  [Edit Profile]
+                  {{ isPendingOnDeleteUser ? 'Deleting...' : 'Delete Account' }}
                 </Button>
                 <Button
                   variant="ghost"
-                  @click="startDeleteAccount"
-                  class="cursor-pointer rounded-none font-[JetBrains_Mono] text-red-500 hover:bg-red-50 hover:text-red-600"
+                  @click="cancelDeleteAccount"
+                  :disabled="isPendingOnDeleteUser"
+                  class="text-muted-foreground rounded-none font-[JetBrains_Mono]"
                 >
-                  [Delete Account]
+                  [Cancel]
                 </Button>
               </div>
-            </template>
-            <template v-else>
-              <div class="flex flex-col gap-4">
+            </div>
+            <template v-else-if="currentUser">
+              <div v-if="!isEditingProfile" class="mt-6 flex flex-col gap-6">
+                <div class="flex flex-col items-center gap-4">
+                  <div
+                    class="flex h-20 w-20 items-center justify-center rounded-full border text-4xl"
+                    :class="[getAvatarClass(user?.avatarBg), 'border-4']"
+                  >
+                    {{ user?.avatarEmoji }}
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-foreground text-lg font-semibold">
+                      {{ user?.name }}
+                    </h3>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                      >Games Played</span
+                    >
+                    <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
+                      {{ user?.gamesPlayed }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                      >Avg. Score</span
+                    >
+                    <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
+                      {{ user?.averageScore }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                      >High Score</span
+                    >
+                    <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
+                      {{ user?.bestScore }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground font-[JetBrains_Mono] text-sm"
+                      >Distance Unit</span
+                    >
+                    <span
+                      v-if="user && user.distanceUnit"
+                      class="text-foreground font-[JetBrains_Mono] text-sm font-medium"
+                    >
+                      {{ user.distanceUnit === 'km' ? 'Kilometers' : 'Miles' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <Button
+                    variant="ghost"
+                    @click="startEditProfile"
+                    class="text-muted-foreground rounded-none font-[JetBrains_Mono]"
+                  >
+                    [Edit Profile]
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    @click="startDeleteAccount"
+                    class="rounded-none font-[JetBrains_Mono] text-red-500 hover:bg-red-50 hover:text-red-600"
+                  >
+                    [Delete Account]
+                  </Button>
+                </div>
+              </div>
+              <div v-else class="mt-6 flex flex-col gap-4">
                 <div class="flex flex-col items-center gap-4">
                   <div
                     class="flex h-20 w-20 items-center justify-center rounded-full border text-4xl"
@@ -235,7 +315,7 @@
                   <Input
                     v-model="editForm.name"
                     placeholder="Enter your name"
-                    class="font-[JetBrains_Mono]"
+                    class="bg-white font-[JetBrains_Mono]"
                   />
                 </div>
                 <div class="flex flex-col gap-2">
@@ -252,7 +332,7 @@
                     >Background Color</label
                   >
                   <Select v-model="editForm.avatarBg">
-                    <SelectTrigger class="w-full">
+                    <SelectTrigger class="w-full bg-white">
                       <SelectValue
                         class="font-[JetBrains_Mono]"
                         placeholder="Select background color"
@@ -280,7 +360,7 @@
                     >Distance Unit</label
                   >
                   <Select v-model="editForm.distanceUnit">
-                    <SelectTrigger class="w-full">
+                    <SelectTrigger class="w-full bg-white">
                       <SelectValue
                         class="font-[JetBrains_Mono]"
                         placeholder="Select distance unit"
@@ -300,107 +380,49 @@
                   <Button
                     @click="saveProfile"
                     :disabled="isPendingOnUpdateUser"
-                    class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                    class="rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
                   >
                     {{ isPendingOnUpdateUser ? 'Saving...' : 'Save Changes' }}
                   </Button>
                   <Button
                     variant="ghost"
                     @click="cancelEditProfile"
-                    class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono]"
+                    class="text-muted-foreground rounded-none font-[JetBrains_Mono]"
                   >
                     [Cancel]
                   </Button>
                 </div>
               </div>
             </template>
-          </CardContent>
-        </Card>
-        <Card v-else-if="isGuest" class="border">
-          <CardContent class="flex flex-col gap-6">
-            <div>
-              <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Playing as Guest</h2>
-              <p class="text-muted-foreground mt-2 font-[JetBrains_Mono] text-sm">
-                Create an account to unlock all features!
-              </p>
-            </div>
-            <div class="flex flex-col gap-3">
-              <div class="rounded-lg bg-blue-50 p-4">
-                <p class="text-foreground mb-2 font-[JetBrains_Mono] text-sm font-semibold">
-                  Sign up to unlock:
-                </p>
-                <ul class="text-muted-foreground space-y-1 font-[JetBrains_Mono] text-sm">
-                  <li>• Save your stats and progress</li>
-                  <li>• Play Multiplayer with friends</li>
-                  <li>• Compete in Daily Challenges</li>
-                </ul>
+            <template v-else>
+              <div class="mt-6 flex flex-col gap-6">
+                <span class="text-muted-foreground font-[JetBrains_Mono]">
+                  Create an account to unlock all features
+                </span>
+                <Button
+                  @click="signUpWithGoogle"
+                  class="self-end rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+                >
+                  Sign Up
+                </Button>
               </div>
-              <Button
-                @click="signUpWithGoogle"
-                class="cursor-pointer rounded-none font-[JetBrains_Mono] transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+            </template>
+          </section>
+          <section class="flex min-h-80 flex-col rounded-2xl bg-slate-50 p-6">
+            <h2 class="font-[JetBrains_Mono] text-xl font-bold">Leaderboard</h2>
+            <span class="text-muted-foreground font-[JetBrains_Mono]">Today's top players</span>
+            <div class="mt-6 flex flex-1 flex-col gap-4">
+              <div
+                v-if="leaderboard.length === 0"
+                class="flex flex-1 items-center justify-center py-8"
               >
-                Sign Up
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card v-if="isDeletingAccount && currentUser" class="borde">
-          <CardContent class="flex flex-col gap-6">
-            <div>
-              <h2 class="font-[Roboto] text-2xl font-semibold text-red-500">Delete Account</h2>
-            </div>
-            <div class="flex flex-col gap-4">
-              <p class="text-foreground font-[JetBrains_Mono] text-sm">
-                This action cannot be undone. This will permanently delete your account and remove
-                all your data.
-              </p>
-              <p class="text-foreground font-[JetBrains_Mono] text-sm">
-                Please type <strong>"Delete account"</strong> to confirm deletion.
-              </p>
-              <Input
-                v-model="deleteConfirmationText"
-                placeholder="Delete account"
-                class="font-[JetBrains_Mono]"
-              />
-              <div class="flex flex-col gap-2">
-                <Button
-                  @click="confirmDeleteAccount"
-                  :disabled="deleteConfirmationText !== 'Delete account' || isPendingOnDeleteUser"
-                  class="cursor-pointer rounded-none bg-red-600 font-[JetBrains_Mono] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-red-600 hover:opacity-95"
-                >
-                  {{ isPendingOnDeleteUser ? 'Deleting...' : 'Delete Account' }}
-                </Button>
-                <Button
-                  variant="ghost"
-                  @click="cancelDeleteAccount"
-                  :disabled="isPendingOnDeleteUser"
-                  class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono]"
-                >
-                  [Cancel]
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card class="border">
-          <CardContent class="flex flex-col gap-6">
-            <div>
-              <h2 class="text-foreground font-[Roboto] text-2xl font-semibold">Leaderboard</h2>
-              <p class="text-muted-foreground mt-1 font-[JetBrains_Mono] text-base">
-                Today's Top Players
-              </p>
-            </div>
-            <div class="flex flex-col gap-4">
-              <div v-if="leaderboard.length === 0" class="flex items-center justify-center py-8">
                 <span class="text-muted-foreground font-[JetBrains_Mono] text-sm">
                   No scores today yet
                 </span>
               </div>
               <div
-                v-else
                 v-for="(player, index) in leaderboard"
+                v-else
                 :key="index"
                 class="flex items-center justify-between"
               >
@@ -412,91 +434,51 @@
                     {{ player.emoji }}
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-foreground font-[Roboto] text-sm font-medium">{{
-                      player.name
-                    }}</span>
-                    <span class="text-muted-foreground font-[JetBrains_Mono] text-xs"
-                      >#{{ index + 1 }}</span
-                    >
+                    <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
+                      {{ player.name }}
+                    </span>
+                    <span class="text-muted-foreground font-[JetBrains_Mono] text-xs">
+                      #{{ index + 1 }}
+                    </span>
                   </div>
                 </div>
-                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">{{
-                  player.score
-                }}</span>
+                <span class="text-foreground font-[JetBrains_Mono] text-sm font-medium">
+                  {{ player.score }}
+                </span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </section>
+        </aside>
+      </section>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import 'emoji-picker-element'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import CustomCardComponent from '@/components/CustomCardComponent.vue'
-import CustomSliderComponent from '@/components/CustomSliderComponent.vue'
 import CustomCheckboxComponent from '@/components/CustomCheckboxComponent.vue'
-import { useRouter } from 'vue-router'
+import CustomSliderComponent from '@/components/CustomSliderComponent.vue'
+import GameModeCardComponent from '@/components/GameModeCardComponent.vue'
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import useUserQuery from '@/composables/useUserQuery'
-import useDailyScoreQuery from '@/composables/useDailyScoreQuery'
-import { AVATAR_CLASS_MAP } from '@/consts'
-import type { GameModeType } from '@/types'
-import useGameConfigStore from '@/stores/gameConfig'
-import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
-import { getAvatarClass } from '@/utils'
-import type { UserDistanceUnitEnum } from '@/services'
+import Button from '@/components/ui/button/Button.vue'
+import Input from '@/components/ui/input/Input.vue'
+import Select from '@/components/ui/select/Select.vue'
+import SelectContent from '@/components/ui/select/SelectContent.vue'
+import SelectItem from '@/components/ui/select/SelectItem.vue'
+import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
+import SelectValue from '@/components/ui/select/SelectValue.vue'
 import useAuth from '@/composables/useAuth'
+import useDailyScoreQuery from '@/composables/useDailyScoreQuery'
+import { useMultiplayerRoom } from '@/composables/useMultiplayerRoom'
+import useUserQuery from '@/composables/useUserQuery'
+import { AVATAR_CLASS_MAP } from '@/consts'
+import type { UserDistanceUnitEnum } from '@/services'
+import useGameConfigStore from '@/stores/gameConfig'
+import type { GameModeType } from '@/types'
+import { getAvatarClass } from '@/utils'
 import { Earth, Sword, Calendar } from 'lucide-vue-next'
-import type { Component } from 'vue'
-
-interface GameModeItem {
-  id: GameModeType
-  title: string
-  description: string
-  icon: Component
-  class: string
-  iconClass: string
-}
-
-const gameModes: GameModeItem[] = [
-  {
-    id: 'single-player',
-    title: 'Single Player',
-    description: 'Explore the world at your own pace',
-    icon: Earth,
-    class: 'bg-blue-50 border-blue-100',
-    iconClass: 'bg-blue-100 border-blue-200 text-blue-900',
-  },
-  {
-    id: 'multiplayer',
-    title: 'Multiplayer',
-    description: 'Challenge friends',
-    icon: Sword,
-    class: 'bg-green-50 border-green-100',
-    iconClass: 'bg-green-100 border-green-200 text-green-900',
-  },
-  {
-    id: 'daily-challenge',
-    title: 'Daily Challenge',
-    description: "Compete in today's unique challenge",
-    icon: Calendar,
-    class: 'bg-purple-50 border-purple-100',
-    iconClass: 'bg-purple-100 border-purple-200 text-purple-900',
-  },
-]
+import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import 'emoji-picker-element'
 
 const router = useRouter()
 
@@ -548,22 +530,48 @@ const isGameModeAvailable = (modeId: GameModeType) => {
   return true
 }
 
-const getGameModeCardClass = (modeId: GameModeType) => {
-  const mode = gameModes.find((m) => m.id === modeId)
-  const baseClass = mode?.class || ''
+const dailyChallengeConfig = {
+  mapType: 'world',
+  timeLimit: 60,
+  onlyPanorama: true,
+  allowMoving: true,
+  allowZooming: true,
+} as const
 
-  if (gameConfig.selectedGameMode === modeId) {
-    if (modeId === 'single-player') {
-      return `${baseClass} border-2! border-blue-500`
-    } else if (modeId === 'multiplayer') {
-      return `${baseClass} border-2! border-green-500`
-    } else if (modeId === 'daily-challenge') {
-      return `${baseClass} border-2! border-purple-500`
-    }
+const gameModes = [
+  {
+    id: 'single-player',
+    title: 'Single Player',
+    description: 'Explore the world at your own pace',
+    icon: Earth,
+  },
+  {
+    id: 'multiplayer',
+    title: 'Multiplayer',
+    description: 'Challenge your friends in real-time',
+    icon: Sword,
+  },
+  {
+    id: 'daily-challenge',
+    title: 'Daily Challenge',
+    description: "Complete in today's unique challenge",
+    icon: Calendar,
+  },
+]
+
+const selectGameMode = (modeId: GameModeType) => {
+  if (!isGameModeAvailable(modeId)) {
+    return
   }
 
-  return baseClass
+  gameConfig.selectedGameMode = modeId
 }
+
+watch(isGuest, (guestMode) => {
+  if (guestMode && !isGameModeAvailable(gameConfig.selectedGameMode)) {
+    gameConfig.selectedGameMode = 'single-player'
+  }
+})
 
 const startEditProfile = () => {
   if (user.value) {
@@ -685,12 +693,12 @@ const startGame = async () => {
 
 <style scoped>
 emoji-picker {
-  --button-hover-background: var(--color-gray-200);
-  --border-radius: 8px;
-  --input-border-radius: 8px;
-  --input-border-color: var(--color-gray-300);
+  --button-hover-background: var(--color-slate-200);
+  --border-radius: 12px;
+  --input-border-radius: 12px;
+  --input-border-color: var(--color-slate-300);
   --input-padding: 4px 12px;
-  --input-placeholder-color: var(--color-gray-500);
-  --indicator-color: var(--color-blue-500);
+  --input-placeholder-color: var(--color-slate-500);
+  --indicator-color: var(--color-orange-600);
 }
 </style>

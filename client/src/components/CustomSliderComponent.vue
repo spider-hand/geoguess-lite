@@ -12,6 +12,7 @@
           :min="min"
           :max="max"
           :step="step"
+          :disabled="disabled"
           class="w-full"
           @update:model-value="handleUpdate"
         />
@@ -47,12 +48,14 @@ const props = withDefaults(
     unlimitedValue?: number
     unlimitedText?: string
     helpText?: string
+    disabled?: boolean
   }>(),
   {
     unit: '',
     unlimitedValue: undefined,
     unlimitedText: 'Unlimited',
     helpText: '',
+    disabled: false,
   },
 )
 

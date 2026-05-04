@@ -3,11 +3,13 @@
     <Checkbox
       :id="id"
       :model-value="modelValue"
+      :disabled="disabled"
       @update:model-value="(val) => handleUpdate(val as boolean)"
     />
     <label
       :for="id"
-      class="text-foreground cursor-pointer font-[JetBrains_Mono] text-base font-medium"
+      class="text-foreground font-[JetBrains_Mono] text-base font-medium"
+      :class="disabled && 'cursor-not-allowed opacity-70'"
     >
       {{ label }}
     </label>
@@ -21,6 +23,7 @@ defineProps<{
   id: string
   label: string
   modelValue: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{

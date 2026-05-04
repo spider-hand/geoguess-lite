@@ -3,15 +3,6 @@ import { mount } from '@vue/test-utils'
 import LobbyComponent from '@/components/LobbyComponent.vue'
 import type { GameConfigNode, PlayerResult } from '@/types'
 
-vi.mock('@/components/ui/card', () => ({
-  Card: {
-    template: '<div><slot /></div>',
-  },
-  CardContent: {
-    template: '<div><slot /></div>',
-  },
-}))
-
 vi.mock('@/components/ui/button', () => ({
   Button: {
     template:

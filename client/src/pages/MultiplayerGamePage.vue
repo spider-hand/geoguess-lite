@@ -22,13 +22,13 @@
           <Progress
             :model-value="progressPercentage"
             class="h-2"
-            :class="isError ? '[&>div]:bg-red-700' : '[&>div]:bg-indigo-700'"
+            :class="isError ? '[&>div]:bg-red-700' : '[&>div]:bg-orange-600'"
           />
         </div>
         <div v-if="isError && myself?.isHost && !isCreatingRounds">
           <Button
             variant="ghost"
-            class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
+            class="text-muted-foreground rounded-none font-[JetBrains_Mono] text-lg"
             @click="startGame"
           >
             [Retry]
@@ -87,7 +87,7 @@
               :disabled="!hasMarker || isLoadingImage || hasUserGuessed"
               data-testid="make-guess-button"
               @click="makeGuess"
-              class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex-1 rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {{ isLoadingImage ? 'Loading...' : hasUserGuessed ? 'Guessed' : 'Make Guess' }}
             </Button>
@@ -95,7 +95,7 @@
               v-else-if="isPlaying"
               data-testid="next-round-button"
               @click="nextRound"
-              class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+              class="flex-1 rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
             >
               Next Round
             </Button>
@@ -103,7 +103,7 @@
               v-else-if="isFinished"
               data-testid="summary-button"
               @click="showSummary"
-              class="flex-1 cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+              class="flex-1 rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
             >
               Summary
             </Button>
@@ -121,7 +121,7 @@
               <div
                 v-for="player in players"
                 :key="player.id"
-                class="flex items-center justify-between rounded border p-2"
+                class="flex items-center justify-between rounded bg-slate-50 p-2"
               >
                 <div class="flex items-center gap-2">
                   <div

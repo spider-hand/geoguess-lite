@@ -43,7 +43,7 @@
           :disabled="!hasMarker || isLoadingImage"
           data-testid="make-guess-button"
           @click="makeGuess"
-          class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+          class="rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {{ isLoadingImage ? 'Loading...' : 'Make Guess' }}
         </Button>
@@ -51,7 +51,7 @@
           v-else-if="currentRound < ROUNDS"
           data-testid="next-round-button"
           @click="nextRound"
-          class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+          class="rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
         >
           Next Round
         </Button>
@@ -59,7 +59,7 @@
           v-else
           data-testid="summary-button"
           @click="showSummary"
-          class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+          class="rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
         >
           Summary
         </Button>
@@ -73,7 +73,7 @@
         <div class="font-[JetBrains_Mono] text-lg text-red-500">Failed to load Daily Challenge</div>
         <Button
           @click="returnToMenu"
-          class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
+          class="rounded-none font-[JetBrains_Mono] text-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95"
         >
           Return to Menu
         </Button>

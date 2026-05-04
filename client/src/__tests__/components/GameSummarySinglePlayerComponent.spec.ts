@@ -18,7 +18,7 @@ vi.mock('@/components/StreetViewComponent.vue', () => ({
 vi.mock('@/components/SummaryCardComponent.vue', () => ({
   default: {
     template: '<div :data-title="title" :data-value="value">{{ title }}: {{ value }}</div>',
-    props: ['title', 'value', 'icon', 'bgClass', 'iconClass'],
+    props: ['title', 'value', 'icon'],
   },
 }))
 
@@ -42,30 +42,6 @@ vi.mock('@/components/ui/accordion/AccordionItem.vue', () => ({
 }))
 
 vi.mock('@/components/ui/accordion/AccordionTrigger.vue', () => ({
-  default: {
-    template: '<div><slot /></div>',
-  },
-}))
-
-vi.mock('@/components/ui/card/Card.vue', () => ({
-  default: {
-    template: '<div><slot /></div>',
-  },
-}))
-
-vi.mock('@/components/ui/card/CardContent.vue', () => ({
-  default: {
-    template: '<div><slot /></div>',
-  },
-}))
-
-vi.mock('@/components/ui/card/CardHeader.vue', () => ({
-  default: {
-    template: '<div><slot /></div>',
-  },
-}))
-
-vi.mock('@/components/ui/card/CardTitle.vue', () => ({
   default: {
     template: '<div><slot /></div>',
   },

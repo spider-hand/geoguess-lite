@@ -7,53 +7,35 @@
       </p>
     </div>
 
-    <Card class="mb-6 border-indigo-100 bg-indigo-50">
-      <CardHeader>
-        <div class="flex items-center gap-3">
-          <div
-            class="flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-100 p-2 text-indigo-900"
-          >
-            <Target class="h-5 w-5" />
-          </div>
-          <CardTitle class="text-muted-foreground font-[Roboto]">Score</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
+    <div class="mb-6 flex flex-col gap-4 rounded-xl bg-slate-50 px-6 py-6">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-600">
+        <Target class="h-7 w-7 text-white" />
+      </div>
+      <div class="flex flex-col gap-3">
+        <h2 class="font-[Roboto] text-lg font-bold">Score</h2>
         <div class="space-y-2">
           <div class="flex justify-between text-sm">
-            <span class="font-[JetBrains_Mono]">{{ totalScore }} / {{ ROUNDS * MAX_SCORE }}</span>
+            <span class="font-[JetBrains_Mono] text-lg"
+              >{{ totalScore }} / {{ ROUNDS * MAX_SCORE }}</span
+            >
           </div>
           <Progress
             :model-value="(totalScore / (ROUNDS * MAX_SCORE)) * 100"
             :max="ROUNDS * MAX_SCORE"
-            class="h-2 [&>div]:bg-indigo-700"
+            class="h-2 [&>div]:bg-orange-600"
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
 
     <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-      <SummaryCardComponent
-        title="Total Distance Off"
-        :value="totalDistance"
-        :icon="MapPinned"
-        bg-class="bg-red-50 border-red-100"
-        icon-class="bg-red-100 border-red-200 text-red-900"
-      />
+      <SummaryCardComponent title="Total Distance Off" :value="totalDistance" :icon="MapPinned" />
       <SummaryCardComponent
         title="Average Score"
         :value="`${averageScore} points`"
         :icon="ChartColumnBig"
-        bg-class="bg-emerald-50 border-emerald-100"
-        icon-class="bg-emerald-100 border-emerald-200 text-emerald-900"
       />
-      <SummaryCardComponent
-        title="Average Time"
-        :value="averageTime"
-        :icon="Timer"
-        bg-class="bg-amber-50 border-amber-100"
-        icon-class="bg-amber-100 border-amber-200 text-amber-900"
-      />
+      <SummaryCardComponent title="Average Time" :value="averageTime" :icon="Timer" />
     </div>
 
     <div class="mb-6">
@@ -66,9 +48,11 @@
       >
         <AccordionItem v-for="record in gameRecords" :key="record.round" :value="`${record.round}`">
           <AccordionTrigger class="flex items-center">
-            <div class="flex items-center gap-2">
-              <span class="font-[Roboto] text-xl">Round {{ record.round }}</span>
-              <span class="text-muted-foreground">{{ record.score }} points</span>
+            <div class="flex items-center gap-4">
+              <span class="font-[JetBrains_Mono] text-xl">Round {{ record.round }}</span>
+              <span class="text-muted-foreground font-[JetBrains_Mono] text-xl"
+                >({{ record.score }} points)</span
+              >
             </div>
           </AccordionTrigger>
           <AccordionContent>
@@ -102,7 +86,7 @@
         v-if="isPlayAgainEnabled"
         data-testid="play-again-button"
         @click="$emit('play-again')"
-        class="cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
+        class="rounded-none font-[JetBrains_Mono] text-lg"
       >
         Play Again
       </Button>
@@ -110,7 +94,7 @@
         data-testid="return-to-menu-button"
         @click="$emit('return-to-menu')"
         variant="ghost"
-        class="text-muted-foreground cursor-pointer rounded-none font-[JetBrains_Mono] text-lg"
+        class="text-muted-foreground rounded-none font-[JetBrains_Mono] text-lg"
       >
         [Return to Main Menu]
       </Button>
@@ -127,10 +111,6 @@ import Accordion from './ui/accordion/Accordion.vue'
 import AccordionContent from './ui/accordion/AccordionContent.vue'
 import AccordionItem from './ui/accordion/AccordionItem.vue'
 import AccordionTrigger from './ui/accordion/AccordionTrigger.vue'
-import Card from './ui/card/Card.vue'
-import CardContent from './ui/card/CardContent.vue'
-import CardHeader from './ui/card/CardHeader.vue'
-import CardTitle from './ui/card/CardTitle.vue'
 import { MAX_SCORE, ROUNDS } from '@/consts'
 import Button from './ui/button/Button.vue'
 import Progress from './ui/progress/Progress.vue'

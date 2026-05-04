@@ -40,18 +40,6 @@ vi.mock('@/components/ui/accordion/AccordionTrigger.vue', () => ({
   },
 }))
 
-vi.mock('@/components/ui/card/Card.vue', () => ({
-  default: {
-    template: '<div><slot /></div>',
-  },
-}))
-
-vi.mock('@/components/ui/card/CardContent.vue', () => ({
-  default: {
-    template: '<div><slot /></div>',
-  },
-}))
-
 vi.mock('@/components/ui/button/Button.vue', () => ({
   default: {
     template: '<button><slot /></button>',

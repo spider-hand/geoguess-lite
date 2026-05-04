@@ -1,33 +1,23 @@
 <template>
-  <Card :class="`${bgClass}`">
-    <CardHeader>
-      <div class="flex items-center gap-3">
-        <div
-          :class="`flex h-10 w-10 items-center justify-center rounded-xl border ${iconClass} p-2`"
-        >
-          <component :is="icon" class="h-5 w-5" />
-        </div>
-        <CardTitle class="text-muted-foreground font-[Roboto]">{{ title }}</CardTitle>
-      </div>
-    </CardHeader>
-    <CardContent>
-      <div class="font-[JetBrains_Mono] text-2xl font-bold">{{ value }}</div>
-    </CardContent>
-  </Card>
+  <div class="flex flex-col gap-4 rounded-xl bg-slate-50 px-6 py-6">
+    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-600">
+      <component :is="icon" class="h-7 w-7 text-white" />
+    </div>
+    <div class="flex flex-col gap-1">
+      <h4 class="font-[Roboto] text-lg font-bold">{{ title }}</h4>
+      <span class="text-muted-foreground font-[JetBrains_Mono] text-lg">
+        {{ value }}
+      </span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import Card from './ui/card/Card.vue'
-import CardContent from './ui/card/CardContent.vue'
-import CardHeader from './ui/card/CardHeader.vue'
-import CardTitle from './ui/card/CardTitle.vue'
 import type { Component } from 'vue'
 
 defineProps<{
   title: string
   value: string
   icon: Component
-  bgClass: string
-  iconClass: string
 }>()
 </script>

@@ -30,44 +30,6 @@ vi.mock('@/components/HeaderComponent.vue', () => ({
   },
 }))
 
-vi.mock('@/components/FooterComponent.vue', () => ({
-  default: {
-    template: '<footer data-testid="footer">Footer</footer>',
-  },
-}))
-
-vi.mock('@/components/CustomCardComponent.vue', () => ({
-  default: {
-    template: '<div data-testid="card"><slot /></div>',
-    props: ['title', 'description', 'icon', 'bgClass', 'iconClass', 'contentAlign', 'iconAlign'],
-  },
-}))
-
-vi.mock('@/components/ui/button', () => ({
-  Button: {
-    template:
-      '<button :disabled="disabled" :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>',
-    props: ['variant', 'size', 'disabled'],
-  },
-}))
-
-vi.mock('@/components/ui/accordion', () => ({
-  Accordion: {
-    template: '<div><slot /></div>',
-    props: ['type', 'collapsible'],
-  },
-  AccordionContent: {
-    template: '<div><slot /></div>',
-  },
-  AccordionItem: {
-    template: '<div><slot /></div>',
-    props: ['value'],
-  },
-  AccordionTrigger: {
-    template: '<div><slot /></div>',
-  },
-}))
-
 describe('LandingPage', () => {
   beforeEach(() => {
     mockCurrentUser.value = null
