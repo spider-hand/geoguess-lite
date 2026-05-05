@@ -165,19 +165,25 @@
       <div class="flex flex-wrap items-center gap-2">
         <button
           class="font-[JetBrains_Mono] text-base font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
+          data-testid="terms-link"
+          @click="router.push({ name: 'terms' })"
         >
           [Terms]
         </button>
         <button
           class="font-[JetBrains_Mono] text-base font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
+          data-testid="privacy-link"
+          @click="router.push({ name: 'privacy' })"
         >
           [Privacy]
         </button>
-        <button
+        <a
           class="font-[JetBrains_Mono] text-base font-bold transition-all duration-300 hover:-translate-y-1 md:text-xl"
+          data-testid="contact-link"
+          href="mailto:creative.spider.hand@gmail.com"
         >
           [Contact]
-        </button>
+        </a>
       </div>
     </footer>
   </div>

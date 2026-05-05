@@ -10,6 +10,16 @@ const router = createRouter({
       component: () => import('@/pages/LandingPage.vue'),
     },
     {
+      path: '/terms',
+      name: 'terms',
+      component: () => import('@/pages/TermsPage.vue'),
+    },
+    {
+      path: '/privacy',
+      name: 'privacy',
+      component: () => import('@/pages/PrivacyPage.vue'),
+    },
+    {
       path: '/game',
       name: 'game',
       component: () => import('@/pages/GamePage.vue'),

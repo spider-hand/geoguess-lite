@@ -101,4 +101,29 @@ describe('LandingPage', () => {
     const getStartedButton = wrapper.find('[data-testid="get-started-button"]')
     expect(getStartedButton.attributes('disabled')).toBeUndefined()
   })
+
+  it('should navigate to terms page when Terms link is clicked', async () => {
+    const wrapper = mount(LandingPage)
+
+    const termsLink = wrapper.find('[data-testid="terms-link"]')
+    await termsLink.trigger('click')
+
+    expect(mockPush).toHaveBeenCalledWith({ name: 'terms' })
+  })
+
+  it('should navigate to privacy page when Privacy link is clicked', async () => {
+    const wrapper = mount(LandingPage)
+
+    const privacyLink = wrapper.find('[data-testid="privacy-link"]')
+    await privacyLink.trigger('click')
+
+    expect(mockPush).toHaveBeenCalledWith({ name: 'privacy' })
+  })
+
+  it('should render contact mailto link', () => {
+    const wrapper = mount(LandingPage)
+
+    const contactLink = wrapper.find('[data-testid="contact-link"]')
+    expect(contactLink.attributes('href')).toBe('mailto:creative.spider.hand@gmail.com')
+  })
 })
